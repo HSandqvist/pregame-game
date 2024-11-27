@@ -1,6 +1,6 @@
 # Pregame^2
 
-This is skeleton code for building "real-time" quiz and polling tools. The code is intended for quick prototyping and for learning (user) interface programming.
+This is the code for the project in [Interface Programming with a User Perspective](https://www.uu.se/en/study/course?query=1MD031) at Uppsala university.
 
 ## Customize configuration
 
