@@ -1,4 +1,4 @@
-# Pregame-game
+# Pregame-gam
 
 This is skeleton code for building "real-time" quiz and polling tools. The code is intended for quick prototyping and for learning (user) interface programming.
 
