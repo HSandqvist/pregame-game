@@ -28,7 +28,8 @@
     <input type="text" v-model="newPollId">
   </label>
   <router-link v-bind:to="'/lobby/' + newPollId">
-    {{ uiLabels.participatePoll }}
+    {{ uiLabels.participatePoll }}¨
+    
   </router-link>
 </template>
 
