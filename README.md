@@ -1,6 +1,6 @@
-# Pregame^2
+# PreGame^2
 
-This is the code for the project in [Interface Programming with a User Perspective](https://www.uu.se/en/study/course?query=1MD031) at Uppsala university.
+This is the code for the project in [Interface Programming with a User Perspective](https://www.uu.se/en/study/course?query=1MD031) at Uppsala university. Our project is a game called *PreGame<sup>2*, which you can play together with your friends and family.
 
 ## Customize configuration
 
