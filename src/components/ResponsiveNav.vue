@@ -1,5 +1,7 @@
 <template>
+  <!-- Navigation bar -->
   <nav v-bind:class="{'hide': hideNav}">
+    <!-- Slot for dynamically injecting content into the navigation -->
     <slot>
     </slot>
   </nav>
@@ -10,7 +12,7 @@
 export default {
   name: 'ResponsiveNav',
   props: {
-      hideNav: Boolean
+      hideNav: Boolean // Boolean prop to control whether the navigation is hidden
   }
 }
 </script>
@@ -35,6 +37,7 @@ export default {
     border-left: 1px solid gray;
   }
 
+/* Media query for screens with a width of 50em or less */
 @media screen and (max-width:50em) {
   nav {
     position: absolute;
@@ -46,6 +49,7 @@ export default {
     grid-template-rows: repeat(auto-fit, 2em);
     transition: 0.5s;
   }
+  /* Adjust slotted link styles for smaller screens */
   nav ::v-slotted(a) {
     justify-content: left;
     padding-left: 1em;
