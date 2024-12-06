@@ -1,7 +1,6 @@
-# Pregame-game
+# PreGame^2
 
-This is skeleton code for building "real-time" quiz and polling tools. The code is intended for quick prototyping and for learning (user) interface programming.
-
+This is the code for the project in [Interface Programming with a User Perspective](https://www.uu.se/en/study/course?query=1MD031) at Uppsala university. Our project is a game called *PreGame<sup>2*, which you can play together with your friends and family.
 
 ## Customize configuration
 
