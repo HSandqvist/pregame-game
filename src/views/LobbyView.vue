@@ -1,21 +1,36 @@
 <template>
   <div>
     {{pollId}}
+
     <!-- Show the participation form if the user has not joined -->
+
     <div v-if="!joined">
+      <p>
+        <h1> 
+      Please enter your name:
+    </h1>
+      </p>
       <!-- Input field for the user to enter their name -->
       <input type="text" v-model="userName">
+
       <!-- Button to join the poll -->
-      <button v-on:click="participateInPoll">
+      <button v-on:click="participateInPoll" id="submitNameButton" >
+        Submit
         {{ this.uiLabels.participateInPoll }}
       </button>
     </div>
     <!-- Show this section if the user has joined the poll -->
     <div v-if="joined">
-      <p>Waiting for host to start poll</p>
+      <p>Waiting for host to start poll...</p>
       <!-- Display the list of participants -->
-      {{ participants }}
+       <p>
+        {{ participants }}
+       </p>
+       <p>
+        {{ participants.length }}
+       </p>
   </div>
+
   </div>
 </template>
 
@@ -59,3 +74,14 @@ export default {
   }
 }
 </script>
+
+<style>
+
+#submitNameButton{
+  font-size: 25px;
+  font-family: "Times New Roman", Times, serif;
+  color: rgb(139, 5, 142);
+  cursor: pointer;
+}
+
+</style>
