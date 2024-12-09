@@ -1,11 +1,11 @@
 {
 	"sales-pitch": "Simply. Great. Polling.",
-	"subHeading": "A simple polling tool",
-	"invite": "Invite participants with this link:",
-	"createPoll": "Create poll",
-	"participatePoll": "Participate in poll",
+	"subHeading": "A Game for Pregames",
+	"invite": "Invite participants:",
+	"createGame": "Create Game",
+	"participateGame": "Join Game",
 	"question": "Question",
 	"changeLanguage": "Byt till svenska",
 	"about": "About",
-	"participateInPoll": "Participate in in poll"
+	"participateInGame": "Participate in game"
 }
