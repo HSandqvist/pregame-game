@@ -12,10 +12,10 @@
     <!-- Buttons for creating and joining a game -->
     <div class="action-buttons">
       <router-link class="btn" to="/create/">
-        {{ uiLabels.createPoll || "Create Game" }}
+        {{ uiLabels.createGame || "Create Game" }}
       </router-link>
       <router-link class="btn" to="/lobby/">
-        {{ uiLabels.participatePoll || "Join Game" }}
+        {{ uiLabels.participateGame || "Join Game" }}
       </router-link>
     </div>
   </div>
