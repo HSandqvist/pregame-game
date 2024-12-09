@@ -15,7 +15,6 @@
 
       <!-- Button to join the poll -->
       <button v-on:click="participateInPoll" id="submitNameButton" >
-        Submit
         {{ this.uiLabels.participateInPoll }}
       </button>
     </div>
@@ -29,8 +28,15 @@
        <p>
         {{ participants.length }}
        </p>
+      
   </div>
-
+  <div v-if="isAdmin">
+          
+       </div>
+       <button v-on:click="startGame" id="startGameButton" >
+        Start Game
+        {{ this.uiLabels.startGame }}
+      </button>
   </div>
 </template>
 
@@ -48,7 +54,8 @@ export default {
       uiLabels: {}, // UI labels for different langs
       joined: false,
       lang: localStorage.getItem("lang") || "en", // Lang preference
-      participants: []
+      participants: [],
+      isAdmin: true,
     }
   },
   created: function () {
@@ -70,6 +77,9 @@ export default {
       // Notify the server of participation
       socket.emit( "participateInPoll", {pollId: this.pollId, name: this.userName} )
       this.joined = true;
+    },
+    startGame: function() {
+      socket.emit()
     }
   }
 }
