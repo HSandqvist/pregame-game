@@ -1,98 +1,110 @@
 'use strict';
-import {readFileSync} from "fs";
+import { readFileSync } from "fs"; // Import the readFileSync function for reading files
 
-// Store data in an object to keep the global namespace clean. In an actual implementation this would be interfacing a database...
+// Define a Data class to encapsulate poll data and keep the global namespace clean.
+// In a real-world scenario, this would interface with a database.
 function Data() {
-  this.polls = {};
+  this.polls = {}; // Object to store all polls
+  // Initialize with a sample poll for testing purposes
   this.polls['test'] = {
-    lang: "en",
-    questions: [
-      {q: "How old are you?", 
-       a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
+    lang: "en", // Language for the poll
+    questions: [ // Array of questions
+      {
+        q: "How old are you?", // Question text
+        a: ["0-13", "14-18", "19-25", "26-35", "36-45", "45-"] // Answer options
       },
-      {q: "How much do you enjoy coding?", 
-       a: ["1", "2", "3", "4", "5"]
+      {
+        q: "How much do you enjoy coding?", // Another question
+        a: ["1", "2", "3", "4", "5"] // Answer options
       }
     ],
-    answers: [],
-    currentQuestion: 0,
-    participants: []
-  }
+    answers: [], // Placeholder for submitted answers
+    currentQuestion: 0, // Index of the current question
+    participants: [] // Array of participants in the poll
+  };
 }
 
 /***********************************************
 For performance reasons, methods are added to the
-prototype of the Data object/class
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
+prototype of the Data object/class.
 ***********************************************/
 
+// Check if a poll exists by its ID
 Data.prototype.pollExists = function (pollId) {
-  return typeof this.polls[pollId] !== "undefined"
-}
+  return typeof this.polls[pollId] !== "undefined";
+};
 
+// Load UI labels from a JSON file based on the specified language
 Data.prototype.getUILabels = function (lang) {
-  //check if lang is valid before trying to load the dictionary file
-  if (!["en", "sv"].some( el => el === lang))
-    lang = "en";
+  // Default to "en" if the language is invalid
+  if (!["en", "sv"].some(el => el === lang)) lang = "en";
+  // Read the appropriate labels file
   const labels = readFileSync("./server/data/labels-" + lang + ".json");
-  return JSON.parse(labels);
-}
+  return JSON.parse(labels); // Parse and return the labels as an object
+};
 
-Data.prototype.createPoll = function(pollId, lang="en") {
+// Create a new poll if it doesn't already exist
+Data.prototype.createPoll = function (pollId, lang = "en") {
   if (!this.pollExists(pollId)) {
-    let poll = {};
-    poll.lang = lang;  
-    poll.questions = [];
-    poll.answers = [];
-    poll.participants = [];
-    poll.currentQuestion = 0;              
-    this.polls[pollId] = poll;
+    let poll = {
+      lang: lang, // Poll language
+      questions: [], // Empty array for questions
+      answers: [], // Empty array for answers
+      participants: [], // Empty array for participants
+      currentQuestion: 0 // Start with the first question
+    };
+    this.polls[pollId] = poll; // Add the poll to the polls object
     console.log("poll created", pollId, poll);
   }
   return this.polls[pollId];
-}
+};
 
-Data.prototype.getPoll = function(pollId) {
+// Retrieve a poll by its ID
+Data.prototype.getPoll = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId];
   }
-  return {};
-}
+  return {}; // Return an empty object if the poll doesn't exist
+};
 
-Data.prototype.participateInPoll = function(pollId, name) {
+// Add a participant to a poll
+Data.prototype.participateInPoll = function (pollId, name) {
   console.log("participant will be added to", pollId, name);
   if (this.pollExists(pollId)) {
-    this.polls[pollId].participants.push({name: name, answers: []})
+    this.polls[pollId].participants.push({ name: name, answers: [] });
   }
-}
+};
 
-Data.prototype.getParticipants = function(pollId) {
-  const poll = this.polls[pollId];
+// Retrieve participants of a poll
+Data.prototype.getParticipants = function (pollId) {
   console.log("participants requested for", pollId);
-  if (this.pollExists(pollId)) { 
-    return this.polls[pollId].participants
+  if (this.pollExists(pollId)) {
+    return this.polls[pollId].participants;
   }
   return [];
-}
+};
 
-Data.prototype.addQuestion = function(pollId, q) {
+// Add a question to a poll
+Data.prototype.addQuestion = function (pollId, q) {
   if (this.pollExists(pollId)) {
     this.polls[pollId].questions.push(q);
   }
-}
+};
 
-Data.prototype.getQuestion = function(pollId, qId = null) {
+// Retrieve a specific question from a poll
+Data.prototype.getQuestion = function (pollId, qId = null) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     if (qId !== null) {
-      poll.currentQuestion = qId;
+      poll.currentQuestion = qId; // Update the current question index
     }
     return poll.questions[poll.currentQuestion];
   }
-  return {}
-}
+  return {}; // Return an empty object if the poll doesn't exist
+};
 
-Data.prototype.getSubmittedAnswers = function(pollId) {
+// Retrieve submitted answers for the current question of a poll
+Data.prototype.getSubmittedAnswers = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const answers = poll.answers[poll.currentQuestion];
@@ -100,31 +112,32 @@ Data.prototype.getSubmittedAnswers = function(pollId) {
       return answers;
     }
   }
-  return {}
-}
+  return {}; // Return an empty object if no answers are found
+};
 
-Data.prototype.submitAnswer = function(pollId, answer) {
+// Submit an answer to a poll
+Data.prototype.submitAnswer = function (pollId, answer) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     let answers = poll.answers[poll.currentQuestion];
-    // create answers object if no answers have yet been submitted
+
+    // Create an answers object if none exists
     if (typeof answers !== 'object') {
       answers = {};
       answers[answer] = 1;
       poll.answers.push(answers);
     }
-    // create answer property if that specific answer has not yet been submitted
+    // Add a new answer property if it doesn't exist
     else if (typeof answers[answer] === 'undefined') {
       answers[answer] = 1;
     }
-    // if the property already exists, increase the number
-    else
-      answers[answer] += 1
+    // Increment the count if the answer already exists
+    else {
+      answers[answer] += 1;
+    }
     console.log("answers looks like ", answers, typeof answers);
   }
-}
+};
 
+// Export the Data class
 export { Data };
-
-
-
