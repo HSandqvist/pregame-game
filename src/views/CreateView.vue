@@ -10,7 +10,7 @@
         <button v-on:click="setAmountQuestions(10)">10</button>
         <button v-on:click="setAmountQuestions(15)">15</button>
       </div>
-      <button v-on:click="nextStep"> Next </button>
+      <button v-on:click="nextStep">Next</button>
     </div>
 
     <!-- Step 2: Select time per question -->
@@ -21,11 +21,15 @@
         <button v-on:click="setTimePerQuestion(20)">20 seconds</button>
         <button v-on:click="setTimePerQuestion(30)">30 seconds</button>
       </div>
+      <button v-on:click="backStep">Back</button>
       <button v-on:click="nextStep">Next</button>
     </div>
 
     <div v-else-if="step === 3" class="create-game-section">
-      <button v-on:click="createPoll()"> Create Game </button>
+      <div id="create-game-section-buttons">
+        <button v-on:click="createPoll()">Create Game</button>
+        <button v-on:click="backStep">Back</button>
+      </div>
     </div>
 
     <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
@@ -38,7 +42,6 @@
         Data: {{ pollData }}
       </div>
     </div>
-
   </div>
 </template>
 
@@ -53,6 +56,7 @@ export default {
     return {
       step: 1, // Current step of the game creation process
       lang: localStorage.getItem("lang") || "en",
+      thePollId: "",
       pollId: "",
       setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
@@ -94,14 +98,23 @@ export default {
       this.step++;
     },
 
+    backStep: function () {
+      //move back one step
+      this.step--;
+    },
+
     //When clicked you should be redirected to lobby
     // Emits an event to create a poll and join it
     createPoll: function () {
+      // Generate a new poll ID if it hasn't been created
+      this.generatePollID();
+
+      // Emit events using the generated poll ID
       socket.emit("createPoll", { pollId: this.pollId, lang: this.lang });
       socket.emit("joinPoll", this.pollId);
 
-       // Redirect to the lobby route
-       this.$router.push(`/lobby/${this.pollId}`);
+      // Redirect to the lobby route
+      this.$router.push(`/lobby/${this.pollId}`);
     },
 
     // Emits an event to start the poll
@@ -136,6 +149,7 @@ body {
 }
 
 /* Button styling */
+/* Add spacing and positioning for buttons */
 button {
   padding: 10px 20px;
   background-color: #007bff;
@@ -143,11 +157,36 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin: 10px; /* Add spacing around each button */
 }
 
 button:hover {
   background-color: #0056b3;
 }
+
+/* Create a container for buttons to manage spacing */
+.amount-questions-buttons,
+.time-per-question-buttons,
+#create-game-section-buttons {
+  display: flex;
+  justify-content: center; /* Center align the buttons */
+  gap: 20px; /* Add space between buttons */
+  margin-top: 20px; /* Move buttons further down */
+}
+
+/* For step 3 buttons extra styling */
+#create-game-section-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center; /* Center align the buttons */
+  gap: 10px; /* Add space between the buttons */
+  margin-top: 50px; /* Add space from the top */
+}
+
+#create-game-section-buttons button {
+  width: auto; /* Ensure buttons retain their default width */
+}
+
 
 .create-game {
   padding: 20px; /* Space around the entire container */
@@ -160,13 +199,6 @@ button:hover {
   display: block;
   margin-bottom: 10px; /* Space between the label and buttons */
 }
-
-/* Add spacing between buttons */
-.amount-questions-buttons button,
-.time-per-question-buttons button {
-  margin: 5px; /* Add spacing around each button */
-}
-
 
 /* Styling for inputs */
 input[type="text"],
