@@ -13,38 +13,26 @@
     <div v-else-if="step === 2" class="camera-container">
       <h1>Capture your avatar:</h1>
       <video ref="video" width="320" height="240" autoplay></video>
-      <button @click="captureImage" id="captureButton">Capture Image</button>
-      <button v-on:click="backStep">Back</button>
+      <button v-on:click="startCamera"> Start Camera </button>
+      <button v-on:click="captureImage"> Take Picture </button>
+      <button v-on:click="nextStep" :disabled="!isPictureTaken"> Next </button>
+      <button v-on:click="backStep"> Back </button>
     </div>
 
-    <!-- Step 3: Display captured avatar -->
+    <!-- Step 3: Display captured avatar and submit -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>Your Avatar:</h1>
+      <h1>Your Avatar: {{ this.userName }} </h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
-      <button v-on:click="nextStep" :disabled="!avatar">Next</button>
-      <button v-on:click="backStep">Back</button>
-    </div>
 
-    <!-- Step 4: Avatar upload if no camera capture -->
-    <div v-else-if="step === 4" class="avatar-upload-section">
-      <h1>Upload an Avatar (optional):</h1>
-      <input
-        type="file"
-        @change="handleAvatarUpload"
-        accept="image/*"
-        v-if="!avatar"
-      />
-      <button v-on:click="nextStep" :disabled="!avatar">Next</button>
-      <button v-on:click="backStep">Back</button>
-    </div>
-
-    <!-- Step 5: Submit participation -->
-    <div v-else-if="step === 5" class="submit-section">
-      <button v-on:click="participateInPoll" id="submitNameButton">
-        Submit
+      <div class="submit-section"> 
+        <button v-on:click="participateInPoll" id="submitNameButton">
+        READY
         {{ this.uiLabels.participateInPoll }}
       </button>
+      <button v-on:click="backStep"> Back </button>
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -65,6 +53,8 @@ export default {
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
       stream: null, // The video stream to access the camera
+
+      isPictureTaken: false, //Tracks that camera is closed and picture taken
     };
   },
   created: function () {
@@ -91,6 +81,7 @@ export default {
     backStep() {
       if (this.step > 1) {
         this.step--;
+        this.isPictureTaken=false;
       }
     },
     // Start the camera stream
@@ -120,6 +111,8 @@ export default {
     captureImage() {
       const video = this.$refs.video;
 
+      this.isPictureTaken = true;
+
       if (video && video.videoWidth > 0 && video.videoHeight > 0) {
         // Create a canvas to capture the image
         const canvas = document.createElement("canvas");
@@ -138,6 +131,7 @@ export default {
 
         // Stop the camera stream after capturing the image
         this.stopCamera();
+
       } else {
         console.error("Video stream is not available.");
       }
@@ -165,14 +159,6 @@ export default {
         avatar: this.avatar,
       });
       this.joined = true;
-    },
-  },
-  watch: {
-    // Automatically start the camera when Step 2 is active
-    step(newStep) {
-      if (newStep === 2) {
-        this.startCamera();
-      }
     },
   },
 };
