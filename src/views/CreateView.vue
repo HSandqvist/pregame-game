@@ -1,5 +1,4 @@
 <template>
-
   <body>
     <div class="create-game">
       <h1 id="create-game-headline">Create game</h1>
@@ -8,41 +7,48 @@
       <div v-if="step === 1" class="amount-questions-section">
         <h2> Number of questions: </h2>
         <div class="amount-questions-buttons">
-        <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
-        <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
-        <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
+          <button
+            v-for="count in [5, 10, 15]"
+            :key="count"
+            @click="tempQuestionsCount = count"
+            :class="{ selected: tempQuestionsCount === count }"
+          >
+            {{ count }}
+          </button>
+        </div>
+        <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
+          Next
+        </button>
       </div>
-
-      <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
-    </div>
 
       <!-- Step 2: Select time per question -->
       <div v-else-if="step === 2" class="time-per-question-section">
         <h2>Seconds per question:</h2>
         <div class="time-per-question-buttons">
-          <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10</button>
-          <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20</button>
-          <button :class="{ selected: selectedTime === 30 }" v-on:click="setTimePerQuestion(30)">30</button>
+          <button
+            v-for="time in [10, 20, 30]"
+            :key="time"
+            @click="tempTimePerQuestion = time"
+            :class="{ selected: tempTimePerQuestion === time }"
+          >
+            {{ time }}
+          </button>
         </div>
-       
-        <button v-on:click="backStep">Back</button>
-        <button v-on:click="createPoll()":disabled="!isTimeSet">Create game</button>
+        <button @click="backStep">Back</button>
+        <button @click="finalizeTime" :disabled="!tempTimePerQuestion">
+          Create game
+        </button>
       </div>
 
-      <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
+      <!-- Step 3: Display poll data -->
       <div v-else class="poll-container">
-        <!-- Poll Data Display -->
         <div class="poll-data-section">
-          <!-- Link to view poll results -->
-          <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
-          <!-- Display poll data -->
+          <router-link :to="'/result/' + pollId">Check result</router-link>
           Data: {{ pollData }}
         </div>
       </div>
-
-  </div>
+    </div>
   </body>
-
 </template>
 
 <script>
@@ -56,13 +62,17 @@ export default {
     return {
       step: 1, // Current step of the game creation process
       lang: localStorage.getItem("lang") || "en",
-      thePollId: "",
       pollId: "",
-      setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
-      isQuestionsSet: false, // Tracks if questions are set
-      isTimeSet: false, // Tracks if time is set
+
+      // Temporary values for selections
+      tempQuestionsCount: null,
+      tempTimePerQuestion: null,
+
+      // Finalized values for the poll
+      selectedQuestionCount: null,
+      selectedTime: null,
     };
   },
 
@@ -70,71 +80,53 @@ export default {
     // Listen for incoming events from the server
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
     socket.on("pollData", (data) => (this.pollData = data));
-    socket.on("participantsUpdate", (p) => (this.pollData.participants = p));
-    // Request UI labels from the server based on the selected language
     socket.emit("getUILabels", this.lang);
   },
 
   methods: {
     generatePollID: function () {
-      // Generate a random number between 100000 and 999999
       this.pollId = Math.floor(100000 + Math.random() * 900000).toString();
     },
 
-    setAmountQuestions: function (count) {
-      // Emit the selected number of random questions to the server
-      this.selectedQuestionCount = count; // Spara vald knapp
-      this.setQuestionsCount = count;
-      this.isQuestionsSet = true; // Mark questions as set
-      socket.emit("setAmountQuestions", { pollId: this.pollId, count: count });
-      console.log(`Question count set to: ${count}`);
+    finalizeQuestions: function () {
+      this.selectedQuestionCount = this.tempQuestionsCount;
+      socket.emit("setAmountQuestions", {
+        pollId: this.pollId,
+        count: this.selectedQuestionCount,
+      });
+      this.nextStep();
     },
 
-    setTimePerQuestion: function (time) {
-      // Emit the selected time for every question to the server
-      this.selectedTime = time; // Spara vald knapp
-      this.timePerQuestion = time;
-      this.isTimeSet = true; // Mark time as set
-      socket.emit("setTimePerQuestion", { pollId: this.pollId, time: time });
-      console.log(`Time per question set to: ${time} seconds`);
+    finalizeTime: function () {
+      this.selectedTime = this.tempTimePerQuestion;
+      socket.emit("setTimePerQuestion", {
+        pollId: this.pollId,
+        time: this.selectedTime,
+      });
+      this.createPoll();
     },
 
     nextStep: function () {
-      //move to next step
       this.step++;
     },
 
     backStep: function () {
-      //move back one step
       this.step--;
     },
 
-    //When clicked you should be redirected to lobby
-    // Emits an event to create a poll and join it
     createPoll: function () {
-      // Generate a new poll ID if it hasn't been created
       this.generatePollID();
-
-      // Emit events using the generated poll ID
       socket.emit("createPoll", { pollId: this.pollId, lang: this.lang });
       socket.emit("joinPoll", this.pollId);
-
-      // Redirect to the lobby route
       this.$router.push(`/lobby/${this.pollId}`);
-    },
-
-    // Emits an event to start the poll
-    startPoll: function () {
-      socket.emit("startPoll", this.pollId);
     },
   },
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap');
-
-/* Center the main application */
+/* @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap'); */
+/* General styling */
 body {
   margin: 0;
   display: flex;
@@ -146,37 +138,20 @@ body {
   color: white;
 }
 
-h1 {
+/* h1 {
   font-family: "Limelight", sans-serif;
-  font-weight: bold;
-  font-style: 400;
   font-size: 50pt;
   margin-bottom: 10px;
-}
+} */
 
-h2 {
+/* h2 {
   font-family: "Truculenta", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: normal;
-  font-style: normal;
   margin-top: -10px;
-}
+} */
 
-/* Container for the poll interface */
-.poll-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* Button styling */
-/* Add spacing and positioning for buttons */
+/* Buttons */
 button {
-  padding: 10px 20px;
+  padding: 15px 30px;
   background-color: pink;
   color: white;
   border: none;
@@ -185,19 +160,7 @@ button {
   font-size: 18px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  padding: 15px 30px;
   transition: all 0.2s ease;
-}
-
-.next-button {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.next-button.visible {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 button:hover {
@@ -209,74 +172,17 @@ button.selected {
   border: 2px solid white;
 }
 
-/* Style for disabled buttons */
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Create a container for buttons to manage spacing */
+/* Button groups */
 .amount-questions-buttons,
-.time-per-question-buttons,
-#create-game-section-buttons {
+.time-per-question-buttons {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
-}
-
-/* For step 3 buttons extra styling */
-#create-game-section-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 50px;
-}
-
-#create-game-section-buttons button {
-  width: auto;
-}
-
-.create-game {
-  padding: 20px;
-  text-align: center;
-  transform: translateY(-20%);
-}
-
-/* Add spacing between the label and buttons */
-.amount-questions-section label,
-.time-per-question-section label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-/* Add spacing between buttons */
-.amount-questions-buttons button,
-.time-per-question-buttons button {
-  margin: 5px;
-  margin-bottom: 15px;
-}
-
-/* Styling for inputs */
-input[type="text"],
-input[type="number"] {
-  padding: 8px;
-  width: 100%;
-  max-width: 400px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-top: 5px;
-}
-
-/* Link styling */
-.poll-data-section a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.poll-data-section a:hover {
-  text-decoration: underline;
 }
 </style>
