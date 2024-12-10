@@ -1,97 +1,210 @@
 <template>
   <div>
-    {{pollId}}
+    {{ pollId }}
 
-    <!-- Show the participation form if the user has not joined -->
+    <!-- Step 1: Enter your name -->
+    <div v-if="step === 1" class="name-entry-section">
+      <h1>Please enter your name:</h1>
+      <input type="text" v-model="userName" />
+      <button v-on:click="nextStep" :disabled="!userName">Next</button>
+    </div>
 
-    <div v-if="!joined">
-      <p>
-        <h1> 
-      Please enter your name:
-    </h1>
-      </p>
-      <!-- Input field for the user to enter their name -->
-      <input type="text" v-model="userName">
+    <!-- Step 2: Capture avatar from the camera -->
+    <div v-else-if="step === 2" class="camera-container">
+      <h1>Capture your avatar:</h1>
+      <video ref="video" width="320" height="240" autoplay></video>
+      <button @click="captureImage" id="captureButton">Capture Image</button>
+      <button v-on:click="backStep">Back</button>
+    </div>
 
-      <!-- Button to join the poll -->
-      <button v-on:click="participateInPoll" id="submitNameButton" >
+    <!-- Step 3: Display captured avatar -->
+    <div v-else-if="step === 3" class="avatar-container">
+      <h1>Your Avatar:</h1>
+      <img :src="avatar" alt="User Avatar" class="avatar" />
+      <button v-on:click="nextStep" :disabled="!avatar">Next</button>
+      <button v-on:click="backStep">Back</button>
+    </div>
+
+    <!-- Step 4: Avatar upload if no camera capture -->
+    <div v-else-if="step === 4" class="avatar-upload-section">
+      <h1>Upload an Avatar (optional):</h1>
+      <input
+        type="file"
+        @change="handleAvatarUpload"
+        accept="image/*"
+        v-if="!avatar"
+      />
+      <button v-on:click="nextStep" :disabled="!avatar">Next</button>
+      <button v-on:click="backStep">Back</button>
+    </div>
+
+    <!-- Step 5: Submit participation -->
+    <div v-else-if="step === 5" class="submit-section">
+      <button v-on:click="participateInPoll" id="submitNameButton">
+        Submit
         {{ this.uiLabels.participateInPoll }}
       </button>
     </div>
-    <!-- Show this section if the user has joined the poll -->
-    <div v-if="joined">
-      <p>Waiting for host to start poll...</p>
-      <!-- Display the list of participants -->
-       <p>
-        {{ participants }}
-       </p>
-       <p>
-        {{ participants.length }}
-       </p>
-      
-  </div>
-  <div v-if="isAdmin">
-          
-       </div>
-       <button v-on:click="startGame" id="startGameButton" >
-        Start Game
-        {{ this.uiLabels.startGame }}
-      </button>
   </div>
 </template>
 
 <script>
-import io from 'socket.io-client';
-// Initialize the WebSocket connection to the server
+import io from "socket.io-client";
 const socket = io("localhost:3000");
 
 export default {
-  name: 'LobbyView',
+  name: "LobbyView",
   data: function () {
     return {
-      userName: "",
-      pollId: "inactive poll",
-      uiLabels: {}, // UI labels for different langs
-      joined: false,
-      lang: localStorage.getItem("lang") || "en", // Lang preference
+      step: 1, // Tracks the current step
+      userName: "", // User's name
+      pollId: "inactive poll", // Placeholder for poll ID
+      uiLabels: {}, // UI labels for different languages
+      joined: false, // If the user has joined
+      avatar: null, // Avatar image data
+      lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
-      isAdmin: true,
-    }
+      stream: null, // The video stream to access the camera
+    };
   },
   created: function () {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
     // Listen for server events
-    socket.on( "uiLabels", labels => this.uiLabels = labels ); // Update UI labels
-    socket.on( "participantsUpdate", p => this.participants = p ); // Update participants list
+    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
     // Navigate to the poll page when the poll starts
-    socket.on( "startPoll", () => this.$router.push("/poll/" + this.pollId) );
+    socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit( "joinPoll", this.pollId );
-    socket.emit( "getUILabels", this.lang );
+    socket.emit("joinPoll", this.pollId);
+    socket.emit("getUILabels", this.lang);
   },
   methods: {
-    // Method to participate in the poll
-    participateInPoll: function () {
-      // Notify the server of participation
-      socket.emit( "participateInPoll", {pollId: this.pollId, name: this.userName} )
+    // Move to the next step
+    nextStep() {
+      if (this.step < 5) {
+        this.step++;
+      }
+    },
+    // Move to the previous step
+    backStep() {
+      if (this.step > 1) {
+        this.step--;
+      }
+    },
+    // Start the camera stream
+    startCamera() {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          this.stream = stream;
+          this.$refs.video.srcObject = stream;
+          console.log("Camera stream is active:", stream);
+        })
+        .catch((error) => {
+          console.error("Error accessing camera:", error);
+          alert(
+            "Unable to access the camera. Please check your camera settings."
+          );
+        });
+    },
+    // Stop the camera stream
+    stopCamera() {
+      if (this.stream) {
+        const tracks = this.stream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+    },
+    // Capture the image from the video stream
+    captureImage() {
+      const video = this.$refs.video;
+
+      if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+        // Create a canvas to capture the image
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Get the context and draw the video frame to the canvas
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert canvas to a base64 image string
+        this.avatar = canvas.toDataURL("image/png");
+
+        // Log to check the base64 image
+        console.log("Captured Avatar: ", this.avatar);
+
+        // Stop the camera stream after capturing the image
+        this.stopCamera();
+      } else {
+        console.error("Video stream is not available.");
+      }
+    },
+    // Handle manual avatar upload
+    handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.avatar = reader.result;
+        };
+        reader.readAsDataURL(file); // Convert image to base64
+      }
+    },
+    // Participate in the poll
+    participateInPoll() {
+      if (!this.avatar) {
+        alert("Please select or capture an avatar!");
+        return;
+      }
+      socket.emit("participateInPoll", {
+        pollId: this.pollId,
+        name: this.userName,
+        avatar: this.avatar,
+      });
       this.joined = true;
     },
-    startGame: function() {
-      socket.emit()
-    }
-  }
-}
+  },
+  watch: {
+    // Automatically start the camera when Step 2 is active
+    step(newStep) {
+      if (newStep === 2) {
+        this.startCamera();
+      }
+    },
+  },
+};
 </script>
 
-<style>
-
-#submitNameButton{
-  font-size: 25px;
-  font-family: "Times New Roman", Times, serif;
-  color: rgb(139, 5, 142);
-  cursor: pointer;
+<style scoped>
+/* Add styles for each section as needed */
+.avatar-container,
+.camera-container,
+.name-entry-section,
+.avatar-upload-section,
+.submit-section {
+  margin-bottom: 20px;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Avatar styles */
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+/* Camera styling */
+video {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
 </style>
