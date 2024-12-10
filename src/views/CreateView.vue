@@ -10,7 +10,7 @@
         <button v-on:click="setAmountQuestions(10)">10</button>
         <button v-on:click="setAmountQuestions(15)">15</button>
       </div>
-      <button v-on:click="nextStep">Next</button>
+      <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
     </div>
 
     <!-- Step 2: Select time per question -->
@@ -22,7 +22,7 @@
         <button v-on:click="setTimePerQuestion(30)">30 seconds</button>
       </div>
       <button v-on:click="backStep">Back</button>
-      <button v-on:click="nextStep">Next</button>
+      <button v-on:click="nextStep" :disabled="!isTimeSet">Next</button>
     </div>
 
     <div v-else-if="step === 3" class="create-game-section">
@@ -61,6 +61,9 @@ export default {
       setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
+
+      isQuestionsSet: false, // Tracks if questions are set
+      isTimeSet: false, // Tracks if time is set
     };
   },
 
@@ -82,6 +85,7 @@ export default {
     setAmountQuestions: function (count) {
       // Emit the selected number of random questions to the server
       this.setQuestionsCount = count;
+      this.isQuestionsSet = true; // Mark questions as set
       socket.emit("setAmountQuestions", { pollId: this.pollId, count: count });
       console.log(`Question count set to: ${count}`);
     },
@@ -89,6 +93,7 @@ export default {
     setTimePerQuestion: function (time) {
       // Emit the selected time for every question to the server
       this.timePerQuestion = time;
+      this.isTimeSet = true; // Mark time as set
       socket.emit("setTimePerQuestion", { pollId: this.pollId, time: time });
       console.log(`Time per question set to: ${time} seconds`);
     },
@@ -164,6 +169,12 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Style for disabled buttons */
+button:disabled {
+  opacity: 0.5; /* Make the button a bit transparent */
+  cursor: not-allowed; /* Change the cursor to show it's disabled */
+}
+ß
 /* Create a container for buttons to manage spacing */
 .amount-questions-buttons,
 .time-per-question-buttons,
@@ -186,7 +197,6 @@ button:hover {
 #create-game-section-buttons button {
   width: auto; /* Ensure buttons retain their default width */
 }
-
 
 .create-game {
   padding: 20px; /* Space around the entire container */
