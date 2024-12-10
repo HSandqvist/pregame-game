@@ -12,6 +12,7 @@
         <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
         <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
       </div>
+
       <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
     </div>
 
@@ -60,11 +61,8 @@ export default {
       setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
-
-
       isQuestionsSet: false, // Tracks if questions are set
       isTimeSet: false, // Tracks if time is set
-
     };
   },
 
@@ -148,7 +146,6 @@ body {
   color: white;
 }
 
-
 h1 {
   font-family: "Limelight", sans-serif;
   font-weight: bold;
@@ -164,7 +161,6 @@ h2 {
   font-style: normal;
   margin-top: -10px;
 }
-
 
 /* Container for the poll interface */
 .poll-container {
@@ -186,32 +182,22 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-
   font-size: 18px;
-  /* Öka textstorleken */
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   padding: 15px 30px;
   transition: all 0.2s ease;
-  /* Mjuk övergång vid hover */
-
 }
 
 .next-button {
   opacity: 0;
-  /* Dold standard */
   pointer-events: none;
-  /* Knappen är inte klickbar */
   transition: opacity 0.3s ease;
-  /* Smidig övergång */
 }
 
 .next-button.visible {
   opacity: 1;
-  /* Gör knappen synlig */
   pointer-events: auto;
-  /* Gör knappen klickbar */
-
 }
 
 button:hover {
@@ -220,44 +206,41 @@ button:hover {
 
 button.selected {
   background-color: rgb(255, 131, 203);
-  /* Grön bakgrund för valda knappar */
   border: 2px solid white;
 }
 
 /* Style for disabled buttons */
 button:disabled {
-  opacity: 0.5; /* Make the button a bit transparent */
-  cursor: not-allowed; /* Change the cursor to show it's disabled */
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-ß
+
 /* Create a container for buttons to manage spacing */
 .amount-questions-buttons,
 .time-per-question-buttons,
 #create-game-section-buttons {
   display: flex;
-  justify-content: center; /* Center align the buttons */
-  gap: 20px; /* Add space between buttons */
-  margin-top: 20px; /* Move buttons further down */
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 /* For step 3 buttons extra styling */
 #create-game-section-buttons {
   display: flex;
-  flex-direction: column; /* Stack buttons vertically */
-  align-items: center; /* Center align the buttons */
-  gap: 10px; /* Add space between the buttons */
-  margin-top: 50px; /* Add space from the top */
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 50px;
 }
 
 #create-game-section-buttons button {
-  width: auto; /* Ensure buttons retain their default width */
+  width: auto;
 }
 
 .create-game {
   padding: 20px;
-  /* Space around the entire container */
   text-align: center;
-  /* Ensure text is centered */
   transform: translateY(-20%);
 }
 
@@ -266,15 +249,12 @@ button:disabled {
 .time-per-question-section label {
   display: block;
   margin-bottom: 10px;
-  /* Space between the label and buttons */
 }
-
 
 /* Add spacing between buttons */
 .amount-questions-buttons button,
 .time-per-question-buttons button {
   margin: 5px;
-  /* Add spacing around each button */
   margin-bottom: 15px;
 }
 
