@@ -1,9 +1,7 @@
 <template>
   <div class="frontpage">
-    <!-- Button to toggle language -->
-    <button class="language-switcher" v-on:click="switchLanguage">
-      {{ lang === 'en' ? 'Switch to Swedish' : 'Switch to English' }}
-    </button>
+    <!-- Language switcher component -->
+    <LanguageSwitcher @language-changed="updateLanguage" />
 
     <!-- Title of the game -->
     <h1 class="game-title">Pregame<sup>2</sup></h1>
@@ -29,12 +27,14 @@
 <script>
 import io from "socket.io-client"; // Import WebSocket library
 import PinInput from "@/components/PinInput.vue"; // Import PinInput component
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 const socket = io("localhost:3000"); // Initialize WebSocket connection
 
 export default {
   name: "StartView",
   components: {
     PinInput,
+    LanguageSwitcher,
   },
   data: function () {
     return {
@@ -50,10 +50,9 @@ export default {
     socket.emit("getUILabels", this.lang);
   },
   methods: {
-    // Toggle between English and Swedish
-    switchLanguage: function () {
-      this.lang = this.lang === "en" ? "sv" : "en";
-      localStorage.setItem("lang", this.lang);
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
     // Show PIN entry form
@@ -87,23 +86,6 @@ export default {
   position: relative;
 }
 
-/* Button to switch languages */
-.language-switcher {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.language-switcher:hover {
-  background-color: #0056b3;
-}
-
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
@@ -129,8 +111,6 @@ export default {
   text-align: center;
   cursor: pointer;
 }
-
-/* Button hover effect */
 .btn:hover {
   background-color: #0056b3;
 }
