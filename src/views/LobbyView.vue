@@ -27,6 +27,7 @@
       <div class="submit-section"> 
         <button v-on:click="participateInPoll" id="submitNameButton">
         READY
+
         {{ this.uiLabels.participateInPoll }}
       </button>
       <button v-on:click="backStep"> Back </button>
@@ -44,6 +45,7 @@ export default {
   name: "LobbyView",
   data: function () {
     return {
+
       step: 1, // Tracks the current step
       userName: "", // User's name
       pollId: "inactive poll", // Placeholder for poll ID
@@ -162,6 +164,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <style scoped>
