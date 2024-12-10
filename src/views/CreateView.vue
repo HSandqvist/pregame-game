@@ -6,41 +6,27 @@
 
       <!-- Step 1: Select amount of questions -->
       <div v-if="step === 1" class="amount-questions-section">
-        <h2> Select number of questions: </h2>
+        <h2> Number of questions: </h2>
         <div class="amount-questions-buttons">
-          <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
-          <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
-          <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
-        </div>
-        <button class="next-button" v-show="true" :class="{ visible: selectedQuestionCount }"
-          v-on:click="nextStep">Next</button>
+        <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
+        <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
+        <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
       </div>
-
       <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
     </div>
 
       <!-- Step 2: Select time per question -->
       <div v-else-if="step === 2" class="time-per-question-section">
-        <h2>Select time per question (in seconds):</h2>
+        <h2>Seconds per question:</h2>
         <div class="time-per-question-buttons">
-          <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10 seconds</button>
-          <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20 seconds</button>
-          <button :class="{ selected: selectedTime === 30 }" v-on:click="setTimePerQuestion(30)">30 seconds</button>
+          <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10</button>
+          <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20</button>
+          <button :class="{ selected: selectedTime === 30 }" v-on:click="setTimePerQuestion(30)">30</button>
         </div>
-        <button class="next-button" v-show="true" :class="{ visible: selectedTime }" v-on:click="nextStep">Next</button>
-      </div>
-
-      <button v-on:click="backStep">Back</button>
-      <button v-on:click="nextStep" :disabled="!isTimeSet">Next</button>
-    </div>
-
-    <div v-else-if="step === 3" class="create-game-section">
-      <div id="create-game-section-buttons">
-        <button v-on:click="createPoll()">Create Game</button>
+       
         <button v-on:click="backStep">Back</button>
+        <button v-on:click="createPoll()":disabled="!isTimeSet">Create game</button>
       </div>
-    </div>
-
 
       <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
       <div v-else class="poll-container">
@@ -53,8 +39,7 @@
         </div>
       </div>
 
-
-    </div>
+  </div>
   </body>
 
 </template>
