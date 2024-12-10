@@ -1,26 +1,35 @@
 <template>
-  <div class="create-game">
-    <h1 id="create-game-headline">Create game</h1>
 
-    <!-- Step 1: Select amount of questions -->
-    <div v-if="step === 1" class="amount-questions-section">
-      <label> Select number of questions: </label>
-      <div class="amount-questions-buttons">
-        <button v-on:click="setAmountQuestions(5)">5</button>
-        <button v-on:click="setAmountQuestions(10)">10</button>
-        <button v-on:click="setAmountQuestions(15)">15</button>
+  <body>
+    <div class="create-game">
+      <h1 id="create-game-headline">Create game</h1>
+
+      <!-- Step 1: Select amount of questions -->
+      <div v-if="step === 1" class="amount-questions-section">
+        <h2> Select number of questions: </h2>
+        <div class="amount-questions-buttons">
+          <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
+          <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
+          <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
+        </div>
+        <button class="next-button" v-show="true" :class="{ visible: selectedQuestionCount }"
+          v-on:click="nextStep">Next</button>
       </div>
+
       <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
     </div>
 
-    <!-- Step 2: Select time per question -->
-    <div v-else-if="step === 2" class="time-per-question-section">
-      <label>Select time per question (in seconds):</label>
-      <div class="time-per-question-buttons">
-        <button v-on:click="setTimePerQuestion(10)">10 seconds</button>
-        <button v-on:click="setTimePerQuestion(20)">20 seconds</button>
-        <button v-on:click="setTimePerQuestion(30)">30 seconds</button>
+      <!-- Step 2: Select time per question -->
+      <div v-else-if="step === 2" class="time-per-question-section">
+        <h2>Select time per question (in seconds):</h2>
+        <div class="time-per-question-buttons">
+          <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10 seconds</button>
+          <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20 seconds</button>
+          <button :class="{ selected: selectedTime === 30 }" v-on:click="setTimePerQuestion(30)">30 seconds</button>
+        </div>
+        <button class="next-button" v-show="true" :class="{ visible: selectedTime }" v-on:click="nextStep">Next</button>
       </div>
+
       <button v-on:click="backStep">Back</button>
       <button v-on:click="nextStep" :disabled="!isTimeSet">Next</button>
     </div>
@@ -32,17 +41,22 @@
       </div>
     </div>
 
-    <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
-    <div v-else class="poll-container">
-      <!-- Poll Data Display -->
-      <div class="poll-data-section">
-        <!-- Link to view poll results -->
-        <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
-        <!-- Display poll data -->
-        Data: {{ pollData }}
+
+      <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
+      <div v-else class="poll-container">
+        <!-- Poll Data Display -->
+        <div class="poll-data-section">
+          <!-- Link to view poll results -->
+          <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
+          <!-- Display poll data -->
+          Data: {{ pollData }}
+        </div>
       </div>
+
+
     </div>
-  </div>
+  </body>
+
 </template>
 
 <script>
@@ -62,8 +76,10 @@ export default {
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
 
+
       isQuestionsSet: false, // Tracks if questions are set
       isTimeSet: false, // Tracks if time is set
+
     };
   },
 
@@ -84,6 +100,7 @@ export default {
 
     setAmountQuestions: function (count) {
       // Emit the selected number of random questions to the server
+      this.selectedQuestionCount = count; // Spara vald knapp
       this.setQuestionsCount = count;
       this.isQuestionsSet = true; // Mark questions as set
       socket.emit("setAmountQuestions", { pollId: this.pollId, count: count });
@@ -92,6 +109,7 @@ export default {
 
     setTimePerQuestion: function (time) {
       // Emit the selected time for every question to the server
+      this.selectedTime = time; // Spara vald knapp
       this.timePerQuestion = time;
       this.isTimeSet = true; // Mark time as set
       socket.emit("setTimePerQuestion", { pollId: this.pollId, time: time });
@@ -131,6 +149,8 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap');
+
 /* Center the main application */
 body {
   margin: 0;
@@ -138,9 +158,28 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f9f9f9;
+  background: linear-gradient(to right, rgb(210, 66, 133), purple);
   font-family: Arial, sans-serif;
+  color: white;
 }
+
+
+h1 {
+  font-family: "Limelight", sans-serif;
+  font-weight: bold;
+  font-style: 400;
+  font-size: 50pt;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-family: "Truculenta", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+  margin-top: -10px;
+}
+
 
 /* Container for the poll interface */
 .poll-container {
@@ -157,16 +196,47 @@ body {
 /* Add spacing and positioning for buttons */
 button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: pink;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin: 10px; /* Add spacing around each button */
+
+  font-size: 18px;
+  /* Öka textstorleken */
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  padding: 15px 30px;
+  transition: all 0.2s ease;
+  /* Mjuk övergång vid hover */
+
+}
+
+.next-button {
+  opacity: 0;
+  /* Dold standard */
+  pointer-events: none;
+  /* Knappen är inte klickbar */
+  transition: opacity 0.3s ease;
+  /* Smidig övergång */
+}
+
+.next-button.visible {
+  opacity: 1;
+  /* Gör knappen synlig */
+  pointer-events: auto;
+  /* Gör knappen klickbar */
+
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: rgb(255, 131, 203);
+}
+
+button.selected {
+  background-color: rgb(255, 131, 203);
+  /* Grön bakgrund för valda knappar */
+  border: 2px solid white;
 }
 
 /* Style for disabled buttons */
@@ -199,15 +269,28 @@ button:disabled {
 }
 
 .create-game {
-  padding: 20px; /* Space around the entire container */
-  text-align: center; /* Ensure text is centered */
+  padding: 20px;
+  /* Space around the entire container */
+  text-align: center;
+  /* Ensure text is centered */
+  transform: translateY(-20%);
 }
 
 /* Add spacing between the label and buttons */
 .amount-questions-section label,
 .time-per-question-section label {
   display: block;
-  margin-bottom: 10px; /* Space between the label and buttons */
+  margin-bottom: 10px;
+  /* Space between the label and buttons */
+}
+
+
+/* Add spacing between buttons */
+.amount-questions-buttons button,
+.time-per-question-buttons button {
+  margin: 5px;
+  /* Add spacing around each button */
+  margin-bottom: 15px;
 }
 
 /* Styling for inputs */
