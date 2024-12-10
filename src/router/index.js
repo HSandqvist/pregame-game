@@ -17,7 +17,7 @@ const router = createRouter({
     },
     {
       // Dynamic route for viewing a poll, with an `id` parameter
-      path: '/poll/:id',
+      path: '/poll/',
       name: 'PollView',
       // Lazy-load the PollView component to improve performance
       component: () => import('../views/PollView.vue')

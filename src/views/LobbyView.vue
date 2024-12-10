@@ -38,6 +38,7 @@
       <button v-on:click="backStep">Back</button>
     </div>
 
+
     <!-- Step 5: Submit participation -->
     <div v-else-if="step === 5" class="submit-section">
       <button v-on:click="participateInPoll" id="submitNameButton">
@@ -45,6 +46,7 @@
         {{ this.uiLabels.participateInPoll }}
       </button>
     </div>
+
   </div>
 </template>
 
@@ -56,6 +58,7 @@ export default {
   name: "LobbyView",
   data: function () {
     return {
+
       step: 1, // Tracks the current step
       userName: "", // User's name
       pollId: "inactive poll", // Placeholder for poll ID
@@ -166,16 +169,12 @@ export default {
       });
       this.joined = true;
     },
-  },
-  watch: {
-    // Automatically start the camera when Step 2 is active
-    step(newStep) {
-      if (newStep === 2) {
-        this.startCamera();
-      }
-    },
-  },
-};
+    startGame: function() {
+      socket.emit()
+    }
+  }
+}
+
 </script>
 
 <style scoped>
