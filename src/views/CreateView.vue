@@ -1,39 +1,31 @@
 <template>
+  <div class="create-game">
+    <h1 id="create-game-headline">Create game</h1>
 
-  <body>
-    <div class="create-game">
-      <h1 id="create-game-headline">Create game</h1>
-
-      <!-- Step 1: Select amount of questions -->
-      <div v-if="step === 1" class="amount-questions-section">
-        <h2> Select number of questions: </h2>
-        <div class="amount-questions-buttons">
-          <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
-          <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
-          <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
-        </div>
-        <button class="next-button" v-show="true" :class="{ visible: selectedQuestionCount }"
-          v-on:click="nextStep">Next</button>
+    <!-- Step 1: Select amount of questions -->
+    <div v-if="step === 1" class="amount-questions-section">
+      <h2>Select number of questions:</h2>
+      <div class="amount-questions-buttons">
+        <button v-on:click="setAmountQuestions(5)" :class="{ selected: selectedQuestionCount === 5 }">5</button>
+        <button v-on:click="setAmountQuestions(10)" :class="{ selected: selectedQuestionCount === 10 }">10</button>
+        <button v-on:click="setAmountQuestions(15)" :class="{ selected: selectedQuestionCount === 15 }">15</button>
       </div>
-
-      <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
+      <button class="next-button" v-show="true" :class="{ visible: selectedQuestionCount }" v-on:click="nextStep">Next</button>
     </div>
 
-      <!-- Step 2: Select time per question -->
-      <div v-else-if="step === 2" class="time-per-question-section">
-        <h2>Select time per question (in seconds):</h2>
-        <div class="time-per-question-buttons">
-          <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10 seconds</button>
-          <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20 seconds</button>
-          <button :class="{ selected: selectedTime === 30 }" v-on:click="setTimePerQuestion(30)">30 seconds</button>
-        </div>
-        <button class="next-button" v-show="true" :class="{ visible: selectedTime }" v-on:click="nextStep">Next</button>
+    <!-- Step 2: Select time per question -->
+    <div v-else-if="step === 2" class="time-per-question-section">
+      <h2>Select time per question (in seconds):</h2>
+      <div class="time-per-question-buttons">
+        <button v-on:click="setTimePerQuestion(10)" :class="{ selected: selectedTime === 10 }">10 seconds</button>
+        <button v-on:click="setTimePerQuestion(20)" :class="{ selected: selectedTime === 20 }">20 seconds</button>
+        <button v-on:click="setTimePerQuestion(30)" :class="{ selected: selectedTime === 30 }">30 seconds</button>
       </div>
-
+      <button class="next-button" v-show="true" :class="{ visible: selectedTime }" v-on:click="nextStep">Next</button>
       <button v-on:click="backStep">Back</button>
-      <button v-on:click="nextStep" :disabled="!isTimeSet">Next</button>
     </div>
 
+    <!-- Step 3: Create game -->
     <div v-else-if="step === 3" class="create-game-section">
       <div id="create-game-section-buttons">
         <button v-on:click="createPoll()">Create Game</button>
@@ -41,22 +33,14 @@
       </div>
     </div>
 
-
-      <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
-      <div v-else class="poll-container">
-        <!-- Poll Data Display -->
-        <div class="poll-data-section">
-          <!-- Link to view poll results -->
-          <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
-          <!-- Display poll data -->
-          Data: {{ pollData }}
-        </div>
+    <!-- Step 4: Display poll data -->
+    <div v-else class="poll-container">
+      <div class="poll-data-section">
+        <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
+        Data: {{ pollData }}
       </div>
-
-
     </div>
-  </body>
-
+  </div>
 </template>
 
 <script>
@@ -75,11 +59,8 @@ export default {
       setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
-
-
       isQuestionsSet: false, // Tracks if questions are set
       isTimeSet: false, // Tracks if time is set
-
     };
   },
 
@@ -163,7 +144,6 @@ body {
   color: white;
 }
 
-
 h1 {
   font-family: "Limelight", sans-serif;
   font-weight: bold;
@@ -179,7 +159,6 @@ h2 {
   font-style: normal;
   margin-top: -10px;
 }
-
 
 /* Container for the poll interface */
 .poll-container {
@@ -201,32 +180,22 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-
   font-size: 18px;
-  /* Öka textstorleken */
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   padding: 15px 30px;
   transition: all 0.2s ease;
-  /* Mjuk övergång vid hover */
-
 }
 
 .next-button {
   opacity: 0;
-  /* Dold standard */
   pointer-events: none;
-  /* Knappen är inte klickbar */
   transition: opacity 0.3s ease;
-  /* Smidig övergång */
 }
 
 .next-button.visible {
   opacity: 1;
-  /* Gör knappen synlig */
   pointer-events: auto;
-  /* Gör knappen klickbar */
-
 }
 
 button:hover {
@@ -235,44 +204,41 @@ button:hover {
 
 button.selected {
   background-color: rgb(255, 131, 203);
-  /* Grön bakgrund för valda knappar */
   border: 2px solid white;
 }
 
 /* Style for disabled buttons */
 button:disabled {
-  opacity: 0.5; /* Make the button a bit transparent */
-  cursor: not-allowed; /* Change the cursor to show it's disabled */
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-ß
+
 /* Create a container for buttons to manage spacing */
 .amount-questions-buttons,
 .time-per-question-buttons,
 #create-game-section-buttons {
   display: flex;
-  justify-content: center; /* Center align the buttons */
-  gap: 20px; /* Add space between buttons */
-  margin-top: 20px; /* Move buttons further down */
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 /* For step 3 buttons extra styling */
 #create-game-section-buttons {
   display: flex;
-  flex-direction: column; /* Stack buttons vertically */
-  align-items: center; /* Center align the buttons */
-  gap: 10px; /* Add space between the buttons */
-  margin-top: 50px; /* Add space from the top */
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 50px;
 }
 
 #create-game-section-buttons button {
-  width: auto; /* Ensure buttons retain their default width */
+  width: auto;
 }
 
 .create-game {
   padding: 20px;
-  /* Space around the entire container */
   text-align: center;
-  /* Ensure text is centered */
   transform: translateY(-20%);
 }
 
@@ -281,15 +247,12 @@ button:disabled {
 .time-per-question-section label {
   display: block;
   margin-bottom: 10px;
-  /* Space between the label and buttons */
 }
-
 
 /* Add spacing between buttons */
 .amount-questions-buttons button,
 .time-per-question-buttons button {
   margin: 5px;
-  /* Add spacing around each button */
   margin-bottom: 15px;
 }
 
