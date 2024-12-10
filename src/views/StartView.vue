@@ -1,5 +1,4 @@
 <template>
-  <!-- Main container for the front page -->
   <div class="frontpage">
     <!-- Button to toggle language -->
     <button class="language-switcher" v-on:click="switchLanguage">
@@ -9,28 +8,39 @@
     <!-- Title of the game -->
     <h1 class="game-title">Pregame<sup>2</sup></h1>
 
-    <!-- Buttons for creating and joining a game -->
-    <div class="action-buttons">
+    <!-- Show PIN input form if joinGameClicked is true -->
+    <PinInput
+      v-if="joinGameClicked"
+      :onPinSubmit="validatePin"
+    />
+
+    <!-- Show action buttons if joinGameClicked is false -->
+    <div v-else class="action-buttons">
       <router-link class="btn" to="/create/">
         {{ uiLabels.createGame || "Create Game" }}
       </router-link>
-      <router-link class="btn" to="/lobby/">
+      <button class="btn" v-on:click="showPinEntry">
         {{ uiLabels.participateGame || "Join Game" }}
-      </router-link>
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import io from "socket.io-client"; // Import WebSocket library
+import PinInput from "@/components/PinInput.vue"; // Import PinInput component
 const socket = io("localhost:3000"); // Initialize WebSocket connection
 
 export default {
   name: "StartView",
+  components: {
+    PinInput,
+  },
   data: function () {
     return {
       uiLabels: {}, // Dynamic UI labels for multilingual support
       lang: localStorage.getItem("lang") || "en", // Language preference
+      joinGameClicked: false, // Tracks whether "Join Game" was clicked
     };
   },
   created: function () {
@@ -42,78 +52,86 @@ export default {
   methods: {
     // Toggle between English and Swedish
     switchLanguage: function () {
-      // Toggle the language state
       this.lang = this.lang === "en" ? "sv" : "en";
-      // Save the new language preference in local storage
       localStorage.setItem("lang", this.lang);
-      // Emit the updated language preference to the server
       socket.emit("getUILabels", this.lang);
+    },
+    // Show PIN entry form
+    showPinEntry: function () {
+      this.joinGameClicked = true;
+    },
+    // Validate PIN and handle server response
+    validatePin(pin) {
+      socket.emit("validatePin", pin, (response) => {
+        if (response.valid) {
+          this.$router.push(`/lobby/${response.pollId}`);
+        } else {
+          alert("Invalid PIN. Please try again.");
+        }
+      });
     },
   },
 };
 </script>
 
 <style scoped>
-/* Center content on the page */
 .frontpage {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* Full viewport height */
-  background-color: #f8f9fa; /* Light background color */
+  height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   font-family: Arial, sans-serif;
   text-align: center;
-  position: relative; /* For placing the language button in a corner */
+  position: relative;
 }
 
 /* Button to switch languages */
 .language-switcher {
-  position: absolute; /* Place in the corner */
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  background-color: #007bff; /* Blue background */
-  color: white; /* White text */
-  border: none; /* No border */
-  padding: 0.5rem 1rem; /* Padding */
-  border-radius: 0.5rem; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor for interactivity */
-  font-size: 0.9rem; /* Smaller text size */
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
-
-/* Hover effect for the language switcher */
 .language-switcher:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3;
 }
 
 /* Style for the game title */
 .game-title {
-  font-size: 3rem; /* Large font size for the title */
-  color: #343a40; /* Dark text color */
-  margin-bottom: 2rem; /* Space below the title */
+  font-size: 3rem;
+  color: #343a40;
+  margin-bottom: 2rem;
 }
 
 /* Container for action buttons */
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Space between buttons */
+  gap: 1rem;
 }
 
 /* Button styles */
 .btn {
-  padding: 0.75rem 1.5rem; /* Padding for buttons */
-  background-color: #007bff; /* Blue background */
-  color: white; /* White text */
-  text-decoration: none; /* Remove underline */
-  font-size: 1.2rem; /* Slightly larger text */
-  border-radius: 0.5rem; /* Rounded corners */
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
   text-align: center;
-  width: 200px; /* Fixed button width */
+  cursor: pointer;
 }
 
-/* Hover effect for buttons */
+/* Button hover effect */
 .btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3;
 }
 </style>

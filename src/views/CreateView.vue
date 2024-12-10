@@ -16,6 +16,9 @@
           v-on:click="nextStep">Next</button>
       </div>
 
+      <button v-on:click="nextStep" :disabled="!isQuestionsSet">Next</button>
+    </div>
+
       <!-- Step 2: Select time per question -->
       <div v-else-if="step === 2" class="time-per-question-section">
         <h2>Select time per question (in seconds):</h2>
@@ -27,9 +30,17 @@
         <button class="next-button" v-show="true" :class="{ visible: selectedTime }" v-on:click="nextStep">Next</button>
       </div>
 
-      <div v-else-if="step === 3" class="create-game-section">
-        <button v-on:click="createPoll()"> Create Game </button>
+      <button v-on:click="backStep">Back</button>
+      <button v-on:click="nextStep" :disabled="!isTimeSet">Next</button>
+    </div>
+
+    <div v-else-if="step === 3" class="create-game-section">
+      <div id="create-game-section-buttons">
+        <button v-on:click="createPoll()">Create Game</button>
+        <button v-on:click="backStep">Back</button>
       </div>
+    </div>
+
 
       <!-- IS NEVER SHOWN NOW; Step 4: Display poll data,  -->
       <div v-else class="poll-container">
@@ -42,8 +53,10 @@
         </div>
       </div>
 
+
     </div>
   </body>
+
 </template>
 
 <script>
@@ -57,12 +70,16 @@ export default {
     return {
       step: 1, // Current step of the game creation process
       lang: localStorage.getItem("lang") || "en",
+      thePollId: "",
       pollId: "",
       setQuestionsCount: 0,
       pollData: {}, // Poll data received from the server
       uiLabels: {}, // UI labels for different langs
-      selectedQuestionCount: null, // Håller reda på vald antal-frågor-knapp
-      selectedTime: null // Håller reda på vald tids-knapp
+
+
+      isQuestionsSet: false, // Tracks if questions are set
+      isTimeSet: false, // Tracks if time is set
+
     };
   },
 
@@ -85,6 +102,7 @@ export default {
       // Emit the selected number of random questions to the server
       this.selectedQuestionCount = count; // Spara vald knapp
       this.setQuestionsCount = count;
+      this.isQuestionsSet = true; // Mark questions as set
       socket.emit("setAmountQuestions", { pollId: this.pollId, count: count });
       console.log(`Question count set to: ${count}`);
     },
@@ -93,6 +111,7 @@ export default {
       // Emit the selected time for every question to the server
       this.selectedTime = time; // Spara vald knapp
       this.timePerQuestion = time;
+      this.isTimeSet = true; // Mark time as set
       socket.emit("setTimePerQuestion", { pollId: this.pollId, time: time });
       console.log(`Time per question set to: ${time} seconds`);
     },
@@ -102,9 +121,18 @@ export default {
       this.step++;
     },
 
+    backStep: function () {
+      //move back one step
+      this.step--;
+    },
+
     //When clicked you should be redirected to lobby
     // Emits an event to create a poll and join it
     createPoll: function () {
+      // Generate a new poll ID if it hasn't been created
+      this.generatePollID();
+
+      // Emit events using the generated poll ID
       socket.emit("createPoll", { pollId: this.pollId, lang: this.lang });
       socket.emit("joinPoll", this.pollId);
 
@@ -165,6 +193,7 @@ h2 {
 }
 
 /* Button styling */
+/* Add spacing and positioning for buttons */
 button {
   padding: 10px 20px;
   background-color: pink;
@@ -172,6 +201,7 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+
   font-size: 18px;
   /* Öka textstorleken */
   font-weight: bold;
@@ -196,6 +226,7 @@ button {
   /* Gör knappen synlig */
   pointer-events: auto;
   /* Gör knappen klickbar */
+
 }
 
 button:hover {
@@ -206,6 +237,35 @@ button.selected {
   background-color: rgb(255, 131, 203);
   /* Grön bakgrund för valda knappar */
   border: 2px solid white;
+}
+
+/* Style for disabled buttons */
+button:disabled {
+  opacity: 0.5; /* Make the button a bit transparent */
+  cursor: not-allowed; /* Change the cursor to show it's disabled */
+}
+ß
+/* Create a container for buttons to manage spacing */
+.amount-questions-buttons,
+.time-per-question-buttons,
+#create-game-section-buttons {
+  display: flex;
+  justify-content: center; /* Center align the buttons */
+  gap: 20px; /* Add space between buttons */
+  margin-top: 20px; /* Move buttons further down */
+}
+
+/* For step 3 buttons extra styling */
+#create-game-section-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center; /* Center align the buttons */
+  gap: 10px; /* Add space between the buttons */
+  margin-top: 50px; /* Add space from the top */
+}
+
+#create-game-section-buttons button {
+  width: auto; /* Ensure buttons retain their default width */
 }
 
 .create-game {
@@ -224,6 +284,7 @@ button.selected {
   /* Space between the label and buttons */
 }
 
+
 /* Add spacing between buttons */
 .amount-questions-buttons button,
 .time-per-question-buttons button {
@@ -231,7 +292,6 @@ button.selected {
   /* Add spacing around each button */
   margin-bottom: 15px;
 }
-
 
 /* Styling for inputs */
 input[type="text"],
