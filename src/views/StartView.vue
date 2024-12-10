@@ -4,7 +4,7 @@
     <LanguageSwitcher @language-changed="updateLanguage" />
 
     <!-- Title of the game -->
-    <h1 class="game-title">Pregame<sup>2</sup></h1>
+    <h1 class="game-title">Pre(game)<sup>2</sup></h1>
 
     <!-- Show PIN input form if joinGameClicked is true -->
     <PinInput
