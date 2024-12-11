@@ -36,7 +36,7 @@ function sockets(io, socket, data) {
   // Event: Participate in a poll
   socket.on('participateInPoll', function(d) {
     // Add a new participant to the poll
-    data.participateInPoll(d.pollId, d.name);
+    data.participateInPoll(d.pollId, d.name, d.avatar);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit('participantsUpdate', data.getParticipants(d.pollId));
   });
