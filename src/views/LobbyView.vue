@@ -12,7 +12,15 @@
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
       <h1>Capture your avatar:</h1>
-      <video ref="video" width="320" height="240" autoplay></video>
+      
+        <p v-if="!isPictureTaken">
+        <video ref="video" width="320" height="240" autoplay></video>
+      </p>
+      
+        <p v-if="isPictureTaken">
+        <img :src="avatar" alt="User Avatar" width="320" height="240" />
+      </p>
+
       <button v-on:click="startCamera"> Start Camera </button>
       <button v-on:click="captureImage"> Take Picture </button>
       <button v-on:click="nextStep" :disabled="!isPictureTaken"> Next </button>
@@ -26,11 +34,18 @@
 
       <div class="submit-section"> 
         <button v-on:click="participateInPoll" id="submitNameButton">
-        READY
-
+      
         {{ this.uiLabels.participateInPoll }}
       </button>
       <button v-on:click="backStep"> Back </button>
+
+      <router-link class="btn" to="/poll/{{this.pollId}}">
+        {{ uiLabels.createGame || "Create Game" }}
+      </router-link>
+
+      <p>
+        {{participants}}
+      </p>
       </div>
     </div>
 
@@ -78,6 +93,8 @@ export default {
       if (this.step < 5) {
         this.step++;
       }
+      this.stopCamera;
+      
     },
     // Move to the previous step
     backStep() {
@@ -88,6 +105,7 @@ export default {
     },
     // Start the camera stream
     startCamera() {
+      this.isPictureTaken=false
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((stream) => {
@@ -112,7 +130,6 @@ export default {
     // Capture the image from the video stream
     captureImage() {
       const video = this.$refs.video;
-
       this.isPictureTaken = true;
 
       if (video && video.videoWidth > 0 && video.videoHeight > 0) {
@@ -159,6 +176,7 @@ export default {
         pollId: this.pollId,
         name: this.userName,
         avatar: this.avatar,
+        
       });
       this.joined = true;
     },

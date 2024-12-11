@@ -68,10 +68,10 @@ Data.prototype.getPoll = function (pollId) {
 };
 
 // Add a participant to a poll
-Data.prototype.participateInPoll = function (pollId, name) {
+Data.prototype.participateInPoll = function (pollId, name, avatar) {
   console.log("participant will be added to", pollId, name);
   if (this.pollExists(pollId)) {
-    this.polls[pollId].participants.push({ name: name, answers: [] });
+    this.polls[pollId].participants.push({ name: name, Img: avatar });
   }
 };
 
