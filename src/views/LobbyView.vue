@@ -22,10 +22,14 @@
         <img :src="avatar" alt="User Avatar" width="320" height="240" />
       </p>
 
-      <button v-on:click="startCamera":disabled="cameraState">Start Camera</button>
-      <button v-on:click="captureImage":disabled="!cameraState">Take Picture</button>
+      <button v-on:click="startCamera" :disabled="cameraState">
+        Start Camera
+      </button>
+      <button v-on:click="captureImage" :disabled="!cameraState">
+        Take Picture
+      </button>
 
-      <button v-on:click="nextStep":disabled="!isPictureTaken">Next</button>
+      <button v-on:click="nextStep" :disabled="!isPictureTaken">Next</button>
       <button v-on:click="backStep">Back</button>
     </div>
 
@@ -33,14 +37,13 @@
     <div v-else-if="step === 3" class="avatar-container">
       <h1>Your Avatar: {{ this.userName }}</h1>
 
-      <!-- Know if user is admin or not
+      <!-- Know if user is admin or not -->
       <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>
-      <h2 v-else class="participant-tag">You are a Participant</h2>-->
+      <h2 v-else class="participant-tag">You are a Participant</h2>
 
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="submit-section">
-
         <!-- ADDED FOR ADMIN -->
         <!-- div v-for="participant in participants" :key="participant.id">
           <p>
@@ -70,17 +73,22 @@ export default {
   data: function () {
     return {
       step: 1, // Tracks the current step
-      userName: "", // User's name
       pollId: "inactive poll", // Placeholder for poll ID
-      uiLabels: {}, // UI labels for different languages
+
+      //user
+      userId: null, //alla ha egen sida sen
+      userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
+      isAdmin: false, //deklarerad här nu men tror det ska göras lite annorlunda
+
+      uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
+
+      //camera
       stream: null, // The video stream to access the camera
-
       isPictureTaken: false, //Tracks that camera is closed and picture taken
-
       cameraState: false, // Tracks whether the camera is active
     };
   },
@@ -96,7 +104,6 @@ export default {
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    //socket.emit("joinPoll", { pollId: this.pollId, isAdmin });//addded isadmin
     socket.emit("joinPoll", this.pollId);
     socket.emit("getUILabels", this.lang);
   },
@@ -118,7 +125,6 @@ export default {
     startCamera() {
       this.isPictureTaken = false;
       this.cameraState = true;
-
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -181,7 +187,7 @@ export default {
         // Log to check the base64 image
         console.log("Captured Avatar: ", this.avatar);
 
-        this.cameraState = false;   // Disable camera actions
+        this.cameraState = false; // Disable camera actions
 
         // Stop the camera stream after capturing the image
         this.stopCamera();
@@ -206,14 +212,27 @@ export default {
         alert("Please select or capture an avatar!");
         return;
       }
+
+      //check if adminId exists - then set to true for admin else create userId
+      if (adminId != null) {
+        this.isAdmin = true;
+        this.userId = adminId;
+      } else {
+        this.userId = Math.ceil(Math.random() * 100000);
+      }
+
       socket.emit("participateInPoll", {
+        userId: this.userId,
         pollId: this.pollId,
         name: this.userName,
         avatar: this.avatar,
+        isAdmin: this.isAdmin,
       });
       this.joined = true;
-    },
 
+      this.$router.push(`/poll/${this.pollId}`);
+      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+    },
   },
 };
 </script>

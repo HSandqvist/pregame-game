@@ -10,7 +10,7 @@ function sockets(io, socket, data) {
   // Event: Create a new poll
   socket.on('createPoll', function(d) {
     // Create a poll with the given ID and language
-    data.createPoll(d.pollId, d.lang);
+    data.createPoll(d.pollId, d.lang, d.adminId);
     // Emit the poll data back to the client
     socket.emit('pollData', data.getPoll(d.pollId));
   });
@@ -24,9 +24,10 @@ function sockets(io, socket, data) {
   });
 
   // Event: Join a poll
-  socket.on('joinPoll', function(pollId) {
+  socket.on('joinPoll', function(d) {
     // Add the client to the specified poll room
-    socket.join(pollId);
+    socket.join(d.pollId);       
+
     // Emit the current question data to the client
     socket.emit('questionUpdate', data.getQuestion(pollId));
     // Emit the submitted answers for the current question to the client
@@ -36,7 +37,7 @@ function sockets(io, socket, data) {
   // Event: Participate in a poll
   socket.on('participateInPoll', function(d) {
     // Add a new participant to the poll
-    data.participateInPoll(d.pollId, d.name, d.avatar);
+    data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit('participantsUpdate', data.getParticipants(d.pollId));
   });

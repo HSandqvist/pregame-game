@@ -28,14 +28,14 @@
           <button
             v-for="time in [10, 20, 30]"
             :key="time"
-            @click="tempTimePerQuestion = time"
+            v-on:click="tempTimePerQuestion = time"
             :class="{ selected: tempTimePerQuestion === time }"
           >
             {{ time }}
           </button>
         </div>
-        <button @click="backStep">Back</button>
-        <button @click="finalizeTime" :disabled="!tempTimePerQuestion">
+        <button v-on:click="backStep">Back</button>
+        <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
           Create game
         </button>
       </div>
@@ -43,7 +43,7 @@
       <!-- Step 3: Display poll data -->
       <div v-else class="poll-container">
         <div class="poll-data-section">
-          <router-link :to="'/result/' + pollId">Check result</router-link>
+          <router-link :to="'/result/' + pollId"> Check result </router-link>
           Data: {{ pollData }}
         </div>
       </div>
@@ -73,6 +73,8 @@ export default {
       // Finalized values for the poll
       selectedQuestionCount: null,
       selectedTime: null,
+
+      adminId: null,
     };
   },
 
@@ -115,11 +117,19 @@ export default {
     },
 
     createPoll: function () {
+
+      this.adminId = Math.ceil(Math.random()*100000);   //specified adminId to set a participant to admin
+
       this.generatePollID();
-      socket.emit("createPoll", { pollId: this.pollId, lang: this.lang });
-      socket.emit("joinPoll", this.pollId);
+      socket.emit("createPoll", { pollId: this.pollId, lang: this.lang, adminId: this.adminId}); 
+      socket.emit("joinPoll", {pollId: this.pollId}); 
       this.$router.push(`/lobby/${this.pollId}`);
     },
+
+
+
+
+
   },
 };
 </script>
