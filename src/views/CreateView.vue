@@ -5,7 +5,7 @@
 
       <!-- Step 1: Select amount of questions -->
       <div v-if="step === 1" class="amount-questions-section">
-        <h2> Number of questions: </h2>
+        <h2>Number of questions:</h2>
         <div class="amount-questions-buttons">
           <button
             v-for="count in [5, 10, 15]"
@@ -90,6 +90,11 @@ export default {
       this.pollId = Math.floor(100000 + Math.random() * 900000).toString();
     },
 
+    generateAdminID: function()
+    {
+      this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
+    },
+
     finalizeQuestions: function () {
       this.selectedQuestionCount = this.tempQuestionsCount;
       socket.emit("setAmountQuestions", {
@@ -117,19 +122,21 @@ export default {
     },
 
     createPoll: function () {
-
-      this.adminId = Math.ceil(Math.random()*100000);   //specified adminId to set a participant to admin
+      this.generateAdminID();
 
       this.generatePollID();
-      socket.emit("createPoll", { pollId: this.pollId, lang: this.lang, adminId: this.adminId}); 
-      socket.emit("joinPoll", {pollId: this.pollId}); 
+
+      socket.emit("createPoll", {
+        pollId: this.pollId,
+        lang: this.lang,
+        adminId: this.adminId,
+      });
+      socket.emit("joinPoll", { pollId: this.pollId });
+
       this.$router.push(`/lobby/${this.pollId}`);
+
+     // this.$router.push(`/lobby/${this.pollId}`);
     },
-
-
-
-
-
   },
 };
 </script>

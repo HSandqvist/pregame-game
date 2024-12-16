@@ -68,6 +68,11 @@ Data.prototype.getPoll = function (pollId) {
   return {}; // Return an empty object if the poll doesn't exist
 };
 
+   /*Data.prototype.thisIsAdmin = function (adminId){
+    adminId=this.adminId;
+    return adminId;
+   }*/
+
 // Add a participant to a poll
 Data.prototype.participateInPoll = function (pollId, name, avatar, userId, isAdmin) {    
   console.log("participant will be added to", pollId, name, userId, isAdmin); 

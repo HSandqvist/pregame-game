@@ -13,6 +13,7 @@ function sockets(io, socket, data) {
     data.createPoll(d.pollId, d.lang, d.adminId);
     // Emit the poll data back to the client
     socket.emit('pollData', data.getPoll(d.pollId));
+    //socket.emit('adminUserId', data.thisIsAdmin(d.adminId));
   });
 
   // Event: Add a new question to a poll
@@ -29,13 +30,15 @@ function sockets(io, socket, data) {
     socket.join(d.pollId);       
 
     // Emit the current question data to the client
-    socket.emit('questionUpdate', data.getQuestion(pollId));
+    socket.emit('questionUpdate', data.getQuestion(d.pollId));
     // Emit the submitted answers for the current question to the client
-    socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(pollId));
+    socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   });
 
   // Event: Participate in a poll
   socket.on('participateInPoll', function(d) {
+    //see who is joining
+    console.log("Participant joining poll:", d.name);
     // Add a new participant to the poll
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
     // Notify all clients in the poll room about the updated participant list

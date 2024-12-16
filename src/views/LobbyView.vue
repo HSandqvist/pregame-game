@@ -80,7 +80,8 @@ export default {
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
-      isAdmin: false, //deklarerad här nu men tror det ska göras lite annorlunda
+      isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
+      adminId: null, //placeholder for eventual adminId, if present
 
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
@@ -96,6 +97,17 @@ export default {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
 
+
+    //socket.on("adminUserId", (data) = (this.adminUserId = data));
+
+    // Retrieve adminId from route parameters (only present for the creator)
+    //this.adminId = this.$route.params.adminId;
+
+    // Mark as admin only if adminId exists in the params
+    //this.isAdmin = !!this.adminId;
+
+
+
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
@@ -104,8 +116,8 @@ export default {
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", this.pollId);
-    socket.emit("getUILabels", this.lang);
+    socket.emit("joinPoll", { pollId: this.pollId });
+    socket.emit("getUILabels", { lang: this.lang });
   },
   methods: {
     // Move to the next step
