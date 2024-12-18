@@ -7,10 +7,7 @@
     <h1 class="game-title">Pre(game)<sup>2</sup></h1>
 
     <!-- Show PIN input form if joinGameClicked is true -->
-    <PinInput
-      v-if="joinGameClicked"
-      :onPinSubmit="validatePin"
-    />
+    <PinInput v-if="joinGameClicked" :onPinSubmit="validatePin" />
 
     <!-- Show action buttons if joinGameClicked is false -->
     <div v-else class="action-buttons">

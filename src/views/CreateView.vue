@@ -5,7 +5,7 @@
 
       <!-- Step 1: Select amount of questions -->
       <div v-if="step === 1" class="amount-questions-section">
-        <h2> Number of questions: </h2>
+        <h2>Number of questions:</h2>
         <div class="amount-questions-buttons">
           <button
             v-for="count in [5, 10, 15]"
@@ -28,14 +28,14 @@
           <button
             v-for="time in [10, 20, 30]"
             :key="time"
-            @click="tempTimePerQuestion = time"
+            v-on:click="tempTimePerQuestion = time"
             :class="{ selected: tempTimePerQuestion === time }"
           >
             {{ time }}
           </button>
         </div>
-        <button @click="backStep">Back</button>
-        <button @click="finalizeTime" :disabled="!tempTimePerQuestion">
+        <button v-on:click="backStep">Back</button>
+        <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
           Create game
         </button>
       </div>
@@ -43,7 +43,7 @@
       <!-- Step 3: Display poll data -->
       <div v-else class="poll-container">
         <div class="poll-data-section">
-          <router-link :to="'/result/' + pollId">Check result</router-link>
+          <router-link :to="'/result/' + pollId"> Check result </router-link>
           Data: {{ pollData }}
         </div>
       </div>
@@ -73,6 +73,8 @@ export default {
       // Finalized values for the poll
       selectedQuestionCount: null,
       selectedTime: null,
+
+      adminId: null,
     };
   },
 
@@ -88,6 +90,19 @@ export default {
       this.pollId = Math.floor(100000 + Math.random() * 900000).toString();
     },
 
+    generateAdminID: function () {
+      console.log("är i generateadmin");
+
+      this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
+      const userId = this.adminId;
+      console.log("admin id", this.adminId)
+
+      //setting in local storage name item, visuable to admin only
+      localStorage.setItem("userId", userId);
+      console.log("User ID stored:", localStorage.getItem("userId"));
+
+    },
+
     finalizeQuestions: function () {
       this.selectedQuestionCount = this.tempQuestionsCount;
       socket.emit("setAmountQuestions", {
@@ -98,6 +113,7 @@ export default {
     },
 
     finalizeTime: function () {
+      console.log("är i finalizeitime");
       this.selectedTime = this.tempTimePerQuestion;
       socket.emit("setTimePerQuestion", {
         pollId: this.pollId,
@@ -115,10 +131,23 @@ export default {
     },
 
     createPoll: function () {
+      console.log("är i createplol");
+
+      this.generateAdminID();
+
       this.generatePollID();
-      socket.emit("createPoll", { pollId: this.pollId, lang: this.lang });
-      socket.emit("joinPoll", this.pollId);
+
+      socket.emit("createPoll", {
+        pollId: this.pollId,
+        lang: this.lang,
+        adminId: this.adminId,
+      });
+      socket.emit("joinPoll", { pollId: this.pollId });
+
+      socket.emit("thisIsAdminId", {pollId: this.pollId, adminId: this.adminId});
+
       this.$router.push(`/lobby/${this.pollId}`);
+
     },
   },
 };
