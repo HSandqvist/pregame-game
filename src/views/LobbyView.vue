@@ -1,3 +1,4 @@
+f
 <template>
   <div>
     {{ pollId }}
@@ -97,17 +98,6 @@ export default {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
 
-
-    //socket.on("adminUserId", (data) = (this.adminUserId = data));
-
-    // Retrieve adminId from route parameters (only present for the creator)
-    //this.adminId = this.$route.params.adminId;
-
-    // Mark as admin only if adminId exists in the params
-    //this.isAdmin = !!this.adminId;
-
-
-
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
@@ -122,10 +112,46 @@ export default {
   methods: {
     // Move to the next step
     nextStep() {
-      if (this.step < 5) {
+      if (this.step == 2) {
+        // Check admin status before moving to Step 3
+        this.checkAdminStatus(() => {
+          this.step++; // Move to Step 3 after admin check
+        });
+      } else if (this.step < 5) {
         this.step++;
       }
     },
+
+    // Function to check if the user is an admin
+    checkAdminStatus(callback) {
+      if (localStorage.userId) {
+        this.userId = localStorage.getItem("userId");
+      } else {
+        this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
+      }
+
+      // Emit admin check request
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+
+      // Listen for the server's response
+      socket.once("adminCheckResult", (data) => {
+        if (data.isAdmin) {
+          console.log("You are the admin for this poll.");
+          this.isAdmin = true; // Set admin flag
+        } else if (data.error) {
+          console.error(data.error); // Handle errors (e.g., poll does not exist)
+          alert(data.error);
+          return; // Stop further execution
+        } else {
+          console.log("You are not the admin for this poll.");
+          this.isAdmin = false; // Set participant flag
+        }
+
+        // Execute the callback after admin check
+        if (typeof callback === "function") callback();
+      });
+    },
+
     // Move to the previous step
     backStep() {
       if (this.step > 1) {
@@ -133,6 +159,7 @@ export default {
         this.isPictureTaken = false;
       }
     },
+
     // Start the camera stream
     startCamera() {
       this.isPictureTaken = false;
@@ -223,14 +250,6 @@ export default {
       if (!this.avatar) {
         alert("Please select or capture an avatar!");
         return;
-      }
-
-      //check if adminId exists - then set to true for admin else create userId
-      if (adminId != null) {
-        this.isAdmin = true;
-        this.userId = adminId;
-      } else {
-        this.userId = Math.ceil(Math.random() * 100000);
       }
 
       socket.emit("participateInPoll", {

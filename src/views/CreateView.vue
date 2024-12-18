@@ -90,9 +90,17 @@ export default {
       this.pollId = Math.floor(100000 + Math.random() * 900000).toString();
     },
 
-    generateAdminID: function()
-    {
+    generateAdminID: function () {
+      console.log("är i generateadmin");
+
       this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
+      const userId = this.adminId;
+      console.log("admin id", this.adminId)
+
+      //setting in local storage name item, visuable to admin only
+      localStorage.setItem("userId", userId);
+      console.log("User ID stored:", localStorage.getItem("userId"));
+
     },
 
     finalizeQuestions: function () {
@@ -105,6 +113,7 @@ export default {
     },
 
     finalizeTime: function () {
+      console.log("är i finalizeitime");
       this.selectedTime = this.tempTimePerQuestion;
       socket.emit("setTimePerQuestion", {
         pollId: this.pollId,
@@ -122,6 +131,8 @@ export default {
     },
 
     createPoll: function () {
+      console.log("är i createplol");
+
       this.generateAdminID();
 
       this.generatePollID();
@@ -133,9 +144,10 @@ export default {
       });
       socket.emit("joinPoll", { pollId: this.pollId });
 
+      socket.emit("thisIsAdminId", {pollId: this.pollId, adminId: this.adminId});
+
       this.$router.push(`/lobby/${this.pollId}`);
 
-     // this.$router.push(`/lobby/${this.pollId}`);
     },
   },
 };

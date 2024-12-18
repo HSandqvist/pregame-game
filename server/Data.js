@@ -68,11 +68,6 @@ Data.prototype.getPoll = function (pollId) {
   return {}; // Return an empty object if the poll doesn't exist
 };
 
-   /*Data.prototype.thisIsAdmin = function (adminId){
-    adminId=this.adminId;
-    return adminId;
-   }*/
-
 // Add a participant to a poll
 Data.prototype.participateInPoll = function (pollId, name, avatar, userId, isAdmin) {    
   console.log("participant will be added to", pollId, name, userId, isAdmin); 
@@ -86,6 +81,7 @@ Data.prototype.getParticipants = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId].participants;
   }
+  
   return [];
 };
 
@@ -143,6 +139,15 @@ Data.prototype.submitAnswer = function (pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 };
+
+// Check if a given userId is the admin of a poll
+Data.prototype.isAdmin = function(pollId, userId) {
+  if (this.pollExists(pollId)) {
+    return this.polls[pollId].adminId === userId;
+  }
+  return false;
+};
+
 
 // Export the Data class
 export { Data };
