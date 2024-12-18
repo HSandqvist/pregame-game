@@ -44,17 +44,18 @@ Data.prototype.getUILabels = function (lang) {
 };
 
 // Create a new poll if it doesn't already exist
-Data.prototype.createPoll = function (pollId, lang = "en") {
+Data.prototype.createPoll = function (pollId, lang = "en", adminId) {
   if (!this.pollExists(pollId)) {
     let poll = {
       lang: lang, // Poll language
       questions: [], // Empty array for questions
       answers: [], // Empty array for answers
       participants: [], // Empty array for participants
-      currentQuestion: 0 // Start with the first question
+      currentQuestion: 0, // Start with the first question
+      adminId: adminId,
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
-    console.log("poll created", pollId, poll);
+    console.log("poll created", pollId, poll, "Admin is:", adminId);
   }
   return this.polls[pollId];
 };
@@ -68,11 +69,10 @@ Data.prototype.getPoll = function (pollId) {
 };
 
 // Add a participant to a poll
-Data.prototype.participateInPoll = function (pollId, name, avatar) {
-  console.log("participant will be added to", pollId, name);
-  if (this.pollExists(pollId)) {
-    this.polls[pollId].participants.push({ name: name, Img: avatar });
-  }
+Data.prototype.participateInPoll = function (pollId, name, avatar, userId, isAdmin) {    
+  console.log("participant will be added to", pollId, name, userId, isAdmin); 
+  // console.log("participant will be added to", pollId, name);
+    this.polls[pollId].participants.push({ name: name, avatar: avatar, userId: userId, isAdmin: isAdmin});
 };
 
 // Retrieve participants of a poll
@@ -81,6 +81,7 @@ Data.prototype.getParticipants = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId].participants;
   }
+  
   return [];
 };
 
@@ -138,6 +139,15 @@ Data.prototype.submitAnswer = function (pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 };
+
+// Check if a given userId is the admin of a poll
+Data.prototype.isAdmin = function(pollId, userId) {
+  if (this.pollExists(pollId)) {
+    return this.polls[pollId].adminId === userId;
+  }
+  return false;
+};
+
 
 // Export the Data class
 export { Data };

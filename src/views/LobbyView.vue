@@ -1,3 +1,4 @@
+f
 <template>
   <div>
     {{ pollId }}
@@ -12,43 +13,55 @@
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
       <h1>Capture your avatar:</h1>
-      
-        <p v-if="!isPictureTaken">
+
+      <p v-if="!isPictureTaken">
         <video ref="video" width="320" height="240" autoplay></video>
       </p>
-      
-        <p v-if="isPictureTaken">
+
+      <!-- show the picture before creating final avatar -->
+      <p v-if="isPictureTaken">
         <img :src="avatar" alt="User Avatar" width="320" height="240" />
       </p>
 
-      <button v-on:click="startCamera"> Start Camera </button>
-      <button v-on:click="captureImage"> Take Picture </button>
-      <button v-on:click="nextStep" :disabled="!isPictureTaken"> Next </button>
-      <button v-on:click="backStep"> Back </button>
+      <button v-on:click="startCamera" :disabled="cameraState">
+        Start Camera
+      </button>
+      <button v-on:click="captureImage" :disabled="!cameraState">
+        Take Picture
+      </button>
+
+      <button v-on:click="nextStep" :disabled="!isPictureTaken">Next</button>
+      <button v-on:click="backStep">Back</button>
     </div>
 
     <!-- Step 3: Display captured avatar and submit -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>Your Avatar: {{ this.userName }} </h1>
+      <h1>Your Avatar: {{ this.userName }}</h1>
+
+      <!-- Know if user is admin or not -->
+      <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>
+      <h2 v-else class="participant-tag">You are a Participant</h2>
+
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
-      <div class="submit-section"> 
+      <div class="submit-section">
+        <!-- ADDED FOR ADMIN -->
+        <!-- div v-for="participant in participants" :key="participant.id">
+          <p>
+            {{ participant.name }}
+            <span v-if="participant.isAdmin" class="admin-tag">(Admin)</span>
+          </p>
+        </div>
+         ADDED FOR ADMIN END -->
+
         <button v-on:click="participateInPoll" id="submitNameButton">
-      
-        {{ this.uiLabels.participateInPoll }}
-      </button>
-      <button v-on:click="backStep"> Back </button>
+          READY
 
-      <router-link class="btn" to="/poll/{{this.pollId}}">
-        {{ uiLabels.createGame || "Create Game" }}
-      </router-link>
-
-      <p>
-        {{participants}}
-      </p>
+          {{ this.uiLabels.participateInPoll }}
+        </button>
+        <button v-on:click="backStep">Back</button>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -60,52 +73,111 @@ export default {
   name: "LobbyView",
   data: function () {
     return {
-
       step: 1, // Tracks the current step
-      userName: "", // User's name
       pollId: "inactive poll", // Placeholder for poll ID
-      uiLabels: {}, // UI labels for different languages
+
+      //user
+      userId: null, //alla ha egen sida sen
+      userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
+      isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
+      adminId: null, //placeholder for eventual adminId, if present
+
+      uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
-      stream: null, // The video stream to access the camera
 
+      //camera
+      stream: null, // The video stream to access the camera
       isPictureTaken: false, //Tracks that camera is closed and picture taken
+      cameraState: false, // Tracks whether the camera is active
     };
   },
   created: function () {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
+
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
+
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", this.pollId);
-    socket.emit("getUILabels", this.lang);
+    socket.emit("joinPoll", { pollId: this.pollId });
+    socket.emit("getUILabels", { lang: this.lang });
   },
   methods: {
     // Move to the next step
     nextStep() {
-      if (this.step < 5) {
+      if (this.step == 2) {
+        // Check admin status before moving to Step 3
+        this.checkAdminStatus(() => {
+          this.step++; // Move to Step 3 after admin check
+        });
+      } else if (this.step < 5) {
         this.step++;
       }
-      this.stopCamera;
-      
     },
+
+    // Function to check if the user is an admin
+    checkAdminStatus(callback) {
+      if (localStorage.userId) {
+        this.userId = localStorage.getItem("userId");
+      } else {
+        this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
+      }
+
+      // Emit admin check request
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+
+      // Listen for the server's response
+      socket.once("adminCheckResult", (data) => {
+        if (data.isAdmin) {
+          console.log("You are the admin for this poll.");
+          this.isAdmin = true; // Set admin flag
+        } else if (data.error) {
+          console.error(data.error); // Handle errors (e.g., poll does not exist)
+          alert(data.error);
+          return; // Stop further execution
+        } else {
+          console.log("You are not the admin for this poll.");
+          this.isAdmin = false; // Set participant flag
+        }
+
+        // Execute the callback after admin check
+        if (typeof callback === "function") callback();
+      });
+    },
+
     // Move to the previous step
     backStep() {
       if (this.step > 1) {
         this.step--;
-        this.isPictureTaken=false;
+        this.isPictureTaken = false;
       }
     },
+
     // Start the camera stream
     startCamera() {
-      this.isPictureTaken=false
+      this.isPictureTaken = false;
+      this.cameraState = true;
+
+      // Stop any existing camera stream before starting a new one, make sure always turned off
+      if (this.stream) {
+        const tracks = this.stream.getTracks();
+        tracks.forEach((track) => track.stop());
+        this.stream = null;
+      }
+
+      // Stop the video element from using the old stream
+      if (this.$refs.video) {
+        this.$refs.video.srcObject = null;
+      }
+
+      //start new camera stream
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((stream) => {
@@ -123,13 +195,19 @@ export default {
     // Stop the camera stream
     stopCamera() {
       if (this.stream) {
+        console.log("stopping stream", this.stream);
         const tracks = this.stream.getTracks();
-        tracks.forEach((track) => track.stop());
+        tracks.forEach((track) => track.stop()); //stop all tracks
+        this.stream = null; //added
+      }
+      if (this.$refs.video) {
+        this.$refs.video.srcObject = null; // Clear the video element source
       }
     },
     // Capture the image from the video stream
     captureImage() {
       const video = this.$refs.video;
+
       this.isPictureTaken = true;
 
       if (video && video.videoWidth > 0 && video.videoHeight > 0) {
@@ -148,9 +226,10 @@ export default {
         // Log to check the base64 image
         console.log("Captured Avatar: ", this.avatar);
 
+        this.cameraState = false; // Disable camera actions
+
         // Stop the camera stream after capturing the image
         this.stopCamera();
-
       } else {
         console.error("Video stream is not available.");
       }
@@ -172,17 +251,21 @@ export default {
         alert("Please select or capture an avatar!");
         return;
       }
+
       socket.emit("participateInPoll", {
+        userId: this.userId,
         pollId: this.pollId,
         name: this.userName,
         avatar: this.avatar,
-        
+        isAdmin: this.isAdmin,
       });
       this.joined = true;
+
+      this.$router.push(`/poll/${this.pollId}`);
+      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
   },
 };
-
 </script>
 
 <style scoped>
