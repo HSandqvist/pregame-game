@@ -37,7 +37,6 @@ function sockets(io, socket, data) {
 
     //ev lägga till
     // Send the adminId to the client after joining
-    // Send the adminId to the client after joining
     const poll = data.getPoll(d.pollId);
     socket.emit("adminId", poll.adminId);
   });
@@ -99,8 +98,6 @@ function sockets(io, socket, data) {
       socket.emit('adminCheckResult', { isAdmin: false, error: "Poll does not exist" }); // Error handling
     }
   });
-
-
 
 }
 

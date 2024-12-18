@@ -144,10 +144,7 @@ export default {
       });
       socket.emit("joinPoll", { pollId: this.pollId });
 
-      socket.emit("thisIsAdminId", {pollId: this.pollId, adminId: this.adminId});
-
       this.$router.push(`/lobby/${this.pollId}`);
-
     },
   },
 };

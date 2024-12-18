@@ -261,8 +261,8 @@ export default {
       });
       this.joined = true;
 
-      this.$router.push(`/poll/${this.pollId}`);
-      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+      //this.$router.push(`/poll/${this.pollId}`);
+      this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
   },
 };
