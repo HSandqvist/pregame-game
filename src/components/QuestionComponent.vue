@@ -1,7 +1,4 @@
 <template>
-  <!-- Display the question -->
-  <p>{{ question.q }}</p>
-
   <!-- Generate a button for each answer option in the question object -->
   <button 
     v-for="a in question.a" 
@@ -14,6 +11,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'QuestionComponent',
   props: {
