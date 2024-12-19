@@ -1,5 +1,5 @@
 'use strict';
-import { readFileSync } from "fs"; // Import the readFileSync function for reading files
+import { readFileSync } from "fs"; // Import the readFileSync function for reading files, reading questions
 
 // Define a Data class to encapsulate poll data and keep the global namespace clean.
 // In a real-world scenario, this would interface with a database.
@@ -43,6 +43,19 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels); // Parse and return the labels as an object
 };
 
+
+
+// Load categories from an external JSON file
+Data.prototype.loadCategories = function() {
+    try {
+        const data = readFileSync("@/assets/questions-en.json", "utf8");
+        this.categories = JSON.parse(data);
+    } catch (error) {
+        console.error("Error loading categories:", error);
+        this.categories = {}; // Fallback to an empty object if there's an error
+    }
+};
+
 // Create a new poll if it doesn't already exist
 Data.prototype.createPoll = function (pollId, lang = "en", adminId) {
   if (!this.pollExists(pollId)) {
@@ -53,6 +66,8 @@ Data.prototype.createPoll = function (pollId, lang = "en", adminId) {
       participants: [], // Empty array for participants
       currentQuestion: 0, // Start with the first question
       adminId: adminId,
+      categoryWinners: {}, // To store the top participants for each category
+      categories: this.categories, // Add the passed categories
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
     console.log("poll created", pollId, poll, "Admin is:", adminId);
@@ -116,29 +131,85 @@ Data.prototype.getSubmittedAnswers = function (pollId) {
   return {}; // Return an empty object if no answers are found
 };
 
+
 // Submit an answer to a poll
 Data.prototype.submitAnswer = function (pollId, answer) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     let answers = poll.answers[poll.currentQuestion];
 
-    // Create an answers object if none exists
-    if (typeof answers !== 'object') {
+
+     // Create an answers object for the current question if it doesn't exist
+     if (typeof answers !== 'object') {
       answers = {};
-      answers[answer] = 1;
-      poll.answers.push(answers);
+      poll.answers[poll.currentQuestion] = answers;
     }
-    // Add a new answer property if it doesn't exist
-    else if (typeof answers[answer] === 'undefined') {
-      answers[answer] = 1;
+
+    // Increment the count for the participant (keyed by their name)
+    if (typeof answers[answer] === 'undefined') {
+      answers[answer] = 1; // First vote for this participant
+    } else {
+      answers[answer] += 1; // Increment vote count
     }
-    // Increment the count if the answer already exists
-    else {
-      answers[answer] += 1;
-    }
-    console.log("answers looks like ", answers, typeof answers);
+
+    console.log("Updated answers for question:", poll.currentQuestion, answers);
+
+};
+
+
+
+
+
+
+Data.prototype.runQuestion = function (pollId, qId) {
+  if (this.pollExists(pollId)) {
+      const poll = this.polls[pollId];
+
+      // Save the top participant for the current question
+      if (poll.answers[poll.currentQuestion]) {
+          const answers = poll.answers[poll.currentQuestion];
+          let maxVotes = 0;
+          let topParticipant = null;
+
+          for (const [name, votes] of Object.entries(answers)) {
+              if (votes > maxVotes) {
+                  maxVotes = votes;
+                  topParticipant = name;
+              }
+          }
+
+          // Map the current question to its category
+          const question = poll.questions[poll.currentQuestion];
+          const category = this.getCategoryForQuestion(question.q);
+          console.log(`Category for question: ${currentQuestion.q} is '${category}'`);
+
+          // Save the top participant in the category winners object
+          if (category && topParticipant) {
+              poll.categoryWinners[category] = topParticipant;
+              console.log(`Saved top participant '${topParticipant}' for category '${category}'`);
+          }
+      }
+
+      // Reset key-value pair for the new question
+      poll.currentQuestion = qId;
+      poll.answers[qId] = {}; // Reset answers for the new question
   }
 };
+
+// Helper function to map a question to its category
+Data.prototype.getCategoryForQuestion = function (question) {
+  for (const [category, questions] of Object.entries(this.categories)) {
+      if (questions.includes(question)) {
+          return category;
+      }
+  }
+  return null;
+};
+
+
+
+
+
 
 // Check if a given userId is the admin of a poll
 Data.prototype.isAdmin = function(pollId, userId) {
@@ -147,6 +218,8 @@ Data.prototype.isAdmin = function(pollId, userId) {
   }
   return false;
 };
+
+}
 
 
 // Export the Data class

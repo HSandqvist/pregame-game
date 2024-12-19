@@ -1,4 +1,5 @@
 <template>
+
   <body>
     <div class="create-game">
       <h1 id="create-game-headline">Create game</h1>
@@ -7,12 +8,8 @@
       <div v-if="step === 1" class="amount-questions-section">
         <h2>Number of questions:</h2>
         <div class="amount-questions-buttons">
-          <button
-            v-for="count in [5, 10, 15]"
-            :key="count"
-            @click="tempQuestionsCount = count"
-            :class="{ selected: tempQuestionsCount === count }"
-          >
+          <button v-for="count in [5, 10, 15]" :key="count" @click="tempQuestionsCount = count"
+            :class="{ selected: tempQuestionsCount === count }">
             {{ count }}
           </button>
         </div>
@@ -25,12 +22,8 @@
       <div v-else-if="step === 2" class="time-per-question-section">
         <h2>Seconds per question:</h2>
         <div class="time-per-question-buttons">
-          <button
-            v-for="time in [10, 20, 30]"
-            :key="time"
-            v-on:click="tempTimePerQuestion = time"
-            :class="{ selected: tempTimePerQuestion === time }"
-          >
+          <button v-for="time in [10, 20, 30]" :key="time" v-on:click="tempTimePerQuestion = time"
+            :class="{ selected: tempTimePerQuestion === time }">
             {{ time }}
           </button>
         </div>
@@ -105,9 +98,9 @@ export default {
 
     finalizeQuestions: function () {
       this.selectedQuestionCount = this.tempQuestionsCount;
-      socket.emit("setAmountQuestions", {
+      socket.emit("setQuestionCount", {
         pollId: this.pollId,
-        count: this.selectedQuestionCount,
+        questionCount: this.selectedQuestionCount,
       });
       this.nextStep();
     },
@@ -144,7 +137,7 @@ export default {
       });
       socket.emit("joinPoll", { pollId: this.pollId });
 
-      socket.emit("thisIsAdminId", {pollId: this.pollId, adminId: this.adminId});
+      socket.emit("thisIsAdminId", { pollId: this.pollId, adminId: this.adminId });
 
       this.$router.push(`/lobby/${this.pollId}`);
 
