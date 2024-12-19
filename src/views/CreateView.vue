@@ -98,10 +98,6 @@ export default {
 
     finalizeQuestions: function () {
       this.selectedQuestionCount = this.tempQuestionsCount;
-      socket.emit("setQuestionCount", {
-        pollId: this.pollId,
-        questionCount: this.selectedQuestionCount,
-      });
       this.nextStep();
     },
 
@@ -130,6 +126,7 @@ export default {
 
       this.generatePollID();
 
+    
       socket.emit("createPoll", {
         pollId: this.pollId,
         lang: this.lang,
@@ -137,6 +134,13 @@ export default {
         questionCount: this.selectedQuestionCount,
         timerCount: this.selectedTime,
       });
+
+      /*
+      socket.emit("setQuestionCount", {
+        pollId: this.pollId,
+        questionCount: this.selectedQuestionCount,
+      });*/
+
       socket.emit("joinPoll", { pollId: this.pollId });
 
       socket.emit("thisIsAdminId", { pollId: this.pollId, adminId: this.adminId });

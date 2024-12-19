@@ -91,8 +91,10 @@ export default {
     });
 
     //KOLLA ANTAL FRÅGOR I SERVER
-    //socket.emit("getQuestionCount", { pollId: this.pollId });
     //socket.emit("setQuestionCount", { pollId: this.pollId })
+
+
+    socket.emit("getQuestionCount", this.pollId);
 
     socket.on("sendQuestionCount", (data) => {
       this.questionCount = data.questionCount;
@@ -102,6 +104,7 @@ export default {
       this.loadQuestions(this.questionCount);
     });
 
+    /*
     // Fallback to load a random question if no question is received from the server
     setTimeout(() => {
       if (!this.question.q) {
@@ -110,7 +113,7 @@ export default {
       if (!this.question.a.length) {
         this.loadRandomAnswer();
       }
-    }, 1000); // Wait a second for potential server response
+    }, 1000); // Wait a second for potential server response*/
   },
   methods: {
     submitAnswer: function (answer) {
@@ -163,10 +166,14 @@ export default {
     //FÅ INFO OM ANTAL FRÅGOR FRÅN CREATE VIEW
     loadQuestions(questionCount) {
       // Fetch the required number of random questions
+      console.log("question count är", questionCount);
       const questions = [];
       for (let i = 0; i < questionCount; i++) {
         const randomQuestion = this.loadRandomQuestion();
 
+        questions.push(randomQuestion);
+
+        /*
         //If question not a dublicate, push to array
         if (
           randomQuestion &&
@@ -175,7 +182,8 @@ export default {
           questions.push(randomQuestion);
         } else {
           i--; // If the question was a duplicate, try again
-        }
+        }*/
+
       }
       // Store the random questions to be displayed and used during the game
       this.questions = questions;
@@ -184,14 +192,14 @@ export default {
 
     // Load a random question from the local `questionsEn.json`
     loadRandomQuestion() {
-      console.log("ÄR I LOAD RANDOM QUESTION");
+      //console.log("ÄR I LOAD RANDOM QUESTION");
 
       const categories = Object.keys(questionsEn.categories);
-      console.log("Available categories:", categories);
+      //console.log("Available categories:", categories);
 
       const randomCategory =
         categories[Math.floor(Math.random() * categories.length)];
-      console.log("Random category selected:", randomCategory);
+      //console.log("Random category selected:", randomCategory);
       const randomQuestion =
         questionsEn.categories[randomCategory][
           Math.floor(

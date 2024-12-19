@@ -12,7 +12,7 @@ function sockets(io, socket, data) {
     // Create a poll with the given ID and language
     data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
 
-   /* // Emit the number of questions for the created poll (LÄGG TILL TID HÄR SEN OCÅ)
+    /* // Emit the number of questions for the created poll (LÄGG TILL TID HÄR SEN OCÅ)
     socket.emit("setQuestionCount", {
       pollId: d.pollId,
       questionCount: d.questionCount,
@@ -270,28 +270,26 @@ function sockets(io, socket, data) {
   //slut - FÖR ATT SPARA KATEGORIN MM (finns även lite i submit answer)
 
   //ladda in val av antal frågor (och sen även tid per fråga) till spelet
-  let pollData = {}; // Example of in-memory storage, can be replaced with database ALT andvända DATA.JS?
 
   // Socket event to set the number of questions
-  socket.on("setQuestionCount", (data) => {
-    const { pollId, questionCount } = data;
+  socket.on("getQuestionCount", (pollId) => {
+    //const { pollId, questionCount } = d;
+    
 
-    // Store the question count for the poll
-    pollData[pollId] = pollData[pollId] || {};
-    pollData[pollId].questionCount = questionCount;
-    console.log(`Poll ${pollId} set to have ${questionCount} questions.`);
+    if (data.polls && data.polls[pollId]) {
+      // Store the question count for the poll
+      const questionCount = data.polls[pollId].questionCount;
+      console.log(`Poll ${pollId} set to have ${questionCount} questions.`);
 
-
-    socket.emit("sendQuestionCount", { questionCount });
-
+      socket.emit("sendQuestionCount", { questionCount });
+    } else {
+      console.error(`Poll with ID ${pollId} does not exist.`);
+      socket.emit("error", {
+        message: `Poll with ID ${pollId} does not exist.`,
+      });
+    }
   });
 
-  socket.on("getQuestionCount", (data) => {
-    const { pollId } = data;
-    const questionCount = pollData[pollId] ? pollData[pollId].questionCount : 0;
-
-    socket.emit("sendQuestionCount", { questionCount });
-  });
   //slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
 }
 
