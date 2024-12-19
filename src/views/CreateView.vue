@@ -134,6 +134,8 @@ export default {
         pollId: this.pollId,
         lang: this.lang,
         adminId: this.adminId,
+        questionCount: this.selectedQuestionCount,
+        timerCount: this.selectedTime,
       });
       socket.emit("joinPoll", { pollId: this.pollId });
 

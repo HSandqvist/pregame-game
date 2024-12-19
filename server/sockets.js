@@ -10,7 +10,14 @@ function sockets(io, socket, data) {
   // Event: Create a new poll
   socket.on("createPoll", function (d) {
     // Create a poll with the given ID and language
-    data.createPoll(d.pollId, d.lang, d.adminId);
+    data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
+
+   /* // Emit the number of questions for the created poll (LÄGG TILL TID HÄR SEN OCÅ)
+    socket.emit("setQuestionCount", {
+      pollId: d.pollId,
+      questionCount: d.questionCount,
+    });*/
+
     // Emit the poll data back to the client
     socket.emit("pollData", data.getPoll(d.pollId));
 
@@ -72,7 +79,6 @@ function sockets(io, socket, data) {
     );
   });
 
-  
   /*socket.on("submitAnswer", function ({ pollId, answer }) {
     // Check if the poll exists in the in-memory store
     if (!polls[pollId]) {
@@ -102,10 +108,7 @@ function sockets(io, socket, data) {
 
   });*/
 
-
-
-
- /* //VARIANT 2 Hare en bra struktur för hur vi loggar svaren för categoreer
+  /* //VARIANT 2 Hare en bra struktur för hur vi loggar svaren för categoreer
   socket.on("submitAnswer", function ({ pollId, answer, userId }) {
     // Ensure the poll exists
     if (!polls[pollId]) {
@@ -147,7 +150,6 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
   });*/
 
-
   //VARIANT 3
   socket.on("submitAnswer", function ({ pollId, answer }) {
     // Ensure the poll exists in memory
@@ -156,34 +158,38 @@ function sockets(io, socket, data) {
       console.log(`Poll ${pollId} initialized. Poll structure:`, polls[pollId]);
     }
     const pollAnswers = polls[pollId].answers;
-  
+
     // If this answer doesn't exist, initialize it with a vote count of 0
     if (pollAnswers[answer]) {
-      pollAnswers[answer] = { count : 0, voters : []};
+      pollAnswers[answer] = { count: 0, voters: [] };
     }
 
-  
     // Ensure the answers object for the current question exists
     if (!pollAnswers[polls[pollId].currentQuestion]) {
       pollAnswers[polls[pollId].currentQuestion] = {};
-      console.log(`Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}`);
+      console.log(
+        `Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}`
+      );
     }
-  
+
     const currentQuestionAnswers = pollAnswers[polls[pollId].currentQuestion];
-  
+
     // Increment the vote count for the selected answer
     if (!currentQuestionAnswers[answer]) {
       currentQuestionAnswers[answer] = 1; // First vote for this answer
     } else {
       currentQuestionAnswers[answer] += 1; // Increment vote count
     }
-  
-    console.log(`Updated answers for question ${polls[pollId].currentQuestion} in poll ${pollId}:`, currentQuestionAnswers);
-  
+
+    console.log(
+      `Updated answers for question ${polls[pollId].currentQuestion} in poll ${pollId}:`,
+      currentQuestionAnswers
+    );
+
     // Find the answer with the most votes
     let topAnswer = null;
     let maxVotes = 0;
-  
+
     // Iterate over the answers and find the one with the most votes
     for (let answerKey in currentQuestionAnswers) {
       const voteCount = currentQuestionAnswers[answerKey];
@@ -192,51 +198,55 @@ function sockets(io, socket, data) {
         topAnswer = answerKey; // Store the answer with the highest votes
       }
     }
-  
-    console.log(`Top answer for poll ${pollId}: ${topAnswer} with ${maxVotes} votes.`);
-  
+
+    console.log(
+      `Top answer for poll ${pollId}: ${topAnswer} with ${maxVotes} votes.`
+    );
+
     // Emit the most voted answer to all clients in the poll room
     io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
   });
-  
 
-
-  
-
+  /*
   socket.on('checkAdmin', function(d) {
     const { pollId, userId } = d;
+    if (typeof data.isAdmin === 'function') {
     const isAdmin = data.isAdmin(pollId, userId);
     socket.emit('adminCheckResult', { isAdmin });
-  });
+  } else {    //error handling added
+    console.error("isAdmin method is not available on the data object.");
+    socket.emit('adminCheckResult', { isAdmin: false, error: "isAdmin method not found." });
+  }
+  });*/
 
-   // Event: Check if user is the admin
-   socket.on('checkAdmin', function(d) {
+  // Event: Check if user is the admin
+  socket.on("checkAdmin", function (d) {
     const { pollId, userId } = d; // Extract pollId and userId from the client
     if (data.pollExists(pollId)) {
       const isAdmin = data.getPoll(pollId).adminId === userId; // Compare userId with adminId
-      socket.emit('adminCheckResult', { isAdmin }); // Emit result back to the client
+      socket.emit("adminCheckResult", { isAdmin }); // Emit result back to the client
     } else {
-      socket.emit('adminCheckResult', { isAdmin: false, error: "Poll does not exist" }); // Error handling
+      socket.emit("adminCheckResult", {
+        isAdmin: false,
+        error: "Poll does not exist",
+      }); // Error handling
     }
   });
-  
-  
+
   socket.on("getSubmittedAnswers", function (pollId) {
     const answers = polls[pollId]?.answers || [];
     socket.emit("previousAnswers", answers);
     console.log(`Sent answers for poll ${pollId}:`, answers);
   });
-  
+
   socket.on("endPoll", function (pollId) {
     if (polls[pollId]) {
       delete polls[pollId]; // Remove the poll data
       console.log(`Poll ${pollId} ended and data removed.`);
     }
-  });  
+  });
 
-
-
-//FÖR ATT SPARA KATEGORIN MM
+  //FÖR ATT SPARA KATEGORIN MM
   socket.on("runQuestion", function (d) {
     const { pollId, questionNumber } = d;
 
@@ -248,40 +258,41 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("questionUpdate", question);
 
     // Emit the reset submitted answers
-    io.to(pollId).emit("submittedAnswersUpdate", data.getSubmittedAnswers(pollId));
+    io.to(pollId).emit(
+      "submittedAnswersUpdate",
+      data.getSubmittedAnswers(pollId)
+    );
 
     // Emit the updated category winners
     const poll = data.getPoll(pollId);
     io.to(pollId).emit("categoryWinnersUpdate", poll.categoryWinners);
-});
-//slut - FÖR ATT SPARA KATEGORIN MM (finns även lite i submit answer)
+  });
+  //slut - FÖR ATT SPARA KATEGORIN MM (finns även lite i submit answer)
+
+  //ladda in val av antal frågor (och sen även tid per fråga) till spelet
+  let pollData = {}; // Example of in-memory storage, can be replaced with database ALT andvända DATA.JS?
+
+  // Socket event to set the number of questions
+  socket.on("setQuestionCount", (data) => {
+    const { pollId, questionCount } = data;
+
+    // Store the question count for the poll
+    pollData[pollId] = pollData[pollId] || {};
+    pollData[pollId].questionCount = questionCount;
+    console.log(`Poll ${pollId} set to have ${questionCount} questions.`);
 
 
+    socket.emit("sendQuestionCount", { questionCount });
 
+  });
 
- 
-//ladda in val av antal frågor (och sen även tid per fråga) till spelet
-let pollData = {}; // Example of in-memory storage, can be replaced with database ALT andvända DATA.JS?
+  socket.on("getQuestionCount", (data) => {
+    const { pollId } = data;
+    const questionCount = pollData[pollId] ? pollData[pollId].questionCount : 0;
 
-// Socket event to set the number of questions
-socket.on('setQuestionCount', (data) => {
-  const { pollId, questionCount } = data;
-  
-  // Store the question count for the poll
-  pollData[pollId] = pollData[pollId] || {};
-  pollData[pollId].questionCount = questionCount;
-  console.log(`Poll ${pollId} set to have ${questionCount} questions.`);
-});
-
-socket.on('getQuestionCount', (data) => {
-  const { pollId } = data;
-  const questionCount = pollData[pollId] ? pollData[pollId].questionCount : 0;
-
-  socket.emit('sendQuestionCount', { questionCount });
-});
-//slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
-
-
+    socket.emit("sendQuestionCount", { questionCount });
+  });
+  //slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
 }
 
 // Export the `sockets` function for use in other modules
