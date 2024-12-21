@@ -3,9 +3,6 @@
     <h1>Poll id: {{ pollId }}</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
-    <h3>Who's most likely to...</h3>
-    <span>{{ currentQuestion.q }}</span>
-
     <!-- Render all questions from the questions array -->
     <h3>All Questions:</h3>
     <ul>
@@ -13,13 +10,22 @@
         {{ q }}
       </li>
     </ul>
-    <!-- Display the submitted answers -->
-    <!-- Ta bort options under sen-->
-    <QuestionComponent
-      v-bind:question="currentQuestion"
-      v-bind:participants="currentQuestion.a"
-      v-on:answer="submitAnswer($event)"
-    />
+
+    <div v-if="view === 'question'">
+      <!-- Render the question component -->
+      <QuestionComponent
+        v-bind:question="currentQuestion"
+        v-bind:participants="currentQuestion.a"
+        v-on:answer="submitAnswer($event)"
+      />
+
+      <!-- alt byta till denna på v-on v-on:answer="submitAnswer($event)" -->
+    </div>
+
+    <div v-if="view === 'results'">
+      <!-- Render ResultQuestionComponent -->
+      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+    </div>
 
     <!-- Navigation to change the current question -->
     <button @click="prevQuestion" :disabled="currentQuestionIndex === 0">
@@ -32,7 +38,7 @@
       Next
     </button>
 
-    <!-- Visa array av svaren-->
+    <!-- Visa array av svaren
     <h3>Saved answers:</h3>
     <div>
       <p id="topAnswer">Top Answer:</p>
@@ -42,14 +48,16 @@
       <li v-for="(votes, name) in submittedAnswers[pollId]" :key="name">
         {{ name }}: {{ votes }} votes
       </li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
+import ResultQuestionComponent from "../components/ResultQuestionComponent.vue";
 import questionsEn from "@/assets/questions-en.json";
+import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -59,6 +67,7 @@ export default {
   name: "PollView",
   components: {
     QuestionComponent, // Register the QuestionComponent
+    ResultQuestionComponent, //Register the ResultQuestionComponent
   },
   data: function () {
     return {
@@ -71,26 +80,36 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
+
+      view: "question", // 'question' or 'results'
     };
   },
 
   created: function () {
     // Poll ID    // Set the poll ID from // Collected answers for the poll the route parameter
     this.pollId = this.$route.params.id;
+   
     // Listen for server events to update the question and submitted answers
-    socket.on("questionUpdate", (q) => (this.currentQuestion = q)); // Update the current question
+    socket.on("questionUpdate", (q) => {
+      (this.currentQuestion = q)
+      console.log("Updated question:", q);  // Add this log
+    }); // Update the current question
+    
     socket.on(
       "submittedAnswersUpdate",
       (answers) => (this.submittedAnswers = answers)
     ); // Update the submitted answers
+
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
+  
     socket.emit("joinPoll", this.pollId);
 
     // Begär redan sparade svar från servern
     socket.emit("getSubmittedAnswers", this.pollId);
+   
     socket.on("previousAnswers", (answers) => {
       this.submittedAnswers = answers;
       console.log("Tidigare svar hämtade från servern:", answers);
@@ -117,21 +136,38 @@ export default {
       // Now, load the questions based on this count
       this.loadQuestions(this.questionCount);
     });
+
+    // Listen for category results update
+    socket.on("categoryResultsUpdate", (results) => {
+      console.log("Category Results:", results);
+      // Update state to display results in the result component
+      this.categoryResults = results;
+    });
   },
   methods: {
     submitAnswer: function (answer) {
       // Emit the answer to the server
       socket.emit("submitAnswer", { pollId: this.pollId, answer: answer });
+      console.log("Answer sent:", answer);
 
-      // Log the action for debugging
-      console.log("Answer sent to server:", {
-        pollId: this.pollId,
-        answer: answer,
+       // Switch view to show the result after answer submission
+       this.view = "results";
+    },
+
+    // Triggered when the current question ends
+    endQuestion: function () {
+      socket.emit("endQuestion", { pollId: this.pollId });
+    },
+
+    // Listen for updated category results from the server
+    updateCategoryResults: function () {
+      socket.on("categoryResultsUpdate", (data) => {
+        console.log("Category Results Updated:", data);
+        // Update your frontend state with the updated results
       });
     },
 
     // Update the question with server data or a randomly selected question
-    //förut med question.q och question.a objektet... bytte till currentQuestion för att se vad som skulle hända
     updateQuestion(serverQuestion) {
       if (serverQuestion && serverQuestion.q) {
         this.currentQuestion.q = serverQuestion.q;
@@ -140,6 +176,7 @@ export default {
     },
 
     loadRandomAnswer() {
+      //uppdatera så den läser in participants sen!!!
       const usernames = [
         "Alice",
         "Bob",
@@ -156,13 +193,12 @@ export default {
         const randomUsername =
           usernames[Math.floor(Math.random() * usernames.length)];
 
-        //  Prevent same person be chosen many times 
+        //  Prevent same person be chosen many times
         if (!selectedAnswers.includes(randomUsername)) {
           selectedAnswers.push(randomUsername);
         }
       }
-      console.log("Slumpmässiga svar:", selectedAnswers); // Log chose users as answer
-
+      console.log("Slupade users svar:", selectedAnswers); // Log chose users as answer
       return selectedAnswers;
     },
 
@@ -177,16 +213,7 @@ export default {
 
         questions.push({ q: randomQuestion, a: selectedRandomAnswers });
 
-        /*
-        //If question not a dublicate, push to array
-        if (
-          randomQuestion &&
-          !this.isQuestionDuplicate(questions, randomQuestion)
-        ) {
-          questions.push(randomQuestion);
-        } else {
-          i--; // If the question was a duplicate, try again
-        }*/
+        //LäGG IN METOD SOM KOLLAR OM FRÅGAN FÖREKOMMER FLERA GÅNGER; ISF LADDA NY FRÅGA
       }
       // Store the random questions to be displayed and used during the game
       this.questions = questions;
@@ -198,7 +225,7 @@ export default {
       }
     },
 
-    //change between questions
+    //change between questions uppdatera sen så man hoppar mellan componnets
     prevQuestion() {
       if (this.currentQuestionIndex > 0) {
         this.updateCurrentQuestion(this.currentQuestionIndex - 1);
@@ -216,14 +243,9 @@ export default {
 
     // Load a random question from the local `questionsEn.json`
     loadRandomQuestion() {
-      //console.log("ÄR I LOAD RANDOM QUESTION");
-
       const categories = Object.keys(questionsEn.categories);
-      //console.log("Available categories:", categories);
-
       const randomCategory =
         categories[Math.floor(Math.random() * categories.length)];
-      //console.log("Random category selected:", randomCategory);
       const randomQuestion =
         questionsEn.categories[randomCategory][
           Math.floor(
@@ -233,17 +255,7 @@ export default {
       console.log("Chosen question:", randomQuestion);
 
       return randomQuestion; //return randomly chosen question
-
-      /*  this.question.q = randomQuestion;
-      console.log("frågan", this.question.q);
-      return this.question.q;*/
     },
-
-    isQuestionDuplicate(questions, newQuestion) {
-      // Check if the new question already exists in the questions array
-      return questions.some((q) => q.q === newQuestion.q);
-    },
-    //slut - FÅ INFO OM ANTAL FRÅGOR FRÅN CREATE VIEW
   },
 };
 </script>

@@ -78,83 +78,14 @@ function sockets(io, socket, data) {
     );
   });
 
-  /*socket.on("submitAnswer", function ({ pollId, answer }) {
-    // Check if the poll exists in the in-memory store
-    if (!polls[pollId]) {
-      polls[pollId] = { answers: [] }; // Initialize poll data if not already created
-    }
-
-    const pollAnswers = polls[pollId].answers;
-  
-    // Ensure the current question's answers object exists
-    if (!pollAnswers[polls[pollId].currentQuestion]) {
-      pollAnswers[polls[pollId].currentQuestion] = {};
-    }
-  
-    const currentQuestionAnswers = pollAnswers[polls[pollId].currentQuestion];
-  
-    // Increment the vote count for the selected answer (participant's name)
-    if (!currentQuestionAnswers[answer]) {
-      currentQuestionAnswers[answer] = 1; // First vote for this participant
-    } else {
-      currentQuestionAnswers[answer] += 1; // Increment vote count
-    }
-  
-    console.log(`Answer updated for poll ${pollId}:`, currentQuestionAnswers);
-  
-    // Notify all clients in the poll room with the updated answers
-    io.to(pollId).emit("submittedAnswersUpdate", currentQuestionAnswers);
-
-  });*/
-
-  /* //VARIANT 2 Hare en bra struktur för hur vi loggar svaren för categoreer
-  socket.on("submitAnswer", function ({ pollId, answer, userId }) {
-    // Ensure the poll exists
-    if (!polls[pollId]) {
-      polls[pollId] = { answers: {}, currentQuestion: null }; // Initialize poll data if not already created
-    }
-  
-    const pollAnswers = polls[pollId].answers;
-  
-    // Ensure the current question's answers object exists
-    if (!pollAnswers[polls[pollId].currentQuestion]) {
-      pollAnswers[polls[pollId].currentQuestion] = {};
-      console.log(`Poll ${pollId} created. Poll structure:`, polls[pollId]);
-    }
-  
-    const currentQuestionAnswers = pollAnswers[polls[pollId].currentQuestion];
-  
-    // Increment the vote count for the selected answer
-    if (!currentQuestionAnswers[answer]) {
-      currentQuestionAnswers[answer] = { count: 1, voters: [userId] }; // First vote for this answer
-    } else {
-      currentQuestionAnswers[answer].count += 1; // Increment vote count
-      currentQuestionAnswers[answer].voters.push(userId); // Track the voter
-    }
-  
-    console.log(`Answer updated for poll ${pollId}:`, currentQuestionAnswers);
-  
-    // Find the answer with the most votes
-    let topAnswer = null;
-    let maxVotes = 0;
-    for (let answerKey in currentQuestionAnswers) {
-      const answerData = currentQuestionAnswers[answerKey];
-      if (answerData.count > maxVotes) {
-        maxVotes = answerData.count;
-        topAnswer = answerKey; // Save the answer with the highest vote count
-      }
-    }
-  
-    // Emit the most popular answer to clients
-    io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
-  });*/
-
-  //VARIANT 3
   socket.on("submitAnswer", function ({ pollId, answer }) {
     // Ensure the poll exists in memory
     if (!polls[pollId]) {
       polls[pollId] = { answers: {}, currentQuestion: null }; // Initialize poll if not created
       console.log(`Poll ${pollId} initialized. Poll structure:`, polls[pollId]);
+
+      data.submitAnswer(pollId, answer);
+      console.log(`Answer received: ${answer} for poll ${pollId}`);
     }
     const pollAnswers = polls[pollId].answers;
 
@@ -206,17 +137,19 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
   });
 
-  /*
-  socket.on('checkAdmin', function(d) {
-    const { pollId, userId } = d;
-    if (typeof data.isAdmin === 'function') {
-    const isAdmin = data.isAdmin(pollId, userId);
-    socket.emit('adminCheckResult', { isAdmin });
-  } else {    //error handling added
-    console.error("isAdmin method is not available on the data object.");
-    socket.emit('adminCheckResult', { isAdmin: false, error: "isAdmin method not found." });
-  }
-  });*/
+  socket.on("endQuestion", ({ pollId }) => {
+    if (data.pollExists(pollId)) {
+      data.runQuestion(pollId, data.getPoll(pollId).currentQuestion + 1);
+
+      // Emit updated results for the category
+      const poll = data.getPoll(pollId);
+      const currentCategory = data.getCategoryForQuestion(
+        poll.questions[poll.currentQuestion].q
+      );
+      const categoryResults = data.totalAnswers.categories[currentCategory];
+      io.to(pollId).emit("categoryResultsUpdate", categoryResults);
+    }
+  });
 
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {
@@ -273,7 +206,6 @@ function sockets(io, socket, data) {
   // Socket event to set the number of questions
   socket.on("getQuestionCount", (pollId) => {
     //const { pollId, questionCount } = d;
-    
 
     if (data.polls && data.polls[pollId]) {
       // Store the question count for the poll
