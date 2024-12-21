@@ -65,7 +65,8 @@ Data.prototype.createPoll = function (
   lang = "en",
   adminId,
   questionCount,
-  timerCount
+  timerCount,
+  questions,
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
@@ -74,13 +75,14 @@ Data.prototype.createPoll = function (
       questionCount: questionCount, // The number of questions for the poll
       timerCount: timerCount, // Time allocated per question
 
-      questions: [], // Empty array for questions
       answers: [], // Empty array for answers
       participants: [], // Empty array for participants
       currentQuestion: 0, // Start with the first question
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
+
+      questions: {}, // Empty array for questions
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
     console.log("poll created", pollId, poll, "Admin is:", adminId);
@@ -105,7 +107,7 @@ Data.prototype.participateInPoll = function (
   isAdmin
 ) {
   console.log("participant will be added to", pollId, name, userId, isAdmin);
-  // console.log("participant will be added to", pollId, name);
+
   this.polls[pollId].participants.push({
     name: name,
     avatar: avatar,
@@ -120,7 +122,6 @@ Data.prototype.getParticipants = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId].participants;
   }
-
   return [];
 };
 
