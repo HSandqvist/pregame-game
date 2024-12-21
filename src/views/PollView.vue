@@ -27,7 +27,7 @@
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
     </div>
 
-    <!-- Navigation to change the current question -->
+    <!-- Navigation to change the current question 
     <button @click="prevQuestion" :disabled="currentQuestionIndex === 0">
       Previous
     </button>
@@ -36,7 +36,7 @@
       :disabled="currentQuestionIndex === questions.length - 1"
     >
       Next
-    </button>
+    </button> -->
 
     <!-- Visa array av svaren
     <h3>Saved answers:</h3>
@@ -144,6 +144,7 @@ export default {
       this.categoryResults = results;
     });
   },
+
   methods: {
     submitAnswer: function (answer) {
       // Emit the answer to the server
@@ -225,6 +226,7 @@ export default {
       }
     },
 
+    /*
     //change between questions uppdatera sen så man hoppar mellan componnets
     prevQuestion() {
       if (this.currentQuestionIndex > 0) {
@@ -235,13 +237,13 @@ export default {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.updateCurrentQuestion(this.currentQuestionIndex + 1);
       }
-    },
+    },*/
     updateCurrentQuestion(index) {
       this.currentQuestionIndex = index;
       this.currentQuestion = this.questions[index];
     },
 
-    // Load a random question from the local `questionsEn.json`
+    // Load a random question from the local questionsEn.json
     loadRandomQuestion() {
       const categories = Object.keys(questionsEn.categories);
       const randomCategory =

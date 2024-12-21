@@ -65,8 +65,7 @@ Data.prototype.createPoll = function (
   lang = "en",
   adminId,
   questionCount,
-  timerCount,
-  questions,
+  timerCount
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
@@ -75,14 +74,13 @@ Data.prototype.createPoll = function (
       questionCount: questionCount, // The number of questions for the poll
       timerCount: timerCount, // Time allocated per question
 
+      questions: [], // Empty array for questions
       answers: [], // Empty array for answers
       participants: [], // Empty array for participants
       currentQuestion: 0, // Start with the first question
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
-
-      questions: {}, // Empty array for questions
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
     console.log("poll created", pollId, poll, "Admin is:", adminId);
@@ -107,7 +105,7 @@ Data.prototype.participateInPoll = function (
   isAdmin
 ) {
   console.log("participant will be added to", pollId, name, userId, isAdmin);
-
+  // console.log("participant will be added to", pollId, name);
   this.polls[pollId].participants.push({
     name: name,
     avatar: avatar,
@@ -122,6 +120,7 @@ Data.prototype.getParticipants = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId].participants;
   }
+
   return [];
 };
 
@@ -199,13 +198,13 @@ Data.prototype.submitAnswer = function (pollId, answer) {
       const question = poll.questions[poll.currentQuestion];
       const category = this.getCategoryForQuestion(question.q);
       console.log(
-        `Category for question: ${currentQuestion.q} is '${category}'`
+        `Category for question: ${currentQuestion.q} is '${category}`
       );
       
       // Save the top participant in the category winners object
           if (category && topParticipant) {
               poll.categoryWinners[category] = topParticipant;
-              console.log(`Saved top participant '${topParticipant}' for category '${category}'`);
+              console.log(`Saved top participant '${topParticipant}' for category '${category}`);
           } 
 
       // Initialize category in totalAnswers if not already

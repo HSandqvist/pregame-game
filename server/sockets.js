@@ -1,56 +1,5 @@
 const polls = {};
-
-const fs = require('fs');
-
-// Load questions from JSON file (make sure you load it only once)
-let questionsData = {};
-fs.readFile('questions.json', 'utf8', (err, data) => {
-  if (err) throw err;
-  questionsData = JSON.parse(data);
-});
-
-// Load random question from categories
-function loadRandomQuestion() {
-  const categories = Object.keys(questionsData.categories);
-  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-  const randomQuestion = questionsData.categories[randomCategory][
-    Math.floor(Math.random() * questionsData.categories[randomCategory].length)
-  ];
-  return randomQuestion;
-}
-
-// Load random answers (e.g., select random users)
-function loadRandomAnswer() {
-  const usernames = ["Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace"];
-  const selectedAnswers = [];
-
-  while (selectedAnswers.length < 3) {
-    const randomUsername = usernames[Math.floor(Math.random() * usernames.length)];
-
-    // Prevent selecting the same user twice
-    if (!selectedAnswers.includes(randomUsername)) {
-      selectedAnswers.push(randomUsername);
-    }
-  }
-  return selectedAnswers;
-}
-
-// Load random questions and answers for the game
-function loadQuestions(questionCount) {
-  const questions = [];
-
-  for (let i = 0; i < questionCount; i++) {
-    const randomQuestion = loadRandomQuestion();
-    const selectedRandomAnswers = loadRandomAnswer();
-    questions.push({ q: randomQuestion, a: selectedRandomAnswers });
-  }
-  return questions;
-}
-
-
-
-//SOCKET FUNCTIONS PART
-// Define the `sockets` function to handle WebSocket events
+// Define the sockets function to handle WebSocket events
 function sockets(io, socket, data) {
   // Event: Request UI labels based on language
   socket.on("getUILabels", function (lang) {
@@ -63,34 +12,23 @@ function sockets(io, socket, data) {
     // Create a poll with the given ID and language
     data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
 
+    /* // Emit the number of questions for the created poll (LÄGG TILL TID HÄR SEN OCÅ)
+    socket.emit("setQuestionCount", {
+      pollId: d.pollId,
+      questionCount: d.questionCount,
+    });*/
+
     // Emit the poll data back to the client
     socket.emit("pollData", data.getPoll(d.pollId));
+
+    // Emit the adminId for the client to use
+    //socket.emit("adminId", d.adminId);
   });
-
-
-
-  // Event when clients request questions to be loaded
-  socket.on('loadQuestions', (questionCount) => {
-    const questions = loadQuestions(questionCount); // Load questions server-side
-    console.log('Loaded questions:', questions);
-    
-    // Emit the questions back to the client
-    socket.emit('questionList', questions); 
-  });
-
-  socket.on("setTimePerQuestion", (data) => {
-    const poll = data.getPoll(data.pollId);
-    if (poll) {
-        poll.timerCount = data.time;
-        console.log(`Time per question set for poll ${data.pollId}: ${data.time} seconds`);
-    }
-});
 
   // Event: Add a new question to a poll
   socket.on("addQuestion", function (d) {
     // Add the question and answer options to the specified poll
     data.addQuestion(d.pollId, { q: d.q, a: d.a });
-
     // Emit the updated question data to the client
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
   });
@@ -99,11 +37,13 @@ function sockets(io, socket, data) {
   socket.on("joinPoll", function (d) {
     // Add the client to the specified poll room
     socket.join(d.pollId);
+    //data.addParticipant(d.pollId, d.myName);
     // Emit the current question data to the client
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
     // Emit the submitted answers for the current question to the client
     socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(d.pollId));
 
+    //ev lägga till
     // Send the adminId to the client after joining
     const poll = data.getPoll(d.pollId);
     socket.emit("adminId", poll.adminId);
@@ -123,8 +63,6 @@ function sockets(io, socket, data) {
   socket.on("startPoll", function (pollId) {
     // Notify all clients in the poll room that the poll has started
     io.to(pollId).emit("startPoll");
-
-    //HÄR KOPPLA SÅ ALLA FRÅGOR SÄTTS? FÖR NU ÄR ALLA PARTICIPANTS MED
   });
 
   // Event: Run a specific question in a poll
@@ -160,7 +98,7 @@ function sockets(io, socket, data) {
     if (!pollAnswers[polls[pollId].currentQuestion]) {
       pollAnswers[polls[pollId].currentQuestion] = {};
       console.log(
-        `Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}`
+        "Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}"
       );
     }
 
@@ -265,7 +203,6 @@ function sockets(io, socket, data) {
 
   //ladda in val av antal frågor (och sen även tid per fråga) till spelet
 
-  /* BEHÖVS EJ OM ANTAL FRÅGOR LADDAS OCH VÄLJAS I SOCKET DIREKT?
   // Socket event to set the number of questions
   socket.on("getQuestionCount", (pollId) => {
     //const { pollId, questionCount } = d;
@@ -283,33 +220,9 @@ function sockets(io, socket, data) {
       });
     }
   });
-  */
 
   //slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
-
-
-
-
-//flytta frågeval till servern:
-socket.on("finalizeQuestions", (data) => {
-  const poll = data.getPoll(data.pollId);
-  if (poll) {
-      poll.questions = generateQuestions(data.questionCount); // Server generates questions
-      io.to(data.pollId).emit("questionList", poll.questions);
-  }
-});
-
-function generateQuestions(count) {
-  const questions = [];
-  for (let i = 0; i < count; i++) {
-      questions.push(`Question ${i + 1}`);
-  }
-  return questions;
 }
 
-
-
-}
-
-// Export the `sockets` function for use in other modules
+// Export the sockets function for use in other modules
 export { sockets };
