@@ -1,29 +1,13 @@
 <template>
-  <div>
-
-    <!-- Display the question -->
-    <p> {{ question.q }} </p>
-
-   <!--<p> {{ question["categories"][Math.ceil(Math.random()*10)][Math.ceil(Math.random()*10)] }}</p> -->
-
-
-
-
-    <!-- CODE GIVEN Generate a button for each answer option in the question object 
-    <button v-for="a in question.a" v-on:click="answer(a)" v-bind:key="a">-->
-      <!-- Display the answer text inside the button 
-      {{ a }}
-    </button>-->
-
-    <!-- Generate a button for each randomly selected answer option -->
-    <button
-      v-for="(option, index) in randomOptions"
-      :key="index"
-      @click="answer(option)"
-    >
-      {{ option.name }}
-    </button>
-  </div>
+  <!-- Generate a button for each answer option in the question object -->
+  <button 
+    v-for="a in question.a" 
+    v-on:click="answer(a)" 
+    v-bind:key="a"
+  >
+    <!-- Display the answer text inside the button -->
+    {{ a }}
+  </button>
 </template>
 
 

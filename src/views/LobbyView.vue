@@ -269,7 +269,7 @@ export default {
 </script>
 
 <style scoped>
-/* Add styles for each section as needed */
+/* Add styles for each section as negit eded */
 .avatar-container,
 .camera-container,
 .name-entry-section,
