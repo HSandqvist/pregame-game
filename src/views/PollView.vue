@@ -141,7 +141,6 @@ export default {
     });
     //SLUT DEL SOM BEHÖVER ADMIN CHECKAS
 
-    //flyttat nedan hit från created delen, se till hända efter att questions array är satt
 
     //Get questions from server, admin has randomized
     socket.on("questionsForGame", (data) => {
@@ -243,6 +242,9 @@ export default {
       for (let i = 0; i < questionCount; i++) {
         const randomQuestion = this.loadRandomQuestion();
         const selectedRandomAnswers = this.loadRandomAnswer();
+
+
+        //socket.emit("addQuestion", {pollId: this.pollId, q: randomQuestion, a: selectedRandomAnswers})
 
         questions.push({ q: randomQuestion, a: selectedRandomAnswers });
 
