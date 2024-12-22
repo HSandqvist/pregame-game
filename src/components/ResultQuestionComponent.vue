@@ -21,8 +21,8 @@
   export default {
     name: "ResultQuestionComponent",
     props: {
-      topAnswer: { type: String, required: true },
-      maxVotes: { type: Number, required: true },
+      topAnswer: { type: String, default: "",required: true },
+      maxVotes: { type: Number, default: 0, required: true },
       categories: { type: Object, default: () => ({}) }, // Optional category results
     },
   };

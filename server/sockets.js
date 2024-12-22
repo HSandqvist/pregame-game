@@ -12,17 +12,8 @@ function sockets(io, socket, data) {
     // Create a poll with the given ID and language
     data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
 
-    /* // Emit the number of questions for the created poll (LÄGG TILL TID HÄR SEN OCÅ)
-    socket.emit("setQuestionCount", {
-      pollId: d.pollId,
-      questionCount: d.questionCount,
-    });*/
-
     // Emit the poll data back to the client
     socket.emit("pollData", data.getPoll(d.pollId));
-
-    // Emit the adminId for the client to use
-    //socket.emit("adminId", d.adminId);
   });
 
   // Event: Add a new question to a poll
@@ -42,6 +33,11 @@ function sockets(io, socket, data) {
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
     // Emit the submitted answers for the current question to the client
     socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(d.pollId));
+
+    //debug
+    console.log("Poll ID:", this.pollId);
+    console.log("Current Question:", this.currentQuestion);
+    console.log("Submitted Answers:", this.submittedAnswers);
 
     //ev lägga till
     // Send the adminId to the client after joining
@@ -89,9 +85,12 @@ function sockets(io, socket, data) {
     }
     const pollAnswers = polls[pollId].answers;
 
-    // If this answer doesn't exist, initialize it with a vote count of 0
-    if (pollAnswers[answer]) {
-      pollAnswers[answer] = { count: 0, voters: [] };
+    // Initialize the structure for the current question's answers if it doesn't exist
+    if (!pollAnswers[polls[pollId].currentQuestion]) {
+      pollAnswers[polls[pollId].currentQuestion] = {}; // Initialize answers for current question
+      console.log(
+        `Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}`
+      );
     }
 
     // Ensure the answers object for the current question exists
@@ -104,12 +103,14 @@ function sockets(io, socket, data) {
 
     const currentQuestionAnswers = pollAnswers[polls[pollId].currentQuestion];
 
-    // Increment the vote count for the selected answer
+    // If the answer doesn't exist for this question, initialize it with a count of 0 and empty voters
     if (!currentQuestionAnswers[answer]) {
-      currentQuestionAnswers[answer] = 1; // First vote for this answer
-    } else {
-      currentQuestionAnswers[answer] += 1; // Increment vote count
+      currentQuestionAnswers[answer] = { count: 0, voters: [] }; // Initialize the answer
     }
+
+    // Increment the vote count for the selected answer
+    currentQuestionAnswers[answer].count += 1; // Increment vote count
+    currentQuestionAnswers[answer].voters.push(answer); // Optionally track voters
 
     console.log(
       `Updated answers for question ${polls[pollId].currentQuestion} in poll ${pollId}:`,
@@ -222,6 +223,22 @@ function sockets(io, socket, data) {
   });
 
   //slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
+
+  //Spara frågor på servern och skicka till clienter
+  socket.on("saveQuestionsForClients", ({ pollId, questions }) => {
+    // Check if the pollId exists in the polls object
+    if (!polls[pollId]) {
+      // If it doesn't exist, initialize it
+      polls[pollId] = { questions: [] }; // Initialize with an empty array for questions or other default structure
+    }
+
+    // Now you can safely set the questions
+    polls[pollId].questions = questions;
+
+    // Broadcast the questions to all clients in the room
+    io.to(pollId).emit("questionsForGame", { questions: questions });
+    console.log("Emitting questionsForGame event:", questions);
+  });
 }
 
 // Export the sockets function for use in other modules

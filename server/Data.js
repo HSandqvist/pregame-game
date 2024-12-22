@@ -5,6 +5,8 @@ import { readFileSync } from "fs"; // Import the readFileSync function for readi
 // In a real-world scenario, this would interface with a database.
 function Data() {
   this.polls = {}; // Object to store all polls
+
+  /*
   // Initialize with a sample poll for testing purposes
   this.polls["test"] = {
     lang: "en", // Language for the poll
@@ -26,7 +28,7 @@ function Data() {
     totalAnswers: {
       categories: {}, // Object to store votes per category
     },
-  };
+  };*/
 }
 
 /***********************************************
