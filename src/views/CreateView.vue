@@ -1,11 +1,11 @@
 <template>
   <body>
     <div class="create-game">
-      <h1 id="create-game-headline">Create game</h1>
+      <h1 id="create-game-headline">{{this.uiLabels.createGame || "Create Game"}}</h1>
 
       <!-- Step 1: Select amount of questions -->
       <div v-if="step === 1" class="amount-questions-section">
-        <h2>Number of questions:</h2>
+        <h2>{{this.uiLabels.numberOfQuestions || "Number of questions" }}: </h2>
         <div class="amount-questions-buttons">
           <button
             v-for="count in [5, 10, 15]"
@@ -17,13 +17,13 @@
           </button>
         </div>
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
-          Next
+          {{this.uiLabels.next || "Next"}}
         </button>
       </div>
 
       <!-- Step 2: Select time per question -->
       <div v-else-if="step === 2" class="time-per-question-section">
-        <h2>Seconds per question:</h2>
+        <h2>{{this.uiLabels.secondsPerQuestion || "Seconds per question " }}:</h2>
         <div class="time-per-question-buttons">
           <button
             v-for="time in [10, 20, 30]"
@@ -34,9 +34,9 @@
             {{ time }}
           </button>
         </div>
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep">{{this.uiLabels.back || "back"}} </button>
         <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
-          Create game
+          {{this.uiLabels.createGame || "Create Game"}}
         </button>
       </div>
 
@@ -53,6 +53,7 @@
 
 <script>
 import io from "socket.io-client";
+import { toHandlers } from "vue";
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
 

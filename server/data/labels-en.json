@@ -1,13 +1,26 @@
 {
-	"sales-pitch": "Simply. Great. Polling.",
-	"subHeading": "A Game for Pregames",
-	"invite": "Invite participants:",
+
+"GENERIC":"",
+	"next" : "Next",
+	"back": "Back",
+
+"STARTVIEW": "",
 	"createGame": "Create Game",
 	"participateGame": "Join Game",
-	"question": "Question",
-	"changeLanguage": "Byt till svenska",
 	"about": "About",
-	"participateInGame": "Participate in game",
 	"startGame": "Start Game",
-	"participateInPoll": "Participate in Poll"
+	"changeLanguage": "Byt till svenska",
+
+"CREATEVIEW":"", 
+
+	"numberOfQuestions": "Number of questions",
+	"secondsPerQuestion": "Seconds per question ",
+
+"LOBBYVIEW": "",
+	"pleaseEnterYourName": "Please enter your name",
+	"captureYourAvatar": "Capture your avatar",
+	"startCamera": "Start camera",
+	"takePicture": "Take picture",
+	"yourAvatar": "Your avatar"
+
 }

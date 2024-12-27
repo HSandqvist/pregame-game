@@ -5,14 +5,18 @@ f
 
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
-      <h1>Please enter your name:</h1>
+      <h1>{{this.uiLabels.pleaseEnterYourName || "Please enter your name"}}:</h1>
       <input type="text" v-model="userName" />
-      <button v-on:click="nextStep" :disabled="!userName">Next</button>
+      <button v-on:click="nextStep" :disabled="!userName">{{this.uiLabels.next || "Next"}}</button>
+
+      <div>
+        
+      </div>
     </div>
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <h1>Capture your avatar:</h1>
+      <h1>{{this.uiLabels.captureYourAvatar || "Capture your avatar"}}: </h1>
 
       <p v-if="!isPictureTaken">
         <video ref="video" width="320" height="240" autoplay></video>
@@ -24,19 +28,19 @@ f
       </p>
 
       <button v-on:click="startCamera" :disabled="cameraState">
-        Start Camera
+        {{this.uiLabels.startCamera || "Start camera"}}
       </button>
       <button v-on:click="captureImage" :disabled="!cameraState">
-        Take Picture
+        {{this.uiLabels.takePicture || "Take picture"}}
       </button>
 
-      <button v-on:click="nextStep" :disabled="!isPictureTaken">Next</button>
-      <button v-on:click="backStep">Back</button>
+      <button v-on:click="nextStep" :disabled="!isPictureTaken">{{this.uiLabels.next || "Next"}}</button>
+      <button v-on:click="backStep">{{this.uiLabels.back || "Back"}}</button>
     </div>
 
     <!-- Step 3: Display captured avatar and submit -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>Your Avatar: {{ this.userName }}</h1>
+      <h1>{{this.uiLabels.yourAvatar || "Your Avatar "}}: {{ this.userName }}</h1>
 
       <!-- Know if user is admin or not -->
       <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>

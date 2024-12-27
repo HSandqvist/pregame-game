@@ -1,11 +1,27 @@
 {
-	"sales-pitch": "Svar. Helt. Enkelt.",
-	"subHeading": "Ett Spel för Förfester",
-	"invite": "Bjud in deltagare:",
+"GENERIC":"",
+	"next" : "Nästa",
+	"back": "Tillbaka",
+
+"STARTVIEW": "",
 	"createGame": "Skapa spel",
 	"participateGame": "Delta i spel",
-	"question": "Fråga",
-	"changeLanguage": "Change to English",
 	"about": "Om oss",
-	"participateInGame": "Delta i spelet"
+	"startGame": "Starta spel",
+	"secondsPerQuestion": "Sekunder per fråga ",
+	"changeLanguage": "Change to English",
+
+"CREATEVIEW":"", 
+
+	"participateInGame": "Delta i spelet",
+	"numberOfQuestions": "Antal frågor",
+
+"LOBBYVIEW": "",
+	"pleaseEnterYourName": "Vänligen skriv in ditt namn",
+	"captureYourAvatar": "Ta din avatarbild",
+	"startCamera": "Starta Kameran",
+	"takePicture": "Ta bild",
+	"yourAvatar": "Din avatar"
+
+
 }
