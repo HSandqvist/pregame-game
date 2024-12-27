@@ -1,5 +1,4 @@
 <template>
-
   <body>
     <div class="create-game">
       <h1 id="create-game-headline">Create game</h1>
@@ -8,8 +7,12 @@
       <div v-if="step === 1" class="amount-questions-section">
         <h2>Number of questions:</h2>
         <div class="amount-questions-buttons">
-          <button v-for="count in [5, 10, 15]" :key="count" @click="tempQuestionsCount = count"
-            :class="{ selected: tempQuestionsCount === count }">
+          <button
+            v-for="count in [5, 10, 15]"
+            :key="count"
+            @click="tempQuestionsCount = count"
+            :class="{ selected: tempQuestionsCount === count }"
+          >
             {{ count }}
           </button>
         </div>
@@ -22,8 +25,12 @@
       <div v-else-if="step === 2" class="time-per-question-section">
         <h2>Seconds per question:</h2>
         <div class="time-per-question-buttons">
-          <button v-for="time in [10, 20, 30]" :key="time" v-on:click="tempTimePerQuestion = time"
-            :class="{ selected: tempTimePerQuestion === time }">
+          <button
+            v-for="time in [10, 20, 30]"
+            :key="time"
+            v-on:click="tempTimePerQuestion = time"
+            :class="{ selected: tempTimePerQuestion === time }"
+          >
             {{ time }}
           </button>
         </div>
@@ -45,6 +52,9 @@
 </template>
 
 <script>
+import questionsEn from "@/assets/questions-en.json"; //läsas in i server istället
+import questionsSv from "@/assets/questions-sv.json";
+
 import io from "socket.io-client";
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
@@ -88,12 +98,11 @@ export default {
 
       this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
       const userId = this.adminId;
-      console.log("admin id", this.adminId)
+      console.log("admin id", this.adminId);
 
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
       console.log("User ID stored:", localStorage.getItem("userId"));
-
     },
 
     finalizeQuestions: function () {
@@ -126,7 +135,8 @@ export default {
 
       this.generatePollID();
 
-    
+      this.loadQuestionsFromFile(); // read json file questions and send to server
+
       socket.emit("createPoll", {
         pollId: this.pollId,
         lang: this.lang,
@@ -143,10 +153,39 @@ export default {
 
       socket.emit("joinPoll", { pollId: this.pollId });
 
-      socket.emit("thisIsAdminId", { pollId: this.pollId, adminId: this.adminId });
+      socket.emit("thisIsAdminId", {
+        pollId: this.pollId,
+        adminId: this.adminId,
+      });
 
       this.$router.push(`/lobby/${this.pollId}`);
     },
+
+    /*
+    // Method to load the questions from the file
+    loadQuestionsFromFile() {
+      // Check language and choose the appropriate file
+      const filePath =
+        this.lang === "en"
+          ? "/assets/questions-en.json"
+          : "/assets/questions-sv.json";
+
+      fetch(filePath)
+        .then((response) => {
+          if (!response.ok) {
+            // Log the status code if the response isn't ok
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json(); // Parse the JSON response
+        })
+        .then((data) => {
+          console.log("Questions loaded:", data);
+          socket.emit("sendQuestionsFromFileData", data); // Emit to server
+        })
+        .catch((error) => {
+          console.error("Error loading questions file:", error);
+        });
+    }, */
   },
 };
 </script>

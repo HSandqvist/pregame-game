@@ -1,10 +1,22 @@
 "use strict";
+import path from "path";
+import fs from "fs";
 import { readFileSync } from "fs"; // Import the readFileSync function for reading files, reading questions
+
+// Use import.meta.url to get the current file's URL
+const fileUrl = import.meta.url;
 
 // Define a Data class to encapsulate poll data and keep the global namespace clean.
 // In a real-world scenario, this would interface with a database.
+
 function Data() {
   this.polls = {}; // Object to store all polls
+  this.categories = {}; //Store categories from external json file
+
+  this.totalAnswers = { categories: {} }; // Object to store votes per category
+
+  //load categories from external json file
+  //this.loadCategories();
 
   /*
   // Initialize with a sample poll for testing purposes
@@ -50,11 +62,29 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels); // Parse and return the labels as an object
 };
 
+
+
 // Load categories from an external JSON file
 Data.prototype.loadCategories = function () {
   try {
-    const data = readFileSync("@/assets/questions-en.json", "utf8");
-    this.categories = JSON.parse(data);
+    // Resolve the path to the questions-en.json file
+    const filePath = path.resolve(
+      new URL(fileUrl).pathname,
+      "../assets/questions-en.json"
+    );
+
+    console.log("Looking for categories file at:", filePath); // Log the path to ensure it is correct
+
+    // Read the JSON file and parse the data
+    fs.readFile(filePath, "utf8", (err, data) => {
+      if (err) {
+        console.error("Error loading categories:", err);
+        return;
+      }
+      const categories = JSON.parse(data).categories;
+      console.log("Loaded categories:", categories);
+    });
+
   } catch (error) {
     console.error("Error loading categories:", error);
     this.categories = {}; // Fallback to an empty object if there's an error
@@ -202,12 +232,14 @@ Data.prototype.submitAnswer = function (pollId, answer) {
       console.log(
         `Category for question: ${currentQuestion.q} is '${category}`
       );
-      
+
       // Save the top participant in the category winners object
-          if (category && topParticipant) {
-              poll.categoryWinners[category] = topParticipant;
-              console.log(`Saved top participant '${topParticipant}' for category '${category}`);
-          } 
+      if (category && topParticipant) {
+        poll.categoryWinners[category] = topParticipant;
+        console.log(
+          `Saved top participant '${topParticipant}' for category '${category}`
+        );
+      }
 
       // Initialize category in totalAnswers if not already
       if (!this.totalAnswers.categories[category]) {
@@ -244,9 +276,11 @@ Data.prototype.submitAnswer = function (pollId, answer) {
   };
 
   // Store top participants for category for results
-  Data.prototype.totalAnswers = {
+
+  //vi gör redan detta i konstruktorn ovan
+  /*Data.prototype.totalAnswers = {
     categories: {}, // Object to store votes per category
-  };
+  };*/
 
   // Check if a given userId is the admin of a poll
   Data.prototype.isAdmin = function (pollId, userId) {
@@ -254,6 +288,62 @@ Data.prototype.submitAnswer = function (pollId, answer) {
       return this.polls[pollId].adminId === userId;
     }
     return false;
+  };
+
+  // Function to generate random questions based on count and participant names
+  Data.prototype.generateQuestions = function (pollId, questionCount) {
+    if (this.pollExists(pollId)) {
+      const poll = this.polls[pollId];
+      const questions = [];
+
+      for (let i = 0; i < questionCount; i++) {
+        const randomQuestion = this.loadRandomQuestion(); // Load random question
+        const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
+
+        questions.push({ q: randomQuestion, a: ["test1", "test2", "test3"] }); //for testing purposes
+        //questions.push({ q: randomQuestion, a: selectedRandomAnswers });
+      }
+
+      poll.questions = questions; // Assign the questions to the poll
+      return questions;
+    }
+    return [];
+  };
+
+  // Function to load a random question from the categories
+  Data.prototype.loadRandomQuestion = function () {
+    const categories = Object.keys(this.categories);
+    //const categories = Object.keys(questionsEn.categories);
+    const randomCategory =
+      categories[Math.floor(Math.random() * categories.length)]; // Select a random category
+
+    const randomQuestions = this.categories[randomCategory];
+    const randomQuestion =
+      randomQuestions[Math.floor(Math.random() * randomQuestions.length)]; // Select a random question from that category
+
+    return randomQuestion;
+  };
+
+  // Method to load random answer options
+  Data.prototype.loadRandomAnswers = function (pollId) {
+    if (this.pollExists(pollId)) {
+      const poll = this.polls[pollId];
+      const participants = poll.participants;
+      const selectedAnswers = [];
+
+      // Randomize three unique usernames
+      while (selectedAnswers.length < 3) {
+        const randomUsername =
+          participants[Math.floor(Math.random() * participants.length)].name;
+
+        // Prevent the same person from being chosen multiple times
+        if (!selectedAnswers.includes(randomUsername)) {
+          selectedAnswers.push(randomUsername);
+        }
+      }
+      return selectedAnswers; // Return an array of 3 random usernames
+    }
+    return []; // Return empty array if poll doesn't exist
   };
 };
 

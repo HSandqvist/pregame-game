@@ -16,12 +16,29 @@ function sockets(io, socket, data) {
     socket.emit("pollData", data.getPoll(d.pollId));
   });
 
+  /*
   // Event: Add a new question to a poll
   socket.on("addQuestion", function (d) {
     // Add the question and answer options to the specified poll
     data.addQuestion(d.pollId, { q: d.q, a: d.a });
     // Emit the updated question data to the client
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
+  });*/
+
+  // Event: Add a new question to a poll
+  socket.on("addQuestion", function (d) {
+    const pollId = d.pollId;
+    const question = d.q; // The question text
+
+    // Add the question and random answer options to the poll
+    data.addQuestion(pollId, question);
+
+    // Emit the updated question data with answers to the client
+    const questionData = data.getQuestion(pollId);
+    socket.emit("questionUpdate", questionData);
+
+    // Optionally, broadcast the updated question to all participants
+    io.to(pollId).emit("questionUpdate", questionData);
   });
 
   // Event: Join a poll
@@ -33,11 +50,6 @@ function sockets(io, socket, data) {
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
     // Emit the submitted answers for the current question to the client
     socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(d.pollId));
-
-    //debug
-    console.log("Poll ID:", this.pollId);
-    console.log("Current Question:", this.currentQuestion);
-    console.log("Submitted Answers:", this.submittedAnswers);
 
     //ev lägga till
     // Send the adminId to the client after joining
@@ -61,7 +73,7 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("startPoll");
   });
 
-  // Event: Run a specific question in a poll
+  /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
     // Get the specified question and update the current question in the poll
     let question = data.getQuestion(d.pollId, d.questionNumber);
@@ -71,6 +83,28 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit(
       "submittedAnswersUpdate",
       data.getSubmittedAnswers(d.pollId)
+    );
+  });*/
+
+  // Event: Run a specific question in a poll (with random question handling)
+  socket.on("runQuestion", function (d) {
+    const pollId = d.pollId;
+
+    // Get all questions from the poll
+    const poll = data.getPoll(pollId);
+    const questionCount = poll.questions.length;
+
+    // Select a random question if there are multiple questions
+    const randomQuestionIndex = Math.floor(Math.random() * questionCount);
+    const randomQuestion = poll.questions[randomQuestionIndex];
+
+    // Emit the random question to the clients
+    io.to(pollId).emit("questionUpdate", randomQuestion);
+
+    // Emit the random answers for this question
+    io.to(pollId).emit(
+      "submittedAnswersUpdate",
+      data.getSubmittedAnswers(pollId)
     );
   });
 
@@ -179,8 +213,34 @@ function sockets(io, socket, data) {
     }
   });
 
+  //send chosen questions for the game to clients
+  socket.on("getQuestionsForGame", function (pollId) {
+    console.log("in getquestionsforgame");
+    console.log(data.polls[pollId].questions);
+
+    if (polls[pollId]) {
+      data.generateQuestions(pollId, polls[pollId].questionCount);
+
+      const gameQuestions = polls[pollId].questions;
+
+      console.log("server skickar frågorna", gameQuestions);
+      socket.emit("questionsForGame", gameQuestions);
+    } else {
+      console.log("frågor laddades inte i server, poll existerar inte")
+    }
+  });
+
+
+  // get questions from json file in create view
+  socket.on("sendQuestionsFromFileData", (questionsData) => {
+    // Store the categories received from the client
+    data.categories = questionsData.categories;
+  
+    console.log('Received and stored categories:', data.categories);
+  });
+
   //FÖR ATT SPARA KATEGORIN MM
-  socket.on("runQuestion", function (d) {
+  /*socket.on("runQuestion", function (d) {
     const { pollId, questionNumber } = d;
 
     // Call the updated Data method to reset answers and save category winners
@@ -199,46 +259,8 @@ function sockets(io, socket, data) {
     // Emit the updated category winners
     const poll = data.getPoll(pollId);
     io.to(pollId).emit("categoryWinnersUpdate", poll.categoryWinners);
-  });
+  });*/
   //slut - FÖR ATT SPARA KATEGORIN MM (finns även lite i submit answer)
-
-  //ladda in val av antal frågor (och sen även tid per fråga) till spelet
-
-  // Socket event to set the number of questions
-  socket.on("getQuestionCount", (pollId) => {
-    //const { pollId, questionCount } = d;
-
-    if (data.polls && data.polls[pollId]) {
-      // Store the question count for the poll
-      const questionCount = data.polls[pollId].questionCount;
-      console.log(`Poll ${pollId} set to have ${questionCount} questions.`);
-
-      socket.emit("sendQuestionCount", { questionCount });
-    } else {
-      console.error(`Poll with ID ${pollId} does not exist.`);
-      socket.emit("error", {
-        message: `Poll with ID ${pollId} does not exist.`,
-      });
-    }
-  });
-
-  //slut - ladda in val av antal frågor (och sen även tid per fråga) till spelet
-
-  //Spara frågor på servern och skicka till clienter
-  socket.on("saveQuestionsForClients", ({ pollId, questions }) => {
-    // Check if the pollId exists in the polls object
-    if (!polls[pollId]) {
-      // If it doesn't exist, initialize it
-      polls[pollId] = { questions: [] }; // Initialize with an empty array for questions or other default structure
-    }
-
-    // Now you can safely set the questions
-    polls[pollId].questions = questions;
-
-    // Broadcast the questions to all clients in the room
-    io.to(pollId).emit("questionsForGame", { questions: questions });
-    console.log("Emitting questionsForGame event:", questions);
-  });
 }
 
 // Export the sockets function for use in other modules

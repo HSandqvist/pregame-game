@@ -11,7 +11,7 @@
       </li>
     </ul>
 
-    <div v-if="view === 'question'">
+    <div v-if="view === 'question_view'">
       <!-- Render the question component -->
       <QuestionComponent
         v-bind:question="currentQuestion"
@@ -22,7 +22,7 @@
       <!-- alt byta till denna på v-on v-on:answer="submitAnswer($event)" -->
     </div>
 
-    <div v-if="view === 'results' && topAnswer && maxVotes >= 0">
+    <div v-if="view === 'results_view' && topAnswer && maxVotes >= 0">
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
@@ -59,8 +59,8 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-import questionsEn from "@/assets/questions-en.json";
-import questionsSv from "@/assets/questions-sv.json";
+//import questionsEn from "@/assets/questions-en.json"; läsas in i server istället
+//import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -88,7 +88,7 @@ export default {
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
 
-      view: "question", // 'question' or 'results'
+      view: "question_view", // 'question_view' or 'results_view'
     };
   },
 
@@ -122,34 +122,16 @@ export default {
       console.log("Tidigare svar hämtade från servern:", answers);
     });
 
-    //DENNA DEL KRÄVER NÅN FORM AV CHECK SÅ ATT EX BARA ADMIN KAN LADDA FRÅGOR OCH DE UPPDATERAS FÖR ALLA KILNETER, FUNKAR INTE DE SÄTT JAG TESTAT
-    // Get the question count for the poll
-    socket.emit("getQuestionCount", this.pollId);
+    //ask server for chosen questions
+    socket.emit("getQuestionsForGame", (this.pollId));
 
-    socket.on("sendQuestionCount", (data) => {
-      this.questionCount = data.questionCount; // Store question count in a local variable
-      console.log(`Poll ${this.pollId} has ${this.questionCount} questions.`);
+    //Get questions from server
+    socket.on("questionsForGame", (d) => {
+      console.log("Data received from server (for game):", d);
 
-      // Load questions based on the question count
-      this.loadQuestions(this.questionCount);
-
-      // Emit the questions to all clients after they have been loaded
-      socket.emit("saveQuestionsForClients", {
-        pollId: this.pollId,
-        questions: this.questions,
-      });
-    });
-    //SLUT DEL SOM BEHÖVER ADMIN CHECKAS
-
-
-    //Get questions from server, admin has randomized
-    socket.on("questionsForGame", (data) => {
-      console.log("Data received from server (for game):", data);
-
-      if (data.questions) {
-        console.log("Data received from server(for game):", data); // Add this to verify data reception
-
-        this.questions = data.questions;
+      if (d.questions) {
+        console.log("Data received from server(for game):", d); // Add this to verify data reception
+        this.questions = d.questions;
         this.updateCurrentQuestion(0); // Start with the first question
         console.log("Questions received from server:", this.questions);
       } else {
@@ -183,7 +165,7 @@ export default {
       console.log("Answer sent:", answer);
 
       // Switch view to show the result after answer submission
-      this.view = "results";
+      this.view = "results_view";
     },
 
     // Triggered when the current question ends
@@ -207,7 +189,7 @@ export default {
       }
     },
 
-    loadRandomAnswer: function () {
+   /* loadRandomAnswer: function () {
       //uppdatera så den läser in participants sen!!!
       const usernames = [
         "Alice",
@@ -230,11 +212,11 @@ export default {
           selectedAnswers.push(randomUsername);
         }
       }
-      console.log("Slupade users svar:", selectedAnswers); // Log chose users as answer
+      //console.log("Slumpade users svar:", selectedAnswers); // Log chose users as answer
       return selectedAnswers;
-    },
+    },*/
 
-    //FÅ INFO OM ANTAL FRÅGOR FRÅN CREATE VIEW
+    /*//FÅ INFO OM ANTAL FRÅGOR FRÅN CREATE VIEW
     loadQuestions: function (questionCount) {
       // Fetch the required number of random questions
       console.log("question count är", questionCount);
@@ -257,14 +239,6 @@ export default {
       if (this.questions.length > 0) {
         this.updateCurrentQuestion(0);
       }
-    },
-
-    /*
-    //change between questions uppdatera sen så man hoppar mellan componnets
-    prevQuestion() {
-      if (this.currentQuestionIndex > 0) {
-        this.updateCurrentQuestion(this.currentQuestionIndex - 1);
-      }
     },*/
 
     nextQuestion: function () {
@@ -273,8 +247,9 @@ export default {
       }
 
       // Switch back to 'question' view
-      this.view = "question";
+      this.view = "question_view";
     },
+
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
@@ -285,7 +260,7 @@ export default {
       }
     },
 
-    // Load a random question from the local questionsEn.json
+    /*// Load a random question from the local questionsEn.json
     loadRandomQuestion: function () {
       const categories = Object.keys(questionsEn.categories);
       const randomCategory =
@@ -296,10 +271,10 @@ export default {
             Math.random() * questionsEn.categories[randomCategory].length
           )
         ];
-      console.log("Chosen question:", randomQuestion);
+      //console.log("Chosen question:", randomQuestion);
 
       return randomQuestion; //return randomly chosen question
-    },
+    },*/
   },
 };
 </script>
