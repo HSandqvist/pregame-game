@@ -135,8 +135,6 @@ export default {
 
       this.generatePollID();
 
-      this.loadQuestionsFromFile(); // read json file questions and send to server
-
       socket.emit("createPoll", {
         pollId: this.pollId,
         lang: this.lang,
@@ -160,32 +158,6 @@ export default {
 
       this.$router.push(`/lobby/${this.pollId}`);
     },
-
-    /*
-    // Method to load the questions from the file
-    loadQuestionsFromFile() {
-      // Check language and choose the appropriate file
-      const filePath =
-        this.lang === "en"
-          ? "/assets/questions-en.json"
-          : "/assets/questions-sv.json";
-
-      fetch(filePath)
-        .then((response) => {
-          if (!response.ok) {
-            // Log the status code if the response isn't ok
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json(); // Parse the JSON response
-        })
-        .then((data) => {
-          console.log("Questions loaded:", data);
-          socket.emit("sendQuestionsFromFileData", data); // Emit to server
-        })
-        .catch((error) => {
-          console.error("Error loading questions file:", error);
-        });
-    }, */
   },
 };
 </script>

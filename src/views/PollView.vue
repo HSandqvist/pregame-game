@@ -59,8 +59,8 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-//import questionsEn from "@/assets/questions-en.json"; läsas in i server istället
-//import questionsSv from "@/assets/questions-sv.json";
+import questionsEn from "@/assets/questions-en.json"; 
+import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -96,6 +96,10 @@ export default {
     // Poll ID    // Set the poll ID from // Collected answers for the poll the route parameter
     this.pollId = this.$route.params.id;
 
+
+    this.loadQuestionsFromFile(); // read json file questions and send to server
+
+
     // Listen for server events to update the question and submitted answers
     socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
@@ -126,12 +130,12 @@ export default {
     socket.emit("getQuestionsForGame", (this.pollId));
 
     //Get questions from server
-    socket.on("questionsForGame", (d) => {
-      console.log("Data received from server (for game):", d);
+    socket.on("questionsForGame", (qs) => {
+      console.log("Data received from server (for game):", qs);
 
-      if (d.questions) {
-        console.log("Data received from server(for game):", d); // Add this to verify data reception
-        this.questions = d.questions;
+      if (qs) {
+        console.log("Data received from server (for game):",qs); // Add this to verify data reception
+        this.questions = qs;
         this.updateCurrentQuestion(0); // Start with the first question
         console.log("Questions received from server:", this.questions);
       } else {
@@ -189,58 +193,6 @@ export default {
       }
     },
 
-   /* loadRandomAnswer: function () {
-      //uppdatera så den läser in participants sen!!!
-      const usernames = [
-        "Alice",
-        "Bob",
-        "Charlie",
-        "David",
-        "Eva",
-        "Frank",
-        "Grace",
-      ];
-      const selectedAnswers = [];
-
-      // Randomize three unique usernames
-      while (selectedAnswers.length < 3) {
-        const randomUsername =
-          usernames[Math.floor(Math.random() * usernames.length)];
-
-        //  Prevent same person be chosen many times
-        if (!selectedAnswers.includes(randomUsername)) {
-          selectedAnswers.push(randomUsername);
-        }
-      }
-      //console.log("Slumpade users svar:", selectedAnswers); // Log chose users as answer
-      return selectedAnswers;
-    },*/
-
-    /*//FÅ INFO OM ANTAL FRÅGOR FRÅN CREATE VIEW
-    loadQuestions: function (questionCount) {
-      // Fetch the required number of random questions
-      console.log("question count är", questionCount);
-      const questions = [];
-      for (let i = 0; i < questionCount; i++) {
-        const randomQuestion = this.loadRandomQuestion();
-        const selectedRandomAnswers = this.loadRandomAnswer();
-
-
-        //socket.emit("addQuestion", {pollId: this.pollId, q: randomQuestion, a: selectedRandomAnswers})
-
-        questions.push({ q: randomQuestion, a: selectedRandomAnswers });
-
-        //LäGG IN METOD SOM KOLLAR OM FRÅGAN FÖREKOMMER FLERA GÅNGER; ISF LADDA NY FRÅGA
-      }
-      // Store the random questions to be displayed and used during the game
-      this.questions = questions;
-
-      // Initialize the first question
-      if (this.questions.length > 0) {
-        this.updateCurrentQuestion(0);
-      }
-    },*/
-
     nextQuestion: function () {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.updateCurrentQuestion(this.currentQuestionIndex + 1);
@@ -260,21 +212,20 @@ export default {
       }
     },
 
-    /*// Load a random question from the local questionsEn.json
-    loadRandomQuestion: function () {
-      const categories = Object.keys(questionsEn.categories);
-      const randomCategory =
-        categories[Math.floor(Math.random() * categories.length)];
-      const randomQuestion =
-        questionsEn.categories[randomCategory][
-          Math.floor(
-            Math.random() * questionsEn.categories[randomCategory].length
-          )
-        ];
-      //console.log("Chosen question:", randomQuestion);
+    // Method to load the questions from the file, send to server
+    loadQuestionsFromFile: function() {
 
-      return randomQuestion; //return randomly chosen question
-    },*/
+      // Choose the appropriate JSON data based on the selected language
+      const allQuestionsFromFile = this.lang === "en" ? questionsEn : questionsSv;
+
+      // Emit the JSON data to the server
+      try {
+        //console.log("Questions to be sent:", allQuestionsFromFile);
+        socket.emit("sendQuestionsFromFileData", allQuestionsFromFile); // Send data to the server
+      } catch (error) {
+        console.error("Error sending questions to server:", error);
+      }
+    },
   },
 };
 </script>

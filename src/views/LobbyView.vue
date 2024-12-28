@@ -224,7 +224,8 @@ export default {
         this.avatar = canvas.toDataURL("image/png");
 
         // Log to check the base64 image
-        console.log("Captured Avatar: ", this.avatar);
+        console.log("Avatar captured")
+        //console.log("Captured Avatar: ", this.avatar);
 
         this.cameraState = false; // Disable camera actions
 

@@ -86,6 +86,7 @@ function sockets(io, socket, data) {
     );
   });*/
 
+  //kolla igenom, gör ej som tänkt
   // Event: Run a specific question in a poll (with random question handling)
   socket.on("runQuestion", function (d) {
     const pollId = d.pollId;
@@ -213,30 +214,33 @@ function sockets(io, socket, data) {
     }
   });
 
-  //send chosen questions for the game to clients
-  socket.on("getQuestionsForGame", function (pollId) {
-    console.log("in getquestionsforgame");
-    console.log(data.polls[pollId].questions);
-
-    if (polls[pollId]) {
-      data.generateQuestions(pollId, polls[pollId].questionCount);
-
-      const gameQuestions = polls[pollId].questions;
-
-      console.log("server skickar frågorna", gameQuestions);
-      socket.emit("questionsForGame", gameQuestions);
-    } else {
-      console.log("frågor laddades inte i server, poll existerar inte")
-    }
-  });
-
-
   // get questions from json file in create view
   socket.on("sendQuestionsFromFileData", (questionsData) => {
     // Store the categories received from the client
     data.categories = questionsData.categories;
-  
-    console.log('Received and stored categories:', data.categories);
+    //console.log('Received and stored categories:', data.categories); //DENNA FUNKAR
+  });
+
+  //send chosen questions for the game to clients
+  socket.on("getQuestionsForGame", function (pollId) {
+    const poll = data.polls[pollId];
+
+    //if poll doesn't exist
+    if (!poll) {
+      console.log(
+        `Questions could not load, poll with ID ${pollId} does not exist.`
+      );
+      return null; // Poll does not exist
+    }
+    // Generate questions if they don't already exist
+    if (!poll.questions || poll.questions.length === 0) {
+      const questionCount = poll.questionCount;
+      poll.questions = data.generateQuestions(pollId, questionCount);
+      console.log(`Generated ${questionCount} questions for poll ID ${pollId}`);
+    }
+    //send generated questions to game room
+    socket.emit("questionsForGame", poll.questions)
+    //io.to(pollId).emit("questionsForGame", poll.questions);//denna rad funkar inte...? varför?
   });
 
   //FÖR ATT SPARA KATEGORIN MM
