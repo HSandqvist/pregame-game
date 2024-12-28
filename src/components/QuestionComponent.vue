@@ -9,6 +9,7 @@
     <div v-for="(participant, index) in participants" :key="index">
       <button @click="answer(participant)">{{ participant }}</button>
     </div>
+  
   </div>
 
   <!-- GAMLA VARIANTEN INNAN TUSEN ÄNDRINGAR-->
