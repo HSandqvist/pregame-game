@@ -36,6 +36,24 @@
       <!-- /div -->
     </div>
 
+
+
+
+
+    <!-- testar!! för finalview-->
+    <div v-if="view === 'final_view'">
+      <!-- Render ResultQuestionComponent -->
+      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+
+      <!-- div v-if="isAdmin === true" -->
+        <button
+          @click="console.log('pressedendgame')"
+        >
+          Endgame
+        </button>
+      <!-- /div -->
+    </div>
+
     <!-- Navigation to change the current question 
     <button @click="prevQuestion" :disabled="currentQuestionIndex === 0">
       Previous
@@ -164,9 +182,15 @@ export default {
       socket.emit("submitAnswer", { pollId: this.pollId, answer: answer });
       console.log("Answer sent:", answer);
 
-      // Switch view to show the result after answer submission
-      this.view = "results_view";
-      console.log("changed to result view")
+      // If it's the last question, transition to final view
+      if (this.currentQuestionIndex === this.questions.length - 1) {
+        console.log("Last question answered. Switching to final view.");
+        this.view = "final_view";
+      } else {
+        // Switch view to show the result after answer submission
+        this.view = "results_view";
+        console.log("Changed to result view.");
+      }
 
     },
 
@@ -174,7 +198,10 @@ export default {
     endQuestion: function () {
       console.log("är i endquestion");
       socket.emit("endQuestion", { pollId: this.pollId });
-      this.isLastQuestion = true;
+      
+      this.view = "final_view";
+      console.loc("current view är", this.view)
+
 
     },
 
@@ -196,7 +223,7 @@ export default {
       }
     },
 
-    nextQuestion: function () {
+    /*nextQuestion: function () {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.updateCurrentQuestion(this.currentQuestionIndex += 1);
         console.log("Current question index:", this.currentQuestionIndex)
@@ -213,7 +240,25 @@ export default {
       // Switch back to 'question' view
       this.view = "question_view";
       
-    },
+    },*/
+
+    nextQuestion: function () {
+  // Check if the current question is NOT the last question
+  if (this.currentQuestionIndex < this.questions.length - 1) {
+    this.currentQuestionIndex += 1; // Increment the index
+    this.updateCurrentQuestion(this.currentQuestionIndex); // Update the question
+    console.log("Current question index:", this.currentQuestionIndex);
+
+    // Switch back to 'question' view
+    this.view = "question_view";
+  } 
+  // If it's the last question, switch to the final view
+  else if (this.currentQuestionIndex === this.questions.length - 1) {
+    console.log("No more questions. Switching to final view.");
+    this.endQuestion();
+  }
+},
+
 
 
     updateCurrentQuestion: function (index) {
