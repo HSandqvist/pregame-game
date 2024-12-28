@@ -22,18 +22,18 @@
       <!-- alt byta till denna på v-on v-on:answer="submitAnswer($event)" -->
     </div>
 
-    <div v-if="view === 'results_view' && topAnswer && maxVotes >= 0">
+    <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
-      <div v-if="isAdmin === true">
+      <!-- div v-if="isAdmin === true" -->
         <button
           @click="nextQuestion"
           :disabled="currentQuestionIndex === questions.length - 1"
         >
           Next question
         </button>
-      </div>
+      <!-- /div -->
     </div>
 
     <!-- Navigation to change the current question 
@@ -59,8 +59,8 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-import questionsEn from "@/assets/questions-en.json"; 
-import questionsSv from "@/assets/questions-sv.json";
+//import questionsEn from "@/assets/questions-en.json"; 
+//import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -96,10 +96,6 @@ export default {
     // Poll ID    // Set the poll ID from // Collected answers for the poll the route parameter
     this.pollId = this.$route.params.id;
 
-
-    this.loadQuestionsFromFile(); // read json file questions and send to server
-
-
     // Listen for server events to update the question and submitted answers
     socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
@@ -131,13 +127,13 @@ export default {
 
     //Get questions from server
     socket.on("questionsForGame", (qs) => {
-      console.log("Data received from server (for game):", qs);
+      //console.log("Data received from server (for game):", qs);
 
       if (qs) {
-        console.log("Data received from server (for game):",qs); // Add this to verify data reception
+        //console.log("Data received from server (for game):",qs); // Add this to verify data reception
         this.questions = qs;
         this.updateCurrentQuestion(0); // Start with the first question
-        console.log("Questions received from server:", this.questions);
+        //console.log("Questions received from server:", this.questions);
       } else {
         console.error("Received empty questions array from server.");
       }
@@ -147,7 +143,6 @@ export default {
     //Kolla så kallas på efter att folk har röstat
     socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
-
       this.topAnswer = topAnswer;
       console.log("mest röster har", topAnswer, "med", maxVotes);
       this.maxVotes = maxVotes;
@@ -170,6 +165,8 @@ export default {
 
       // Switch view to show the result after answer submission
       this.view = "results_view";
+      console.log("changed to result view")
+
     },
 
     // Triggered when the current question ends
@@ -190,12 +187,15 @@ export default {
       if (serverQuestion && serverQuestion.q) {
         this.currentQuestion.q = serverQuestion.q;
         this.currentQuestion.a = serverQuestion.a || [];
+
+        console.log("current q:", this.currentQuestion.q)
       }
     },
 
     nextQuestion: function () {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.updateCurrentQuestion(this.currentQuestionIndex + 1);
+        console.log("current question index:", this.currentQuestionIndex)
       }
 
       // Switch back to 'question' view
@@ -205,27 +205,13 @@ export default {
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
-        console.log("Current question data:", this.questions[index]);
-        // Add logic to display the current question
+        this.currentQuestion = this.questions[index];
+        console.log("Current question data:", this.currentQuestion);        
       } else {
         console.error("Invalid question index:", index);
       }
     },
-
-    // Method to load the questions from the file, send to server
-    loadQuestionsFromFile: function() {
-
-      // Choose the appropriate JSON data based on the selected language
-      const allQuestionsFromFile = this.lang === "en" ? questionsEn : questionsSv;
-
-      // Emit the JSON data to the server
-      try {
-        //console.log("Questions to be sent:", allQuestionsFromFile);
-        socket.emit("sendQuestionsFromFileData", allQuestionsFromFile); // Send data to the server
-      } catch (error) {
-        console.error("Error sending questions to server:", error);
-      }
-    },
+ 
   },
 };
 </script>
