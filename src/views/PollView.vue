@@ -88,6 +88,7 @@ export default {
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
 
+
       view: "question_view", // 'question_view' or 'results_view'
     };
   },
@@ -171,7 +172,10 @@ export default {
 
     // Triggered when the current question ends
     endQuestion: function () {
+      console.log("är i endquestion");
       socket.emit("endQuestion", { pollId: this.pollId });
+      this.isLastQuestion = true;
+
     },
 
     // Listen for updated category results from the server
@@ -194,13 +198,23 @@ export default {
 
     nextQuestion: function () {
       if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.updateCurrentQuestion(this.currentQuestionIndex + 1);
-        console.log("current question index:", this.currentQuestionIndex)
+        this.updateCurrentQuestion(this.currentQuestionIndex += 1);
+        console.log("Current question index:", this.currentQuestionIndex)
+
+        
+      }
+      // när man kommer till sista frågan
+      if (this.currentQuestionIndex == this.questions.length -1){
+        console.log("No more questions");
+        this.endQuestion();
+
       }
 
       // Switch back to 'question' view
       this.view = "question_view";
+      
     },
+
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
