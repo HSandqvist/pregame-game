@@ -1,11 +1,12 @@
 <template>
     <div>
-      <h2>Results</h2>
-      <p>Top Answer: {{ topAnswer }}</p>
-      <p>Votes: {{ maxVotes }}</p>
+      <h2> Results </h2>
+      <p> Top Answer: {{ topAnswer }} </p>
+      <p> Votes: {{ maxVotes }} </p> 
     </div>
 
     <!-- Display category-level results if needed TA BORT sEN -->
+     <!-- 
     <div v-if="categories">
       <h3>Category Results:</h3>
       <ul>
@@ -13,7 +14,7 @@
           {{ participant }}: {{ votes }} votes
         </li>
       </ul>
-    </div>
+    </div> -->
 
   </template>
   
@@ -23,7 +24,7 @@
     props: {
       topAnswer: { type: String, default: "",required: true },
       maxVotes: { type: Number, default: 0, required: true },
-      categories: { type: Object, default: () => ({}) }, // Optional category results
+      //categories: { type: Object, default: () => ({}) }, // Optional category results
     },
   };
   </script>

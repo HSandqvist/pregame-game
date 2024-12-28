@@ -1,11 +1,13 @@
 <template>
   <body>
     <div class="create-game">
-      <h1 id="create-game-headline">{{this.uiLabels.createGame || "Create Game"}}</h1>
+      <h1 id="create-game-headline">
+        {{ this.uiLabels.createGame || "Create Game" }}
+      </h1>
 
       <!-- Step 1: Select amount of questions -->
       <div v-if="step === 1" class="amount-questions-section">
-        <h2>{{this.uiLabels.numberOfQuestions || "Number of questions" }}: </h2>
+        <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
         <div class="amount-questions-buttons">
           <button
             v-for="count in [5, 10, 15]"
@@ -17,13 +19,15 @@
           </button>
         </div>
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
-          {{this.uiLabels.next || "Next"}}
+          {{ this.uiLabels.next || "Next" }}
         </button>
       </div>
 
       <!-- Step 2: Select time per question -->
       <div v-else-if="step === 2" class="time-per-question-section">
-        <h2>{{this.uiLabels.secondsPerQuestion || "Seconds per question " }}:</h2>
+        <h2>
+          {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
+        </h2>
         <div class="time-per-question-buttons">
           <button
             v-for="time in [10, 20, 30]"
@@ -34,9 +38,11 @@
             {{ time }}
           </button>
         </div>
-        <button v-on:click="backStep">{{this.uiLabels.back || "back"}} </button>
+        <button v-on:click="backStep">
+          {{ this.uiLabels.back || "back" }}
+        </button>
         <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
-          {{this.uiLabels.createGame || "Create Game"}}
+          {{ this.uiLabels.createGame || "Create Game" }}
         </button>
       </div>
 
@@ -136,6 +142,9 @@ export default {
 
       this.generatePollID();
 
+      // Send file with questions to server
+      this.loadQuestionsFromFile(); // read json file questions and send to server
+
       socket.emit("createPoll", {
         pollId: this.pollId,
         lang: this.lang,
@@ -158,6 +167,21 @@ export default {
       });
 
       this.$router.push(`/lobby/${this.pollId}`);
+    },
+
+    // Method to load the questions from the file, send to server
+    loadQuestionsFromFile: function () {
+      // Choose the appropriate JSON data based on the selected language
+      const allQuestionsFromFile =
+        this.lang === "en" ? questionsEn : questionsSv;
+
+      // Emit the JSON data to the server
+      try {
+        //console.log("Questions to be sent:", allQuestionsFromFile);
+        socket.emit("sendQuestionsFromFileData", allQuestionsFromFile); // Send data to the server
+      } catch (error) {
+        console.error("Error sending questions to server:", error);
+      }
     },
   },
 };
