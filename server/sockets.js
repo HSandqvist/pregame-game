@@ -1,4 +1,5 @@
-// Define the `sockets` function to handle WebSocket events
+const polls = {};
+// Define the sockets function to handle WebSocket events
 function sockets(io, socket, data) {
   // Event: Request UI labels based on language
   socket.on("getUILabels", function (lang) {
@@ -9,20 +10,35 @@ function sockets(io, socket, data) {
   // Event: Create a new poll
   socket.on("createPoll", function (d) {
     // Create a poll with the given ID and language
-    data.createPoll(d.pollId, d.lang, d.adminId);
+    data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
+
     // Emit the poll data back to the client
     socket.emit("pollData", data.getPoll(d.pollId));
-
-    // Emit the adminId for the client to use
-    //socket.emit("adminId", d.adminId);
   });
 
+  /*
   // Event: Add a new question to a poll
   socket.on("addQuestion", function (d) {
     // Add the question and answer options to the specified poll
     data.addQuestion(d.pollId, { q: d.q, a: d.a });
     // Emit the updated question data to the client
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
+  });*/
+
+  // Event: Add a new question to a poll
+  socket.on("addQuestion", function (d) {
+    const pollId = d.pollId;
+    const question = d.q; // The question text
+
+    // Add the question and random answer options to the poll
+    data.addQuestion(pollId, question);
+
+    // Emit the updated question data with answers to the client
+    const questionData = data.getQuestion(pollId);
+    socket.emit("questionUpdate", questionData);
+
+    // Optionally, broadcast the updated question to all participants
+    io.to(pollId).emit("questionUpdate", questionData);
   });
 
   // Event: Join a poll
@@ -36,7 +52,6 @@ function sockets(io, socket, data) {
     socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(d.pollId));
 
     //ev lägga till
-    // Send the adminId to the client after joining
     // Send the adminId to the client after joining
     const poll = data.getPoll(d.pollId);
     socket.emit("adminId", poll.adminId);
@@ -58,7 +73,7 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("startPoll");
   });
 
-  // Event: Run a specific question in a poll
+  /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
     // Get the specified question and update the current question in the poll
     let question = data.getQuestion(d.pollId, d.questionNumber);
@@ -69,40 +84,188 @@ function sockets(io, socket, data) {
       "submittedAnswersUpdate",
       data.getSubmittedAnswers(d.pollId)
     );
-  });
+  });*/
 
-  // Event: Submit an answer for a poll question
-  socket.on("submitAnswer", function (d) {
-    // Add the submitted answer to the poll
-    data.submitAnswer(d.pollId, d.answer);
-    // Notify all clients in the poll room with the updated submitted answers
-    io.to(d.pollId).emit(
+  //kolla igenom, gör ej som tänkt
+  // Event: Run a specific question in a poll (with random question handling)
+  socket.on("runQuestion", function (d) {
+    const pollId = d.pollId;
+
+    // Get all questions from the poll
+    const poll = data.getPoll(pollId);
+    const questionCount = poll.questions.length;
+
+    // Select a random question if there are multiple questions
+    const randomQuestionIndex = Math.floor(Math.random() * questionCount);
+    const randomQuestion = poll.questions[randomQuestionIndex];
+
+    // Emit the random question to the clients
+    io.to(pollId).emit("questionUpdate", randomQuestion);
+
+    // Emit the random answers for this question
+    io.to(pollId).emit(
       "submittedAnswersUpdate",
-      data.getSubmittedAnswers(d.pollId)
+      data.getSubmittedAnswers(pollId)
     );
   });
 
+  socket.on("submitAnswer", function ({ pollId, answer }) {
+    // Ensure the poll exists in memory
+    if (!polls[pollId]) {
+      polls[pollId] = { answers: {}, currentQuestion: null }; // Initialize poll if not created
+      console.log(`Poll ${pollId} initialized. Poll structure:`, polls[pollId]);
 
-  socket.on('checkAdmin', function(d) {
-    const { pollId, userId } = d;
-    const isAdmin = data.isAdmin(pollId, userId);
-    socket.emit('adminCheckResult', { isAdmin });
+      data.submitAnswer(pollId, answer);
+      console.log(`Answer received: ${answer} for poll ${pollId}`);
+    }
+    const pollAnswers = polls[pollId].answers;
+
+    // Initialize the structure for the current question's answers if it doesn't exist
+    if (!pollAnswers[polls[pollId].currentQuestion]) {
+      pollAnswers[polls[pollId].currentQuestion] = {}; // Initialize answers for current question
+      console.log(
+        `Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}`
+      );
+    }
+
+    // Ensure the answers object for the current question exists
+    if (!pollAnswers[polls[pollId].currentQuestion]) {
+      pollAnswers[polls[pollId].currentQuestion] = {};
+      console.log(
+        "Answers for question ${polls[pollId].currentQuestion} initialized in poll ${pollId}"
+      );
+    }
+
+    const currentQuestionAnswers = pollAnswers[polls[pollId].currentQuestion];
+
+    // If the answer doesn't exist for this question, initialize it with a count of 0 and empty voters
+    if (!currentQuestionAnswers[answer]) {
+      currentQuestionAnswers[answer] = { count: 0, voters: [] }; // Initialize the answer
+    }
+
+    // Increment the vote count for the selected answer
+    currentQuestionAnswers[answer].count += 1; // Increment vote count
+    currentQuestionAnswers[answer].voters.push(answer); // Optionally track voters
+
+    console.log(
+      `Updated answers for question ${polls[pollId].currentQuestion} in poll ${pollId}:`,
+      currentQuestionAnswers
+    );
+
+    // Find the answer with the most votes
+    let topAnswer = null;
+    let maxVotes = 0;
+
+    // Iterate over the answers and find the one with the most votes
+    for (let answerKey in currentQuestionAnswers) {
+      const voteCount = currentQuestionAnswers[answerKey];
+      if (voteCount > maxVotes) {
+        maxVotes = voteCount;
+        topAnswer = answerKey; // Store the answer with the highest votes
+      }
+    }
+
+    console.log(
+      `Top answer for poll ${pollId}: ${topAnswer} with ${maxVotes} votes.`
+    );
+
+    // Emit the most voted answer to all clients in the poll room
+    io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
   });
 
-   // Event: Check if user is the admin
-   socket.on('checkAdmin', function(d) {
-    const { pollId, userId } = d; // Extract pollId and userId from the client
+  socket.on("endQuestion", ({ pollId }) => {
     if (data.pollExists(pollId)) {
-      const isAdmin = data.getPoll(pollId).adminId === userId; // Compare userId with adminId
-      socket.emit('adminCheckResult', { isAdmin }); // Emit result back to the client
-    } else {
-      socket.emit('adminCheckResult', { isAdmin: false, error: "Poll does not exist" }); // Error handling
+      data.runQuestion(pollId, data.getPoll(pollId).currentQuestion + 1);
+
+      // Emit updated results for the category
+      const poll = data.getPoll(pollId);
+      const currentCategory = data.getCategoryForQuestion(
+        poll.questions[poll.currentQuestion].q
+      );
+      const categoryResults = data.totalAnswers.categories[currentCategory];
+      io.to(pollId).emit("categoryResultsUpdate", categoryResults);
     }
   });
 
+  // Event: Check if user is the admin
+  socket.on("checkAdmin", function (d) {
+    const { pollId, userId } = d; // Extract pollId and userId from the client
+    if (data.pollExists(pollId)) {
+      const isAdmin = data.getPoll(pollId).adminId === userId; // Compare userId with adminId
+      socket.emit("adminCheckResult", { isAdmin }); // Emit result back to the client
+    } else {
+      socket.emit("adminCheckResult", {
+        isAdmin: false,
+        error: "Poll does not exist",
+      }); // Error handling
+    }
+  });
 
+  socket.on("getSubmittedAnswers", function (pollId) {
+    const answers = polls[pollId]?.answers || [];
+    socket.emit("previousAnswers", answers);
+    console.log(`Sent answers for poll ${pollId}:`, answers);
+  });
 
+  socket.on("endPoll", function (pollId) {
+    if (polls[pollId]) {
+      delete polls[pollId]; // Remove the poll data
+      console.log(`Poll ${pollId} ended and data removed.`);
+    }
+  });
+
+  // get questions from json file in create view
+  socket.on("sendQuestionsFromFileData", (questionsData) => {
+    // Store the categories received from the client
+    data.categories = questionsData.categories;
+    //console.log('Received and stored categories:', data.categories); //DENNA FUNKAR
+  });
+
+  //send chosen questions for the game to clients
+  socket.on("getQuestionsForGame", function (pollId) {
+    const poll = data.polls[pollId];
+
+    //if poll doesn't exist
+    if (!poll) {
+      console.log(
+        `Questions could not load, poll with ID ${pollId} does not exist.`
+      );
+      return null; // Poll does not exist
+    }
+    // Generate questions if they don't already exist
+    if (!poll.questions || poll.questions.length === 0) {
+      const questionCount = poll.questionCount;
+      poll.questions = data.generateQuestions(pollId, questionCount);
+      console.log(`Generated ${questionCount} questions for poll ID ${pollId}`);
+    }
+    //send generated questions to game room
+    socket.emit("questionsForGame", poll.questions)
+    //io.to(pollId).emit("questionsForGame", poll.questions);//denna rad funkar inte...? varför?
+  });
+
+  //FÖR ATT SPARA KATEGORIN MM
+  /*socket.on("runQuestion", function (d) {
+    const { pollId, questionNumber } = d;
+
+    // Call the updated Data method to reset answers and save category winners
+    data.runQuestion(pollId, questionNumber);
+
+    // Emit the updated question to the clients
+    const question = data.getQuestion(pollId, questionNumber);
+    io.to(pollId).emit("questionUpdate", question);
+
+    // Emit the reset submitted answers
+    io.to(pollId).emit(
+      "submittedAnswersUpdate",
+      data.getSubmittedAnswers(pollId)
+    );
+
+    // Emit the updated category winners
+    const poll = data.getPoll(pollId);
+    io.to(pollId).emit("categoryWinnersUpdate", poll.categoryWinners);
+  });*/
+  //slut - FÖR ATT SPARA KATEGORIN MM (finns även lite i submit answer)
 }
 
-// Export the `sockets` function for use in other modules
+// Export the sockets function for use in other modules
 export { sockets };

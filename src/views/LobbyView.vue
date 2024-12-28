@@ -228,7 +228,8 @@ export default {
         this.avatar = canvas.toDataURL("image/png");
 
         // Log to check the base64 image
-        console.log("Captured Avatar: ", this.avatar);
+        console.log("Avatar captured")
+        //console.log("Captured Avatar: ", this.avatar);
 
         this.cameraState = false; // Disable camera actions
 
@@ -265,15 +266,15 @@ export default {
       });
       this.joined = true;
 
-      this.$router.push(`/poll/${this.pollId}`);
-      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+      //this.$router.push(`/poll/${this.pollId}`);
+      this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
   },
 };
 </script>
 
 <style scoped>
-/* Add styles for each section as needed */
+/* Add styles for each section as negit eded */
 .avatar-container,
 .camera-container,
 .name-entry-section,

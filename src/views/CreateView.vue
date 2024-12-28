@@ -52,6 +52,9 @@
 </template>
 
 <script>
+import questionsEn from "@/assets/questions-en.json"; //läsas in i server istället
+import questionsSv from "@/assets/questions-sv.json";
+
 import io from "socket.io-client";
 import { toHandlers } from "vue";
 // Initialize the WebSocket connection to the server
@@ -96,20 +99,15 @@ export default {
 
       this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
       const userId = this.adminId;
-      console.log("admin id", this.adminId)
+      console.log("admin id", this.adminId);
 
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
       console.log("User ID stored:", localStorage.getItem("userId"));
-
     },
 
     finalizeQuestions: function () {
       this.selectedQuestionCount = this.tempQuestionsCount;
-      socket.emit("setAmountQuestions", {
-        pollId: this.pollId,
-        count: this.selectedQuestionCount,
-      });
       this.nextStep();
     },
 
@@ -142,13 +140,24 @@ export default {
         pollId: this.pollId,
         lang: this.lang,
         adminId: this.adminId,
+        questionCount: this.selectedQuestionCount,
+        timerCount: this.selectedTime,
       });
+
+      /*
+      socket.emit("setQuestionCount", {
+        pollId: this.pollId,
+        questionCount: this.selectedQuestionCount,
+      });*/
+
       socket.emit("joinPoll", { pollId: this.pollId });
 
-      socket.emit("thisIsAdminId", {pollId: this.pollId, adminId: this.adminId});
+      socket.emit("thisIsAdminId", {
+        pollId: this.pollId,
+        adminId: this.adminId,
+      });
 
       this.$router.push(`/lobby/${this.pollId}`);
-
     },
   },
 };
