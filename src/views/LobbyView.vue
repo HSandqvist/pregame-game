@@ -1,7 +1,6 @@
-f
 <template>
   <div>
-    {{ pollId }}
+    
 
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
@@ -40,6 +39,10 @@ f
 
     <!-- Step 3: Display captured avatar and submit -->
     <div v-else-if="step === 3" class="avatar-container">
+      <h1>
+        {{ pollId }}
+      </h1>
+          <hr>
       <h1>{{this.uiLabels.yourAvatar || "Your Avatar "}}: {{ this.userName }}</h1>
 
       <!-- Know if user is admin or not -->
@@ -58,13 +61,16 @@ f
         </div>
          ADDED FOR ADMIN END -->
 
-        <button v-on:click="participateInPoll" id="submitNameButton">
-          READY
-
-          {{ this.uiLabels.participateInPoll }}
+        <button v-on:click="participateInPoll" id="submitNameButton" :disabled="joined">
+          {{ this.uiLabels.participateInPoll || "Participate in poll"}}
         </button>
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep"> {{ this.uiLabels.back  || "Back"}}</button>
+
+        <button v-if="isAdmin" v-on:click="startGame">
+          Start Game
+        </button>
       </div>
+      <div> {{ participants }}</div>
     </div>
   </div>
 </template>
@@ -81,7 +87,7 @@ export default {
       pollId: "inactive poll", // Placeholder for poll ID
 
       //user
-      userId: null, //alla ha egen sida sen
+      userId: null, //alla ha egen sida sen hej
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
@@ -104,6 +110,7 @@ export default {
 
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.emit("getUILabels", this.lang);
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
 
     // Navigate to the poll page when the poll starts
@@ -111,7 +118,7 @@ export default {
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
-    socket.emit("getUILabels", { lang: this.lang });
+    
   },
   methods: {
     // Move to the next step
@@ -125,11 +132,17 @@ export default {
         this.step++;
       }
     },
+    startGame(){
+      this.$router.push(`/poll/${this.pollId}/${this.userId}`);
 
-    // Function to check if the user is an admin
+    },
+
+
+       // Function to check if the user is an admin
     checkAdminStatus(callback) {
       if (localStorage.userId) {
         this.userId = localStorage.getItem("userId");
+        
       } else {
         this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
       }
@@ -138,7 +151,7 @@ export default {
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
       // Listen for the server's response
-      socket.once("adminCheckResult", (data) => {
+      socket.on("adminCheckResult", (data) => {
         if (data.isAdmin) {
           console.log("You are the admin for this poll.");
           this.isAdmin = true; // Set admin flag
@@ -155,6 +168,8 @@ export default {
         if (typeof callback === "function") callback();
       });
     },
+
+
 
     // Move to the previous step
     backStep() {
@@ -252,10 +267,10 @@ export default {
     },
     // Participate in the poll
     participateInPoll() {
-      if (!this.avatar) {
-        alert("Please select or capture an avatar!");
-        return;
-      }
+      //if (!this.avatar) {
+      //  alert("Please select or capture an avatar!");
+        //return;
+      //}
 
       socket.emit("participateInPoll", {
         userId: this.userId,
@@ -267,7 +282,7 @@ export default {
       this.joined = true;
 
       //this.$router.push(`/poll/${this.pollId}`);
-      this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
   },
 };
