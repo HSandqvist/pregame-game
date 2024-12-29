@@ -7,32 +7,6 @@ import { readFileSync } from "fs"; // Import the readFileSync function for readi
 function Data() {
   this.polls = {}; // Object to store all polls
   this.categories = {}; //Store categories from external json file
-
-  this.totalAnswers = { categories: {} }; // Object to store votes per category
-
-  /*
-  // Initialize with a sample poll for testing purposes
-  this.polls["test"] = {
-    lang: "en", // Language for the poll
-    questions: [
-      // Array of questions
-      {
-        q: "How old are you?", // Question text
-        a: ["0-13", "14-18", "19-25", "26-35", "36-45", "45-"], // Answer options
-      },
-      {
-        q: "How much do you enjoy coding?", // Another question
-        a: ["1", "2", "3", "4", "5"], // Answer options
-      },
-    ],
-    answers: [], // Placeholder for submitted answers
-    currentQuestion: 0, // Index of the current question
-    participants: [], // Array of participants in the poll
-
-    totalAnswers: {
-      categories: {}, // Object to store votes per category
-    },
-  };*/
 }
 
 /***********************************************
@@ -78,7 +52,7 @@ Data.prototype.createPoll = function (
       categories: this.categories, // Add the passed categories
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
-    console.log("poll created", pollId, poll, "Admin is:", adminId);
+    console.log("Poll created", pollId, poll, "Admin is:", adminId);
   }
   return this.polls[pollId];
 };
@@ -115,24 +89,24 @@ Data.prototype.getParticipants = function (pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId].participants;
   }
-
   return [];
 };
 
+/* //används inte i nuläget
 // Add a question to a poll
 Data.prototype.addQuestion = function (pollId, q) {
   if (this.pollExists(pollId)) {
     this.polls[pollId].questions.push(q);
   }
-};
+};*/
 
 // Retrieve a specific question from a poll
-Data.prototype.getQuestion = function (pollId, qId = null) {
+Data.prototype.getQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-    if (qId !== null) {
-      poll.currentQuestion = qId; // Update the current question index
-    }
+
+    //poll.currentQuestion =+ 1; // Update the current question index //BEHÖVS?
+
     return poll.questions[poll.currentQuestion];
   }
   return {}; // Return an empty object if the poll doesn't exist
@@ -154,6 +128,33 @@ Data.prototype.getSubmittedAnswers = function (pollId) {
 Data.prototype.submitAnswer = function (pollId, answer) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
+    const currentQuestion = poll.currentQuestion;
+
+    if (typeof poll.answers[currentQuestion] !== "object") {
+      poll.answers[currentQuestion] = {};
+    }
+
+    const answers = poll.answers[currentQuestion];
+
+    // Initialize answer count and voters if not already present
+    if (!answers[answer]) {
+      answers[answer] = { count: 0, voters: [] };
+    }
+
+    // Increment the count for this answer
+    answers[answer].count += 1;
+
+    // Log the voter (assuming "answer" includes the voter's name)
+    answers[answer].voters.push(answer);
+
+    console.log(
+      `Updated answers for question ${currentQuestion} in poll ${pollId}:`,
+      answers
+    );
+  }
+
+  /*if (this.pollExists(pollId)) {
+    const poll = this.polls[pollId];
     let answers = poll.answers[poll.currentQuestion];
 
     // Create an answers object for the current question if it doesn't exist
@@ -170,60 +171,74 @@ Data.prototype.submitAnswer = function (pollId, answer) {
     }
 
     console.log("Updated answers for question:", poll.currentQuestion, answers);
+  }*/
+};
+
+Data.prototype.runQuestion = function (pollId) {
+  if (this.pollExists(pollId)) {
+    const poll = this.polls[pollId];
+    const currentQuestion = poll.currentQuestion;
+
+    // Determine the top answer for the current question
+    const answers = poll.answers[currentQuestion];
+    let maxVotes = 0;
+    let topAnswer = null;
+
+    for (const [answer, data] of Object.entries(answers)) {
+      const { count, voters } = data; //kanske vill spara voters sen för specifik funktionalitet
+
+      if (count > maxVotes) {
+        maxVotes = count;
+        topAnswer = answer;
+      }
+    }
+
+    // Log the top answer for the current question
+    console.log(
+      `Top answer for poll ${pollId}, question ${currentQuestion}: ${topAnswer} with ${maxVotes} votes.`
+    );
+
+    // Save the winner to the category using the complementary function
+    this.updateCategoryWinner(pollId, currentQuestion, topParticipant);
+
+    // Move to the next question
+    poll.currentQuestion += 1; // Increment to the next question
+    poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
+
+    // Return the topAnswer and maxVotes (to sockets then to clients)
+    return { topAnswer, maxVotes };
   }
 };
 
-Data.prototype.runQuestion = function (pollId, qId) {
+Data.prototype.updateCategoryWinner = function (
+  pollId,
+  question,
+  topParticipant
+) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
 
-    // Save the top participant for the current question
-    if (poll.answers[poll.currentQuestion]) {
-      const answers = poll.answers[poll.currentQuestion];
-      let maxVotes = 0;
-      let topParticipant = null;
+    // Use the helper function to get the category for the question
+    const category = this.getCategoryForQuestion(question);
 
-      for (const [name, votes] of Object.entries(answers)) {
-        if (votes > maxVotes) {
-          maxVotes = votes;
-          topParticipant = name;
-        }
-      }
-    }
-    // Map the current question to its category
-    const question = poll.questions[poll.currentQuestion];
-    const category = this.getCategoryForQuestion(question.q);
-    console.log(`Category for question: ${currentQuestion.q} is '${category}`);
-
-    // Save the top participant in the category winners object
-    if (category && topParticipant) {
-      poll.categoryWinners[category] = topParticipant;
-      console.log(
-        `Saved top participant '${topParticipant}' for category '${category}`
-      );
+    // Initialize the category in categoryWinners if not already present
+    if (!poll.categoryWinners[category]) {
+      poll.categoryWinners[category] = {};
     }
 
-    // Initialize category in totalAnswers if not already
-    if (!this.totalAnswers.categories[category]) {
-      this.totalAnswers.categories[category] = {};
+    // Increment the vote count for the topParticipant in the category winners object
+    if (!poll.categoryWinners[category][topParticipant]) {
+      poll.categoryWinners[category][topParticipant] = 0; // Initialize count
     }
 
-    // Initialize username in the category if not already
-    if (!this.totalAnswers.categories[category][topParticipant]) {
-      this.totalAnswers.categories[category][topParticipant] = 0;
-    }
-
-    // Increment the vote count for the top participant in the category
-    this.totalAnswers.categories[category][topParticipant] += 1;
+    poll.categoryWinners[category][topParticipant] += 1; // Increment count
 
     console.log(
-      `Updated totalAnswers for category '${category}':`,
-      this.totalAnswers.categories[category]
+      `Updated categoryWinners for category '${category}':`,
+      poll.categoryWinners[category]
     );
-
-    // Reset key-value pair for the new question
-    poll.currentQuestion = qId;
-    poll.answers[qId] = {}; // Reset answers for the new question
+  } else {
+    console.error(`Poll ID ${pollId} does not exist.`);
   }
 };
 
@@ -236,13 +251,6 @@ Data.prototype.getCategoryForQuestion = function (question) {
   }
   return null;
 };
-
-// Store top participants for category for results
-
-//vi gör redan detta i konstruktorn ovan
-/*Data.prototype.totalAnswers = {
-    categories: {}, // Object to store votes per category
-  };*/
 
 // Check if a given userId is the admin of a poll
 Data.prototype.isAdmin = function (pollId, userId) {
@@ -257,7 +265,6 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const questions = [];
-
     for (let i = 0; i < questionCount; i++) {
       const randomQuestion = this.loadRandomQuestion(); // Load random question
       //const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
@@ -269,7 +276,7 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
     poll.questions = questions; // Assign the questions to the poll
     console.log(`Generated questions for poll ${pollId}:`, questions);
 
-    return questions;//behövs nog inte om inte för debug
+    return questions; //behövs nog inte om inte för debug
   }
   return []; //behövs nog inte om inte för debug
 };
