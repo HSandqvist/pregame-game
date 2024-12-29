@@ -95,7 +95,7 @@ function sockets(io, socket, data) {
     const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly
 
     console.log(
-      `Top answer for poll ${pollId}: ${topAnswer} with ${maxVotes} votes.`
+      `Socket runQuestionResults: Top answer for question ${data.getQuestion(pollId)}: ${topAnswer} with ${maxVotes} votes.`
     );
 
     // Emit the most voted answer to all clients in the poll room
@@ -123,21 +123,6 @@ function sockets(io, socket, data) {
     data.submitAnswer(pollId, answer);
 
     console.log(`Answer received: ${answer} for poll ${pollId}`);
-  });
-
-  socket.on("endQuestion", ({ pollId }) => {
-    if (data.pollExists(pollId)) {
-      data.runQuestion(pollId, data.getPoll(pollId).currentQuestion + 1);
-
-      // Emit updated results for the category
-      const poll = data.getPoll(pollId);
-      const currentCategory = data.getCategoryForQuestion(
-        poll.questions[poll.currentQuestion].q
-      );
-      const categoryResults =
-        data.polls[pollId].categoryWinners[currentCategory];
-      io.to(pollId).emit("categoryResultsUpdate", categoryResults);
-    }
   });
 
   // Event: Check if user is the admin

@@ -145,22 +145,6 @@ export default {
         console.error("Received empty questions array from server.");
       }
     });
-
-    //Kolla så kallas på efter att folk har röstat
-    socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
-      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
-      this.topAnswer = topAnswer;
-      console.log("mest röster har", topAnswer, "med", maxVotes);
-      this.maxVotes = maxVotes;
-    });
-
-    //ev onödig här
-    // Listen for category results update
-    socket.on("categoryResultsUpdate", (results) => {
-      console.log("Category Results:", results);
-      // Update state to display results in the result component
-      this.categoryResults = results;
-    });
   },
 
   methods: {
@@ -168,6 +152,16 @@ export default {
       // Emit the answer to the server
       socket.emit("submitAnswer", { pollId: this.pollId, answer: answer });
       console.log("Answer sent:", answer);
+
+      //uppdatera topanswer och votecounten
+      socket.emit("runQuestionResults", this.pollId);
+
+      //Kolla så kallas på efter att folk har röstat
+      socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
+        console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
+        this.topAnswer = topAnswer;
+        this.maxVotes = maxVotes;
+      });
 
       // If it's the last question, transition to final view
       if (this.currentQuestionIndex === this.questions.length - 1) {
@@ -178,23 +172,6 @@ export default {
         this.view = "results_view";
         console.log("Changed to result view.");
       }
-    },
-
-    // Triggered when the current question ends
-    endQuestion: function () {
-      console.log("är i endquestion");
-      socket.emit("endQuestion", { pollId: this.pollId });
-
-      this.view = "final_view";
-      console.loc("current view är", this.view);
-    },
-
-    // Listen for updated category results from the server
-    updateCategoryResults: function () {
-      socket.on("categoryResultsUpdate", (data) => {
-        console.log("Category Results Updated:", data);
-        // Update your frontend state with the updated results
-      });
     },
 
     // Update the question with server data or a randomly selected question
@@ -220,7 +197,8 @@ export default {
       // If it's the last question, switch to the final view
       else if (this.currentQuestionIndex === this.questions.length - 1) {
         console.log("No more questions. Switching to final view."); //printas aldrig
-        this.endQuestion();
+
+        this.view = "final_view";
       }
     },
 

@@ -52,7 +52,7 @@ Data.prototype.createPoll = function (
       categories: this.categories, // Add the passed categories
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
-    console.log("Poll created", pollId, poll, "Admin is:", adminId);
+    //console.log("Poll created", pollId, poll, "Admin is:", adminId);
   }
   return this.polls[pollId];
 };
@@ -148,44 +148,24 @@ Data.prototype.submitAnswer = function (pollId, answer) {
     answers[answer].voters.push(answer);
 
     console.log(
-      `Updated answers for question ${currentQuestion} in poll ${pollId}:`,
+      `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
       answers
     );
   }
-
-  /*if (this.pollExists(pollId)) {
-    const poll = this.polls[pollId];
-    let answers = poll.answers[poll.currentQuestion];
-
-    // Create an answers object for the current question if it doesn't exist
-    if (typeof answers !== "object") {
-      answers = {};
-      poll.answers[poll.currentQuestion] = answers;
-    }
-
-    // Increment the count for the participant (keyed by their name)
-    if (typeof answers[answer] === "undefined") {
-      answers[answer] = 1; // First vote for this participant
-    } else {
-      answers[answer] += 1; // Increment vote count
-    }
-
-    console.log("Updated answers for question:", poll.currentQuestion, answers);
-  }*/
 };
 
 Data.prototype.runQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-    const currentQuestion = poll.currentQuestion;
+    const currentQuestion = poll.currentQuestion;   //ger ett index?? 
 
     // Determine the top answer for the current question
     const answers = poll.answers[currentQuestion];
     let maxVotes = 0;
     let topAnswer = null;
 
-    for (const [answer, data] of Object.entries(answers)) {
-      const { count, voters } = data; //kanske vill spara voters sen för specifik funktionalitet
+    for (const [answer, answerdata] of Object.entries(answers)) {
+      const { count, voters } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
 
       if (count > maxVotes) {
         maxVotes = count;
@@ -195,11 +175,11 @@ Data.prototype.runQuestion = function (pollId) {
 
     // Log the top answer for the current question
     console.log(
-      `Top answer for poll ${pollId}, question ${currentQuestion}: ${topAnswer} with ${maxVotes} votes.`
+      `Top answer for poll ${pollId}, question ${poll.questions[currentQuestion].q}: ${topAnswer} with ${maxVotes} votes.`
     );
 
     // Save the winner to the category using the complementary function
-    this.updateCategoryWinner(pollId, currentQuestion, topParticipant);
+    this.updateCategoryWinner(pollId, poll.questions[currentQuestion].q, topAnswer);
 
     // Move to the next question
     poll.currentQuestion += 1; // Increment to the next question
