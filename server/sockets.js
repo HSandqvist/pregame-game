@@ -68,9 +68,9 @@ function sockets(io, socket, data) {
   });
 
   // Event: Start a poll
-  socket.on("startPoll", function (pollId) {
+  socket.on("startGame", function (pollId) {
     // Notify all clients in the poll room that the poll has started
-    io.to(pollId).emit("startPoll");
+    io.to(pollId).emit("startGame");
   });
 
   /*// Event: Run a specific question in a poll

@@ -93,6 +93,7 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
     socket.on("pollData", (data) => (this.pollData = data));
     socket.emit("getUILabels", this.lang);
+    this.generateAdminID()
   },
 
   methods: {
@@ -110,6 +111,11 @@ export default {
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
       console.log("User ID stored:", localStorage.getItem("userId"));
+    },
+
+    makeUserAdmin(){
+
+
     },
 
     finalizeQuestions: function () {
@@ -137,8 +143,6 @@ export default {
 
     createPoll: function () {
       console.log("är i createplol");
-
-      this.generateAdminID();
 
       this.generatePollID();
 

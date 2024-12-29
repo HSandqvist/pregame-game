@@ -1,17 +1,11 @@
-f
 <template>
   <div>
-    {{ pollId }}
-
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
       <h1>{{this.uiLabels.pleaseEnterYourName || "Please enter your name"}}:</h1>
       <input type="text" v-model="userName" />
       <button v-on:click="nextStep" :disabled="!userName">{{this.uiLabels.next || "Next"}}</button>
 
-      <div>
-        
-      </div>
     </div>
 
     <!-- Step 2: Capture avatar from the camera -->
@@ -34,36 +28,47 @@ f
         {{this.uiLabels.takePicture || "Take picture"}}
       </button>
 
-      <button v-on:click="nextStep" :disabled="!isPictureTaken">{{this.uiLabels.next || "Next"}}</button>
+      <button v-on:click="nextStep" :disabled="!isPictureTaken" >{{this.uiLabels.next || "Next"}}</button>
       <button v-on:click="backStep">{{this.uiLabels.back || "Back"}}</button>
     </div>
 
-    <!-- Step 3: Display captured avatar and submit -->
+    <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>{{this.uiLabels.yourAvatar || "Your Avatar "}}: {{ this.userName }}</h1>
+      <h1>Your Avatar: {{ this.userName }} </h1>
+      <img :src="avatar" alt="User Avatar" class="avatar" />
+
+      <div class="submit-section">
+        <button v-on:click="nextStep" id="submitNameButton">
+          {{ this.uiLabels.ready }} ready
+        </button>
+        <button v-on:click="backStep"> Back </button>
+      </div>
+    </div>
+
+    <div v-else-if="step === 4" class="waiting-area">
+      <h1>Lobby for poll: {{ pollId }}</h1>
+      <p>Participants:</p>
+      <ul>
+        <li v-for="(participant, index) in participants" :key="index">
+          <img :src="participant.avatar" class="avatar" /> {{ participant.name }}
+          <span v-if="participant.isAdmin"> (Host)</span>
+        </li>
+      </ul>
 
       <!-- Know if user is admin or not -->
       <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>
       <h2 v-else class="participant-tag">You are a Participant</h2>
-
+     
       <img :src="avatar" alt="User Avatar" class="avatar" />
-
+      <h3>{{this.userName }}</h3>
       <div class="submit-section">
-        <!-- ADDED FOR ADMIN -->
-        <!-- div v-for="participant in participants" :key="participant.id">
-          <p>
-            {{ participant.name }}
-            <span v-if="participant.isAdmin" class="admin-tag">(Admin)</span>
-          </p>
-        </div>
-         ADDED FOR ADMIN END -->
-
-        <button v-on:click="participateInPoll" id="submitNameButton">
-          READY
-
-          {{ this.uiLabels.participateInPoll }}
+        <button v-on:click="participateInPoll" id="submitNameButton" :disabled="joined">
+          {{ this.uiLabels.participateInPoll || "Participate in poll"}}
         </button>
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep" :disabled="joined"> {{ this.uiLabels.back  || "Back"}} </button>
+        <button v-if="isAdmin" v-on:click="adminStartGame" :disabled="!joined">
+          Start Game
+        </button>
       </div>
     </div>
   </div>
@@ -81,7 +86,7 @@ export default {
       pollId: "inactive poll", // Placeholder for poll ID
 
       //user
-      userId: null, //alla ha egen sida sen
+      userId: null, //alla ha egen sida sen hej
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
@@ -104,19 +109,23 @@ export default {
 
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.emit("getUILabels", this.lang);
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
+
+    //Listen for start game from server
+    socket.on("startGame",() => this.participatStartGame())
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
-    socket.emit("getUILabels", { lang: this.lang });
+    
   },
   methods: {
     // Move to the next step
     nextStep() {
-      if (this.step == 2) {
+      if (this.step == 3) {
         // Check admin status before moving to Step 3
         this.checkAdminStatus(() => {
           this.step++; // Move to Step 3 after admin check
@@ -124,21 +133,28 @@ export default {
       } else if (this.step < 5) {
         this.step++;
       }
+      console.log(this.step)
+    },
+    adminStartGame(){
+      socket.emit("startGame", this.pollId);
     },
 
-    // Function to check if the user is an admin
+    participatStartGame(){
+      this.$router.push(`/poll/${this.pollId}/${this.userId}`);
+    },
+
+       // Function to check if the user is an admin
     checkAdminStatus(callback) {
       if (localStorage.userId) {
         this.userId = localStorage.getItem("userId");
       } else {
         this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
       }
-
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
       // Listen for the server's response
-      socket.once("adminCheckResult", (data) => {
+      socket.on("adminCheckResult", (data) => {
         if (data.isAdmin) {
           console.log("You are the admin for this poll.");
           this.isAdmin = true; // Set admin flag
@@ -150,17 +166,15 @@ export default {
           console.log("You are not the admin for this poll.");
           this.isAdmin = false; // Set participant flag
         }
-
         // Execute the callback after admin check
         if (typeof callback === "function") callback();
       });
     },
-
     // Move to the previous step
     backStep() {
       if (this.step > 1) {
         this.step--;
-        this.isPictureTaken = false;
+       
       }
     },
 
@@ -253,9 +267,9 @@ export default {
     // Participate in the poll
     participateInPoll() {
       if (!this.avatar) {
-        alert("Please select or capture an avatar!");
-        return;
-      }
+      alert("Please select or capture an avatar!");
+      return;
+    }
 
       socket.emit("participateInPoll", {
         userId: this.userId,
@@ -265,9 +279,8 @@ export default {
         isAdmin: this.isAdmin,
       });
       this.joined = true;
-
-      //this.$router.push(`/poll/${this.pollId}`);
-      this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+      
+      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
   },
 };

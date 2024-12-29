@@ -17,6 +17,12 @@
       <button class="btn" v-on:click="showPinEntry">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
+      
+    </div>
+
+    <div>
+      <input type="text" v-model="inputedID" />
+      <button v-on:click="quickEnterTEST" > QUICK JOIN </button>
     </div>
   </div>
 </template>
@@ -38,6 +44,8 @@ export default {
       uiLabels: {}, // Dynamic UI labels for multilingual support
       lang: localStorage.getItem("lang") || "en", // Language preference
       joinGameClicked: false, // Tracks whether "Join Game" was clicked
+      userId: null,
+      inputedID: ""
     };
   },
   created: function () {
@@ -52,6 +60,15 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
+//TESTING METHODS
+    quickEnterTEST(){
+      localStorage.removeItem("userId")
+      this.$router.push(`/lobby/${this.inputedID}`);
+    },
+
+
+    //TESTING METHODS
+
     // Show PIN entry form
     showPinEntry: function () {
       this.joinGameClicked = true;

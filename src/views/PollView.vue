@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Poll id: {{ pollId }}</h1>
+    <h1>Poll id: {{ pollId }} User: {{ this.userId }}</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
     <!-- Render all questions from the questions array -->
@@ -84,7 +84,7 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
-
+      siteUserId: null,
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
 
