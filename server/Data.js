@@ -125,7 +125,7 @@ Data.prototype.getSubmittedAnswers = function (pollId) {
 };
 
 // Submit an answer to a poll
-Data.prototype.submitAnswer = function (pollId, answer) {
+Data.prototype.submitAnswer = function (pollId, answer, voter) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;
@@ -144,8 +144,8 @@ Data.prototype.submitAnswer = function (pollId, answer) {
     // Increment the count for this answer
     answers[answer].count += 1;
 
-    // Log the voter (assuming "answer" includes the voter's name)
-    answers[answer].voters.push(answer);
+    // Log the voter for the option
+    answers[answer].voters.push(voter);
 
     console.log(
       `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
@@ -158,6 +158,7 @@ Data.prototype.runQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;   //ger ett index?? 
+    console.log("data runQuestion har currentquestion:", currentQuestion);
 
     // Determine the top answer for the current question
     const answers = poll.answers[currentQuestion];

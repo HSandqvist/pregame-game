@@ -86,6 +86,9 @@ export default {
     return {
       // Current question data (question text and answer options)
       //question: {q: "", a: [],}, // Legacy object for compatibility
+      currentParticipant: {}, //the participant using a certain poll client
+      userId: "",
+
       participants: [], // List of participants for the question
       pollId: "inactive poll",
       submittedAnswers: {},
@@ -103,13 +106,27 @@ export default {
   },
 
   created: function () {
-    // Poll ID    // Set the poll ID from
+    // Poll ID    // Set the poll ID from route params
     this.pollId = this.$route.params.id;
+
+    // User ID    // Set the user ID from route params
+    this.userId = this.$route.params.userId;
+
+    socket.emit("getCurrentParticipant", {
+      pollId: this.pollId,
+      userId: this.userId,
+    });
+
+    // Get this participant
+    socket.on("currentParticipant", (participantData) => {
+      this.currentParticipant = participantData;
+      console.log("Participant name received:", participantData.name);
+    });
 
     // Listen for server events to update the question and submitted answers
     socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
-      console.log("Updated question:", q); // Add this log
+      //console.log("Updated question:", q); // Add this log
     }); // Update the current question
 
     socket.on(
@@ -129,7 +146,7 @@ export default {
 
     socket.on("previousAnswers", (answers) => {
       this.submittedAnswers = answers;
-      console.log("Tidigare svar hämtade från servern:", answers);
+      //console.log("Tidigare svar hämtade från servern:", answers);
     });
 
     //ask server for chosen questions
@@ -145,23 +162,41 @@ export default {
         console.error("Received empty questions array from server.");
       }
     });
+
+    //Kolla så kallas på efter att folk har röstat
+    socket.off("topAnswerUpdate"); // Clear any existing listeners
+
+    socket.on("topAnswerUpdate", (data) => {
+      //console.log("Received data:", data); // Log the received data
+      const { topAnswer, maxVotes } = data;
+      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
+      this.topAnswer = topAnswer;
+      this.maxVotes = maxVotes;
+    });
+
+    /*socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
+      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
+      this.topAnswer = topAnswer;
+      this.maxVotes = maxVotes;
+    });*/
   },
 
   methods: {
     submitAnswer: function (answer) {
+      const voter = this.currentParticipant; // Assume `currentParticipant` contains the voter's info
+
       // Emit the answer to the server
-      socket.emit("submitAnswer", { pollId: this.pollId, answer: answer });
-      console.log("Answer sent:", answer);
+      socket.emit("submitAnswer", {
+        pollId: this.pollId,
+        answer: answer,
+        voter: voter.name,
+      });
+      console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
       socket.emit("runQuestionResults", this.pollId);
 
-      //Kolla så kallas på efter att folk har röstat
-      socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
-        console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
-        this.topAnswer = topAnswer;
-        this.maxVotes = maxVotes;
-      });
+      //flyttat socket.on top answer update till created delen
 
       // If it's the last question, transition to final view
       if (this.currentQuestionIndex === this.questions.length - 1) {

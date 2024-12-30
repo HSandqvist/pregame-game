@@ -101,11 +101,9 @@ export default {
     },
 
     generateAdminID: function () {
-      console.log("är i generateadmin");
-
       this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
       const userId = this.adminId;
-      console.log("admin id", this.adminId);
+      console.log("Admin ID is:", this.adminId);
 
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
@@ -118,7 +116,6 @@ export default {
     },
 
     finalizeTime: function () {
-      console.log("är i finalizeitime");
       this.selectedTime = this.tempTimePerQuestion;
       socket.emit("setTimePerQuestion", {
         pollId: this.pollId,
@@ -136,10 +133,7 @@ export default {
     },
 
     createPoll: function () {
-      console.log("är i createplol");
-
       this.generateAdminID();
-
       this.generatePollID();
 
       // Send file with questions to server

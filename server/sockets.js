@@ -86,20 +86,43 @@ function sockets(io, socket, data) {
     );
   });*/
 
-  //ANVÄNDS INTE NÅNSTANS NU
+  socket.on("getCurrentParticipant", function ({ pollId, userId }) {
+    // Retrieve the poll using the provided pollId
+    const poll = data.getPoll(pollId);
+
+    if (poll && poll.participants) {
+      // Find the participant with the matching userId
+      const participantData = poll.participants.find(
+        (participant) => participant.userId === userId
+      );
+
+      if (participantData) {
+        // Emit the participant data back to the client
+        socket.emit("currentParticipant", participantData);
+      } else {
+        // Emit an error if no participant with the given userId was found
+        socket.emit("currentParticipant", { error: "Participant not found" });
+      }
+    } else {
+      // Emit an error if the poll does not exist or has no participants
+      socket.emit("currentParticipant", { error: "Poll not found" });
+    }
+  });
+
   // Event: använda för handling när resultatet per fråga ska visas?
   socket.on("runQuestionResults", function (pollId) {
-    
     //NEDAN BORDE TYP GÖRAS NÄR TIDEN TAGIT SLUT FÖR EN FRÅGA?
-    // Run the question logic (determine the top answer and update category winner)
+    // Run the question logic (determine the top answer)
     const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly
 
     console.log(
-      `Socket runQuestionResults: Top answer for question ${data.getQuestion(pollId)}: ${topAnswer} with ${maxVotes} votes.`
+      `Socket runQuestionResults: Top answer for question: ${topAnswer} with ${maxVotes} votes.`
     );
 
+    console.log(`Emitting topAnswerUpdate: ${topAnswer}, ${maxVotes}`); // Log data before emitting
     // Emit the most voted answer to all clients in the poll room
-    io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes });
+    //io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes }); //uppdatera för alla som är inne i pollen
+    socket.emit("topAnswerUpdate", { topAnswer, maxVotes });
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
@@ -112,7 +135,7 @@ function sockets(io, socket, data) {
     );
   });
 
-  socket.on("submitAnswer", function ({ pollId, answer }) {
+  socket.on("submitAnswer", function ({ pollId, answer, voter }) {
     // Ensure the poll exists before submitting an answer
     const poll = data.getPoll(pollId);
     if (!poll) {
@@ -120,7 +143,7 @@ function sockets(io, socket, data) {
       return; // Early exit if poll doesn't exist
     }
     // Submit the answer via the data function
-    data.submitAnswer(pollId, answer);
+    data.submitAnswer(pollId, answer, voter);
 
     console.log(`Answer received: ${answer} for poll ${pollId}`);
   });
