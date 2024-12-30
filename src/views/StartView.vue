@@ -98,17 +98,18 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  background: linear-gradient(to right, rgb(210, 66, 133), purple); /* Updated background to match CreateView */
   font-family: Arial, sans-serif;
   text-align: center;
   position: relative;
+  color: white;
 }
 
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
-  color: #343a40;
   margin-bottom: 2rem;
+  font-family: "Limelight", cursive; /* Match font family from CreateView */
 }
 
 /* Container for Join Game input and button */
@@ -131,17 +132,26 @@ export default {
 
 /* Button styles */
 .btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  padding: 15px 30px;
+  background-color: pink;
   color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  border-radius: 0.5rem;
-  text-align: center;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
+
 .btn:hover {
-  background-color: #0056b3;
+  background-color: rgb(255, 131, 203);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Container for action buttons */
