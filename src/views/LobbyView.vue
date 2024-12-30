@@ -47,6 +47,7 @@
 
     <div v-else-if="step === 4" class="waiting-area">
       <h1>Lobby for poll: {{ pollId }}</h1>
+      <p>Number of participants: {{ participants.length }}</p>
       <p>Participants:</p>
       <ul>
         <li v-for="(participant, index) in participants" :key="index">
@@ -65,10 +66,14 @@
         <button v-on:click="participateInPoll" id="submitNameButton" :disabled="joined">
           {{ this.uiLabels.participateInPoll || "Participate in poll"}}
         </button>
+
         <button v-on:click="backStep" :disabled="joined"> {{ this.uiLabels.back  || "Back"}} </button>
-        <button v-if="isAdmin" v-on:click="adminStartGame" :disabled="!joined">
+
+        <button v-if="isAdmin" v-on:click="adminStartGame" 
+          :disabled="!joined ||  !atLeastThree">
           Start Game
         </button>
+
       </div>
     </div>
   </div>
@@ -93,15 +98,18 @@ export default {
       isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
       adminId: null, //placeholder for eventual adminId, if present
 
+
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
+      atLeastThree: false,
 
       //camera
       stream: null, // The video stream to access the camera
       isPictureTaken: false, //Tracks that camera is closed and picture taken
       cameraState: false, // Tracks whether the camera is active
-    };
+  }
+    
   },
   created: function () {
     // Set the poll ID from the route parameter
@@ -111,7 +119,7 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.emit("getUILabels", this.lang);
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
-
+    socket.on("participantsUpdate", () => this.checkAtLeastThree());
     //Listen for start game from server
     socket.on("startGame",() => this.participatStartGame())
 
@@ -122,6 +130,7 @@ export default {
     socket.emit("joinPoll", { pollId: this.pollId });
     
   },
+ 
   methods: {
     // Move to the next step
     nextStep() {
@@ -279,9 +288,16 @@ export default {
         isAdmin: this.isAdmin,
       });
       this.joined = true;
-      
+      if(this.participants.length >= 3){
+        this.atLeastThree= true
+      }
       //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
+    checkAtLeastThree(){
+      if(this.participants.length >= 3){
+        this.atLeastThree= true
+      }
+    }
   },
 };
 </script>

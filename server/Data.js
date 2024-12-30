@@ -152,22 +152,23 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
       `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
       answers
     );
+
   }
 };
 
-Data.prototype.runQuestion = function (pollId) {
+Data.prototype.runQuestion = function (pollId, savedAnswers) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;   //ger ett index?? 
     console.log("data runQuestion har currentquestion:", currentQuestion);
 
     // Determine the top answer for the current question
-    const answers = poll.answers[currentQuestion];
+    //const answers = poll.answers[currentQuestion];    flyttar till poll
     let maxVotes = 0;
     let topAnswer = null;
 
-    for (const [answer, answerdata] of Object.entries(answers)) {
-      const { count, voters } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
+    for (const [savedAnswers, savedAnswersdata] of Object.entries(savedAnswers)) {
+      const { count, voters } = savedAnswersdata; //kanske vill spara voters sen för specifik funktionalitet
 
       if (count > maxVotes) {
         maxVotes = count;
@@ -249,9 +250,9 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
     const questions = [];
     for (let i = 0; i < questionCount; i++) {
       const randomQuestion = this.loadRandomQuestion(); // Load random question
-      //const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
-
-      questions.push({ q: randomQuestion, a: ["test1", "test2", "test3"] }); //for testing purposes
+      const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
+      
+      questions.push({ q: randomQuestion, a: selectedRandomAnswers }); 
       //questions.push({ q: randomQuestion, a: selectedRandomAnswers });
     }
 
