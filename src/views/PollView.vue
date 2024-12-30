@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1>Poll id: {{ pollId }} User: {{ this.userId }}</h1>
+    <h1>Poll id: {{ pollId }} User: {{ this.userId }} </h1>
+    <h1 v-if="isAdmin"> You are the host</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
     <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
@@ -24,15 +25,15 @@
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
-      <!-- add so only admin can use buttons -->
-      <!-- div v-if="isAdmin === true" -->
+      <!-- so only admin can use buttons -->
+      <div v-if="isAdmin === true">
       <button
         @click="nextQuestion"
         :disabled="currentQuestionIndex === questions.length - 1"
       >
         Next question
       </button>
-      <!-- /div -->
+      </div>
     </div>
 
     <!-- testar!! för finalview-->
@@ -40,10 +41,10 @@
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
-      <!-- add so only admin can use buttons -->
-      <!-- div v-if="isAdmin === true" -->
+      <!-- so only admin can use buttons -->
+      <div v-if="isAdmin === true">
       <button @click="toResults">Endgame</button>
-      <!-- /div -->
+      </div >
     </div>
 
     <!-- Navigation to change the current question 
@@ -69,8 +70,6 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-//import questionsEn from "@/assets/questions-en.json";
-//import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -92,6 +91,7 @@ export default {
       participants: [], // List of participants for the question
       pollId: "inactive poll",
       submittedAnswers: {},
+      isAdmin: false,
 
       questionCount: 0,
       questions: [], // Array of all questions
@@ -111,11 +111,17 @@ export default {
 
     // User ID    // Set the user ID from route params
     this.userId = this.$route.params.userId;
+    
+    this.checkAdminStatus()
+
+    
 
     socket.emit("getCurrentParticipant", {
       pollId: this.pollId,
       userId: this.userId,
     });
+    //Listen for admin to press next
+    
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -173,12 +179,7 @@ export default {
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
     });
-
-    /*socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
-      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
-      this.topAnswer = topAnswer;
-      this.maxVotes = maxVotes;
-    });*/
+    
   },
 
   methods: {
@@ -208,6 +209,28 @@ export default {
         console.log("Changed to result view.");
       }
     },
+    checkAdminStatus(callback) {
+     
+      // Emit admin check request
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+
+      // Listen for the server's response
+      socket.on("adminCheckResult", (data) => {
+        if (data.isAdmin) {
+          console.log("You are the admin for this poll.");
+          this.isAdmin = true; // Set admin flag
+        } else if (data.error) {
+          console.error(data.error); // Handle errors (e.g., poll does not exist)
+          alert(data.error);
+          return; // Stop further execution
+        } else {
+          console.log("You are not the admin for this poll.");
+          this.isAdmin = false; // Set participant flag
+        }
+        // Execute the callback after admin check
+        if (typeof callback === "function") callback();
+      });
+    },
 
     // Update the question with server data or a randomly selected question
     updateQuestion: function (serverQuestion) {
@@ -236,6 +259,11 @@ export default {
         this.view = "final_view";
       }
     },
+
+    particpantNext(){
+      console.log("participant next")
+      this.nextQuestion()
+    },  
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
