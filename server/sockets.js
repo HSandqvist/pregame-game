@@ -201,6 +201,14 @@ function sockets(io, socket, data) {
     }
   });
 
+  socket.on("checkLobbyExists", (pollId, callback) => {
+    if (data.pollExists(pollId)) {
+      callback({ exists: true }); // Respond with true if the poll exists
+    } else {
+      callback({ exists: false }); // Respond with false if the poll doesn't exist
+    }
+  });
+
   socket.on("getSubmittedAnswers", function (pollId) {
     const answers = polls[pollId]?.answers || [];
     socket.emit("previousAnswers", answers);
