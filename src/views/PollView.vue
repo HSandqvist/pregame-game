@@ -3,7 +3,7 @@
     <h1>Poll id: {{ pollId }} User: {{ this.userId }}</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
-    <!-- Render all questions from the questions array -->
+    <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
     <h3>All Questions:</h3>
     <ul>
       <li v-for="(q, index) in questions" :key="index">
@@ -18,21 +18,31 @@
         v-bind:participants="currentQuestion.a"
         v-on:answer="submitAnswer($event)"
       />
-
-      <!-- alt byta till denna på v-on v-on:answer="submitAnswer($event)" -->
     </div>
 
     <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
+      <!-- add so only admin can use buttons -->
       <!-- div v-if="isAdmin === true" -->
-        <button
-          @click="nextQuestion"
-          :disabled="currentQuestionIndex === questions.length - 1"
-        >
-          Next question
-        </button>
+      <button
+        @click="nextQuestion"
+        :disabled="currentQuestionIndex === questions.length - 1"
+      >
+        Next question
+      </button>
+      <!-- /div -->
+    </div>
+
+    <!-- testar!! för finalview-->
+    <div v-if="view === 'final_view'">
+      <!-- Render ResultQuestionComponent -->
+      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+
+      <!-- add so only admin can use buttons -->
+      <!-- div v-if="isAdmin === true" -->
+      <button @click="toResults">Endgame</button>
       <!-- /div -->
     </div>
 
@@ -59,7 +69,7 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-//import questionsEn from "@/assets/questions-en.json"; 
+//import questionsEn from "@/assets/questions-en.json";
 //import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
@@ -76,6 +86,9 @@ export default {
     return {
       // Current question data (question text and answer options)
       //question: {q: "", a: [],}, // Legacy object for compatibility
+      currentParticipant: {}, //the participant using a certain poll client
+      userId: "",
+
       participants: [], // List of participants for the question
       pollId: "inactive poll",
       submittedAnswers: {},
@@ -88,19 +101,32 @@ export default {
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
 
-
       view: "question_view", // 'question_view' or 'results_view'
     };
   },
 
   created: function () {
-    // Poll ID    // Set the poll ID from // Collected answers for the poll the route parameter
+    // Poll ID    // Set the poll ID from route params
     this.pollId = this.$route.params.id;
+
+    // User ID    // Set the user ID from route params
+    this.userId = this.$route.params.userId;
+
+    socket.emit("getCurrentParticipant", {
+      pollId: this.pollId,
+      userId: this.userId,
+    });
+
+    // Get this participant
+    socket.on("currentParticipant", (participantData) => {
+      this.currentParticipant = participantData;
+      console.log("Participant name received:", participantData.name);
+    });
 
     // Listen for server events to update the question and submitted answers
     socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
-      console.log("Updated question:", q); // Add this log
+      //console.log("Updated question:", q); // Add this log
     }); // Update the current question
 
     socket.on(
@@ -120,18 +146,15 @@ export default {
 
     socket.on("previousAnswers", (answers) => {
       this.submittedAnswers = answers;
-      console.log("Tidigare svar hämtade från servern:", answers);
+      //console.log("Tidigare svar hämtade från servern:", answers);
     });
 
     //ask server for chosen questions
-    socket.emit("getQuestionsForGame", (this.pollId));
+    socket.emit("getQuestionsForGame", this.pollId);
 
     //Get questions from server
     socket.on("questionsForGame", (qs) => {
-      //console.log("Data received from server (for game):", qs);
-
       if (qs) {
-        //console.log("Data received from server (for game):",qs); // Add this to verify data reception
         this.questions = qs;
         this.updateCurrentQuestion(0); // Start with the first question
         //console.log("Questions received from server:", this.questions);
@@ -140,50 +163,50 @@ export default {
       }
     });
 
-    //VARIANT 3 - fixa så att man kan visa vem som fått mest röster här sen!!
     //Kolla så kallas på efter att folk har röstat
-    socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
+    socket.off("topAnswerUpdate"); // Clear any existing listeners
+
+    socket.on("topAnswerUpdate", (data) => {
+      //console.log("Received data:", data); // Log the received data
+      const { topAnswer, maxVotes } = data;
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
-      console.log("mest röster har", topAnswer, "med", maxVotes);
       this.maxVotes = maxVotes;
     });
 
-    //ev onödig här
-    // Listen for category results update
-    socket.on("categoryResultsUpdate", (results) => {
-      console.log("Category Results:", results);
-      // Update state to display results in the result component
-      this.categoryResults = results;
-    });
+    /*socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
+      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
+      this.topAnswer = topAnswer;
+      this.maxVotes = maxVotes;
+    });*/
   },
 
   methods: {
     submitAnswer: function (answer) {
+      const voter = this.currentParticipant; // Assume `currentParticipant` contains the voter's info
+
       // Emit the answer to the server
-      socket.emit("submitAnswer", { pollId: this.pollId, answer: answer });
-      console.log("Answer sent:", answer);
-
-      // Switch view to show the result after answer submission
-      this.view = "results_view";
-      console.log("changed to result view")
-
-    },
-
-    // Triggered when the current question ends
-    endQuestion: function () {
-      console.log("är i endquestion");
-      socket.emit("endQuestion", { pollId: this.pollId });
-      this.isLastQuestion = true;
-
-    },
-
-    // Listen for updated category results from the server
-    updateCategoryResults: function () {
-      socket.on("categoryResultsUpdate", (data) => {
-        console.log("Category Results Updated:", data);
-        // Update your frontend state with the updated results
+      socket.emit("submitAnswer", {
+        pollId: this.pollId,
+        answer: answer,
+        voter: voter.name,
       });
+      console.log("Answer sent:", answer, "by voter", voter.name);
+
+      //uppdatera topanswer och votecounten
+      socket.emit("runQuestionResults", this.pollId);
+
+      //flyttat socket.on top answer update till created delen
+
+      // If it's the last question, transition to final view
+      if (this.currentQuestionIndex === this.questions.length - 1) {
+        console.log("Last question answered. Switching to final view.");
+        this.view = "final_view";
+      } else {
+        // Switch view to show the result after answer submission
+        this.view = "results_view";
+        console.log("Changed to result view.");
+      }
     },
 
     // Update the question with server data or a randomly selected question
@@ -192,40 +215,42 @@ export default {
         this.currentQuestion.q = serverQuestion.q;
         this.currentQuestion.a = serverQuestion.a || [];
 
-        console.log("current q:", this.currentQuestion.q)
+        console.log("current q:", this.currentQuestion.q);
       }
     },
 
     nextQuestion: function () {
+      // Check if the current question is NOT the last question
       if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.updateCurrentQuestion(this.currentQuestionIndex += 1);
-        console.log("Current question index:", this.currentQuestionIndex)
+        this.currentQuestionIndex += 1; // Increment the index
+        this.updateCurrentQuestion(this.currentQuestionIndex); // Update the question
+        console.log("Current question index:", this.currentQuestionIndex);
 
-        
+        // Switch back to 'question' view
+        this.view = "question_view";
       }
-      // när man kommer till sista frågan
-      if (this.currentQuestionIndex == this.questions.length -1){
-        console.log("No more questions");
-        this.endQuestion();
+      // If it's the last question, switch to the final view
+      else if (this.currentQuestionIndex === this.questions.length - 1) {
+        console.log("No more questions. Switching to final view."); //printas aldrig
 
+        this.view = "final_view";
       }
-
-      // Switch back to 'question' view
-      this.view = "question_view";
-      
     },
-
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
         this.currentQuestion = this.questions[index];
-        console.log("Current question data:", this.currentQuestion);        
+        console.log("Current question data:", this.currentQuestion);
       } else {
         console.error("Invalid question index:", index);
       }
     },
- 
+
+    toResults: function () {
+      console.log("game finished, going to result view");
+      this.$router.push(`/result/${this.pollId}`);
+    },
   },
 };
 </script>
