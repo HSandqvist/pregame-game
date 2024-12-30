@@ -6,6 +6,7 @@ import { readFileSync } from "fs"; // Import the readFileSync function for readi
 
 function Data() {
   this.polls = {}; // Object to store all polls
+
   this.categories = {}; //Store categories from external json file
 }
 
@@ -34,7 +35,7 @@ Data.prototype.createPoll = function (
   lang = "en",
   adminId,
   questionCount,
-  timerCount
+  timerCount,
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
