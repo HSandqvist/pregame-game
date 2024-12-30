@@ -17,8 +17,11 @@
       <QuestionComponent
         v-bind:question="currentQuestion"
         v-bind:participants="currentQuestion.a"
-        v-on:answer="submitAnswer($event)"
+        v-on:answer="submitAnswer($event)" 
       />
+      <button v-if="isAdmin" v-on:click="switchView()"> 
+        Show result
+      </button>
     </div>
 
     <div v-if="view === 'results_view'">
@@ -100,7 +103,7 @@ export default {
       siteUserId: null,
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
-
+      hasVoted: false,
       view: "question_view", // 'question_view' or 'results_view'
     };
   },
@@ -190,16 +193,36 @@ export default {
       socket.emit("submitAnswer", {
         pollId: this.pollId,
         answer: answer,
-        voter: voter.name,
+        voter: this.userId,
       });
+
       console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
-      socket.emit("runQuestionResults", this.pollId);
+      //socket.emit("runQuestionResults", this.pollId);
+      this.hasVoted= true;
 
       //flyttat socket.on top answer update till created delen
 
-      // If it's the last question, transition to final view
+      //FÖR ATT KOLLA OM ALLA RÖSTAT O GÅ VIDARE ENDAST DÅ
+      // Check if all users have answered
+      const totalParticipants = poll.participants.length;
+      const totalVotes = Object.values(answers).reduce((sum, option) => sum + option.count, 0);
+      const savedAnswers = poll.answers[currentQuestion];
+
+      if (totalVotes === totalParticipants) {
+      // Emit the top answer
+      socket.emit("runQuestionResults", this.pollId, savedAnswers);
+      console.log(`Emitting result for poll ${pollId}, question ${currentQuestion}:`, result);
+
+      // Emit to sockets or return the result for further processing
+      return result;
+    }
+  },
+   
+
+    switchView(){
+       // If it's the last question, transition to final view
       if (this.currentQuestionIndex === this.questions.length - 1) {
         console.log("Last question answered. Switching to final view.");
         this.view = "final_view";
@@ -209,6 +232,7 @@ export default {
         console.log("Changed to result view.");
       }
     },
+    
     checkAdminStatus(callback) {
      
       // Emit admin check request
@@ -257,6 +281,7 @@ export default {
         console.log("No more questions. Switching to final view."); //printas aldrig
 
         this.view = "final_view";
+    
       }
     },
 

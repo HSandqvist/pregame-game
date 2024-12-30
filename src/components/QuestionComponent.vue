@@ -7,7 +7,7 @@
     <p v-if="!question.q">Question is not available!</p>
 
     <div v-for="(participant, index) in participants" :key="index">
-      <button @click="answer(participant)">{{ participant }}</button>
+      <button @click="answer(participant)" >{{ participant }} </button>
     </div>
   
   </div>
