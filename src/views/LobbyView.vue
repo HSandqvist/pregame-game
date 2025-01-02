@@ -1,16 +1,21 @@
 <template>
+  <div class="global-music-control">
+    <button @click="toggleMusic">
+      {{ isMusicPlaying ? "Turn Music Off" : "Turn Music On" }}
+    </button>
+  </div>
   <div>
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
-      <h1>{{this.uiLabels.pleaseEnterYourName || "Please enter your name"}}:</h1>
+      <h1>{{ this.uiLabels.pleaseEnterYourName || "Please enter your name" }}:</h1>
       <input type="text" v-model="userName" />
-      <button v-on:click="nextStep" :disabled="!userName">{{this.uiLabels.next || "Next"}}</button>
+      <button v-on:click="nextStep" :disabled="!userName">{{ this.uiLabels.next || "Next" }}</button>
 
     </div>
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <h1>{{this.uiLabels.captureYourAvatar || "Capture your avatar"}}: </h1>
+      <h1>{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}: </h1>
 
       <p v-if="!isPictureTaken">
         <video ref="video" width="320" height="240" autoplay></video>
@@ -22,14 +27,14 @@
       </p>
 
       <button v-on:click="startCamera" :disabled="cameraState">
-        {{this.uiLabels.startCamera || "Start camera"}}
+        {{ this.uiLabels.startCamera || "Start camera" }}
       </button>
       <button v-on:click="captureImage" :disabled="!cameraState">
-        {{this.uiLabels.takePicture || "Take picture"}}
+        {{ this.uiLabels.takePicture || "Take picture" }}
       </button>
 
-      <button v-on:click="nextStep" :disabled="!isPictureTaken" >{{this.uiLabels.next || "Next"}}</button>
-      <button v-on:click="backStep">{{this.uiLabels.back || "Back"}}</button>
+      <button v-on:click="nextStep" :disabled="!isPictureTaken">{{ this.uiLabels.next || "Next" }}</button>
+      <button v-on:click="backStep">{{ this.uiLabels.back || "Back" }}</button>
     </div>
 
     <!-- Step 3: Display captured avatar and go to wait area -->
@@ -45,38 +50,53 @@
       </div>
     </div>
 
+
+    <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
       <h1>Lobby for poll: {{ pollId }}</h1>
       <p>Number of participants: {{ participants.length }}</p>
       <p>Participants:</p>
-      <ul>
-        <li v-for="(participant, index) in participants" :key="index">
-          <img :src="participant.avatar" class="avatar" /> {{ participant.name }}
-          <span v-if="participant.isAdmin"> (Host)</span>
-        </li>
-      </ul>
 
-      <!-- Know if user is admin or not -->
+      <!-- Participants grid -->
+      <div class="participants-grid">
+        <div v-for="(participant, index) in participants" :key="index"
+          :class="['participant-item', { 'current-user': participant.userId === userId }]">
+
+          <!-- Participant avatar -->
+          <img :src="participant.avatar" alt="User Avatar" class="avatar" :class="{ host: participant.isAdmin }" />
+
+          <p>{{ participant.name }}</p>
+        </div>
+      </div>
+
+      <!-- Admin or participant tags -->
       <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>
       <h2 v-else class="participant-tag">You are a Participant</h2>
-     
+
+      <!-- User details -->
       <img :src="avatar" alt="User Avatar" class="avatar" />
-      <h3>{{this.userName }}</h3>
+      <h3>{{ this.userName }}</h3>
+
+      <!-- Actions -->
       <div class="submit-section">
         <button v-on:click="participateInPoll" id="submitNameButton" :disabled="joined">
-          {{ this.uiLabels.participateInPoll || "Participate in poll"}}
+          {{ this.uiLabels.participateInPoll || "Participate in poll" }}
         </button>
 
-        <button v-on:click="backStep" :disabled="joined"> {{ this.uiLabels.back  || "Back"}} </button>
 
-        <button v-if="isAdmin" v-on:click="adminStartGame" 
-          :disabled="!joined ||  !atLeastThree">
+        <button v-on:click="backStep" :disabled="joined"> {{ this.uiLabels.back || "Back" }} </button>
+
+        <button v-if="isAdmin" v-on:click="adminStartGame" :disabled="!joined || !atLeastThree">
           Start Game
         </button>
 
       </div>
     </div>
   </div>
+  <audio ref="backgroundMusic" loop>
+    <source src="/Users/sannagunnarsson/Desktop/Local Elevator.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
 </template>
 
 <script>
@@ -108,8 +128,11 @@ export default {
       stream: null, // The video stream to access the camera
       isPictureTaken: false, //Tracks that camera is closed and picture taken
       cameraState: false, // Tracks whether the camera is active
-  }
-    
+
+      //music
+      isMusicPlaying: false,
+    }
+
   },
   created: function () {
     // Set the poll ID from the route parameter
@@ -121,16 +144,16 @@ export default {
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
     socket.on("participantsUpdate", () => this.checkAtLeastThree());
     //Listen for start game from server
-    socket.on("startGame",() => this.participatStartGame())
+    socket.on("startGame", () => this.participatStartGame())
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
-    
+
   },
- 
+
   methods: {
     // Move to the next step
     nextStep() {
@@ -144,15 +167,15 @@ export default {
       }
       console.log(this.step)
     },
-    adminStartGame(){
+    adminStartGame() {
       socket.emit("startGame", this.pollId);
     },
 
-    participatStartGame(){
+    participatStartGame() {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
-       // Function to check if the user is an admin
+    // Function to check if the user is an admin
     checkAdminStatus(callback) {
       if (localStorage.userId) {
         this.userId = localStorage.getItem("userId");
@@ -183,7 +206,7 @@ export default {
     backStep() {
       if (this.step > 1) {
         this.step--;
-       
+
       }
     },
 
@@ -262,6 +285,18 @@ export default {
         console.error("Video stream is not available.");
       }
     },
+
+    toggleMusic() {
+      const audio = this.$refs.backgroundMusic;
+      if (!audio) return;
+
+      if (this.isMusicPlaying) {
+        audio.pause();
+      } else {
+        audio.play();
+      }
+      this.isMusicPlaying = !this.isMusicPlaying;
+    },
     // Handle manual avatar upload
     handleAvatarUpload(event) {
       const file = event.target.files[0];
@@ -276,9 +311,9 @@ export default {
     // Participate in the poll
     participateInPoll() {
       if (!this.avatar) {
-      alert("Please select or capture an avatar!");
-      return;
-    }
+        alert("Please select or capture an avatar!");
+        return;
+      }
 
       socket.emit("participateInPoll", {
         userId: this.userId,
@@ -288,14 +323,14 @@ export default {
         isAdmin: this.isAdmin,
       });
       this.joined = true;
-      if(this.participants.length >= 3){
-        this.atLeastThree= true
+      if (this.participants.length >= 3) {
+        this.atLeastThree = true
       }
       //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
     },
-    checkAtLeastThree(){
-      if(this.participants.length >= 3){
-        this.atLeastThree= true
+    checkAtLeastThree() {
+      if (this.participants.length >= 3) {
+        this.atLeastThree = true
       }
     }
   },
@@ -331,4 +366,91 @@ video {
   border: 1px solid #ccc;
   border-radius: 10px;
 }
+.participants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsiv layout */
+  gap: 20px; /* Avstånd mellan deltagare */
+  margin: 20px 0;
+}
+
+.participant-item.current-user img.avatar {
+  border-color: rgb(255, 139, 230); /* Lila kant runt aktuell användare */
+  border-style: solid; /* Fylld kant */
+  animation: borderHighlight 1s infinite alternate; /* Animerar kantfärgen */
+}
+
+@keyframes borderHighlight {
+  from {
+    border-color: rgb(255, 139, 230); /* Startfärg */
+  }
+  to {
+    border-color: rgb(244, 34, 255); /* Slutfärg */
+  }
+}
+
+.participant-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+img.avatar {
+  width: 100%; /* Gör bilderna flexibla */
+  height: auto; /* Behåll proportionerna */
+  aspect-ratio: 1 / 1; /* Fyrkantiga bilder */
+  border-radius: 50%; /* Runda bilder */
+  object-fit: cover; /* Beskär inte bilder */
+  max-width: 150px; /* Maximal bildstorlek */
+  border: 4px solid transparent; /* Standardkant */
+  border-color: white; /* Default-kantfärg */
+  transition: border-color 0.3s ease; /* Mjuk övergång för kantfärg */
+}
+
+img.avatar.host {
+  border-color: rgb(15, 177, 69); /* Grön kant för admin */
+}
+
+.participant-item p {
+  margin-top: 10px; /* Avstånd mellan bild och namn */
+  font-size: 14px; /* Mindre textstorlek */
+}
+
+@media (max-width: 768px) {
+  .participants-grid {
+    grid-template-columns: repeat(2, 1fr); /* Två bilder per rad på små skärmar */
+  }
+}
+
+@media (max-width: 480px) {
+  .participants-grid {
+    grid-template-columns: repeat(1, 1fr); /* En bild per rad på mycket små skärmar */
+  }
+}
+.global-music-control {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.global-music-control button {
+  padding: 10px 18px;
+  background-color: pink;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.global-music-control button:hover {
+  background-color: rgb(255, 131, 203);
+}
+
 </style>
