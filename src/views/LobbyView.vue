@@ -94,13 +94,14 @@
     </div>
   </div>
   <audio ref="backgroundMusic" loop>
-    <source src="/Users/sannagunnarsson/Desktop/Local Elevator.mp3" type="audio/mpeg" />
+    <source :src="lobbyviewMusic" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
 </template>
 
 <script>
 import io from "socket.io-client";
+import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 const socket = io("localhost:3000");
 
 export default {
@@ -288,7 +289,12 @@ export default {
 
     toggleMusic() {
       const audio = this.$refs.backgroundMusic;
-      if (!audio) return;
+      if (!audio) {
+        console.error("Audio element not found!");
+        return;
+      }
+
+      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
 
       if (this.isMusicPlaying) {
         audio.pause();
@@ -366,25 +372,34 @@ video {
   border: 1px solid #ccc;
   border-radius: 10px;
 }
+
 .participants-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsiv layout */
-  gap: 20px; /* Avstånd mellan deltagare */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  /* Responsiv layout */
+  gap: 20px;
+  /* Avstånd mellan deltagare */
   margin: 20px 0;
 }
 
 .participant-item.current-user img.avatar {
-  border-color: rgb(255, 139, 230); /* Lila kant runt aktuell användare */
-  border-style: solid; /* Fylld kant */
-  animation: borderHighlight 1s infinite alternate; /* Animerar kantfärgen */
+  border-color: rgb(255, 139, 230);
+  /* Lila kant runt aktuell användare */
+  border-style: solid;
+  /* Fylld kant */
+  animation: borderHighlight 1s infinite alternate;
+  /* Animerar kantfärgen */
 }
 
 @keyframes borderHighlight {
   from {
-    border-color: rgb(255, 139, 230); /* Startfärg */
+    border-color: rgb(255, 139, 230);
+    /* Startfärg */
   }
+
   to {
-    border-color: rgb(244, 34, 255); /* Slutfärg */
+    border-color: rgb(244, 34, 255);
+    /* Slutfärg */
   }
 }
 
@@ -397,37 +412,52 @@ video {
 }
 
 img.avatar {
-  width: 100%; /* Gör bilderna flexibla */
-  height: auto; /* Behåll proportionerna */
-  aspect-ratio: 1 / 1; /* Fyrkantiga bilder */
-  border-radius: 50%; /* Runda bilder */
-  object-fit: cover; /* Beskär inte bilder */
-  max-width: 150px; /* Maximal bildstorlek */
-  border: 4px solid transparent; /* Standardkant */
-  border-color: white; /* Default-kantfärg */
-  transition: border-color 0.3s ease; /* Mjuk övergång för kantfärg */
+  width: 100%;
+  /* Gör bilderna flexibla */
+  height: auto;
+  /* Behåll proportionerna */
+  aspect-ratio: 1 / 1;
+  /* Fyrkantiga bilder */
+  border-radius: 50%;
+  /* Runda bilder */
+  object-fit: cover;
+  /* Beskär inte bilder */
+  max-width: 150px;
+  /* Maximal bildstorlek */
+  border: 4px solid transparent;
+  /* Standardkant */
+  border-color: white;
+  /* Default-kantfärg */
+  transition: border-color 0.3s ease;
+  /* Mjuk övergång för kantfärg */
 }
 
 img.avatar.host {
-  border-color: rgb(15, 177, 69); /* Grön kant för admin */
+  border-color: rgb(15, 177, 69);
+  /* Grön kant för admin */
 }
 
 .participant-item p {
-  margin-top: 10px; /* Avstånd mellan bild och namn */
-  font-size: 14px; /* Mindre textstorlek */
+  margin-top: 10px;
+  /* Avstånd mellan bild och namn */
+  font-size: 14px;
+  /* Mindre textstorlek */
 }
 
 @media (max-width: 768px) {
   .participants-grid {
-    grid-template-columns: repeat(2, 1fr); /* Två bilder per rad på små skärmar */
+    grid-template-columns: repeat(2, 1fr);
+    /* Två bilder per rad på små skärmar */
   }
 }
 
 @media (max-width: 480px) {
   .participants-grid {
-    grid-template-columns: repeat(1, 1fr); /* En bild per rad på mycket små skärmar */
+    grid-template-columns: repeat(1, 1fr);
+    /* En bild per rad på mycket små skärmar */
   }
 }
+
 .global-music-control {
   position: fixed;
   top: 10px;
@@ -452,5 +482,4 @@ img.avatar.host {
 .global-music-control button:hover {
   background-color: rgb(255, 131, 203);
 }
-
 </style>
