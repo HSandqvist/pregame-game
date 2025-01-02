@@ -51,6 +51,7 @@ Data.prototype.createPoll = function (
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
+      globalTopAnswer: "test",
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
     //console.log("Poll created", pollId, poll, "Admin is:", adminId);
@@ -130,7 +131,7 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;
-
+    
     if (typeof poll.answers[currentQuestion] !== "object") {
       poll.answers[currentQuestion] = {};
     }
@@ -140,6 +141,7 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
     // Initialize answer count and voters if not already present
     if (!answers[answer]) {
       answers[answer] = { count: 0, voters: [] };
+      console.log("")
     }
 
     // Increment the count for this answer
@@ -152,27 +154,42 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
       `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
       answers
     );
-
   }
 };
 
-Data.prototype.runQuestion = function (pollId, savedAnswers) {
+Data.prototype.votingReset = function(pollId) {
+  if (this.pollExists(pollId)) {
+    const poll = this.polls[pollId];
+    const currentQuestion = poll.currentQuestion;   //ger ett index?? 
+    console.log("data votingreset har currentquestion:", currentQuestion);
+    // Save the winner to the category using the complementary function
+    this.updateCategoryWinner(pollId, poll.questions[currentQuestion].q, this.globalTopAnswer);
+
+    // Move to the next question
+    poll.currentQuestion += 1; // Increment to the next question
+    poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
+    console.log("data votingreset har uppdaterat currentquestion till:", currentQuestion);
+    } 
+};
+
+Data.prototype.runQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;   //ger ett index?? 
     console.log("data runQuestion har currentquestion:", currentQuestion);
 
     // Determine the top answer for the current question
-    //const answers = poll.answers[currentQuestion];    flyttar till poll
+    const answers = poll.answers[currentQuestion];    
     let maxVotes = 0;
     let topAnswer = null;
 
-    for (const [savedAnswers, savedAnswersdata] of Object.entries(savedAnswers)) {
-      const { count, voters } = savedAnswersdata; //kanske vill spara voters sen för specifik funktionalitet
+    for (const [answer, answerdata] of Object.entries(answers)) {
+      const { count, voters } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
 
       if (count > maxVotes) {
         maxVotes = count;
         topAnswer = answer;
+        this.globalTopAnswer= topAnswer;
       }
     }
 
@@ -181,15 +198,8 @@ Data.prototype.runQuestion = function (pollId, savedAnswers) {
       `Top answer for poll ${pollId}, question ${poll.questions[currentQuestion].q}: ${topAnswer} with ${maxVotes} votes.`
     );
 
-    // Save the winner to the category using the complementary function
-    this.updateCategoryWinner(pollId, poll.questions[currentQuestion].q, topAnswer);
-
-    // Move to the next question
-    poll.currentQuestion += 1; // Increment to the next question
-    poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
-
     // Return the topAnswer and maxVotes (to sockets then to clients)
-    return { topAnswer, maxVotes };
+    return {topAnswer , maxVotes };
   }
 };
 

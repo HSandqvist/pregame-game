@@ -19,7 +19,7 @@
         v-bind:participants="currentQuestion.a"
         v-on:answer="submitAnswer($event)" 
       />
-      <button v-if="isAdmin" v-on:click="switchView()"> 
+      <button v-if="isAdmin" v-on:click="adminNext()"> 
         Show result
       </button>
     </div>
@@ -31,7 +31,7 @@
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
       <button
-        @click="nextQuestion"
+        @click="adminNext"
         :disabled="currentQuestionIndex === questions.length - 1"
       >
         Next question
@@ -138,6 +138,10 @@ export default {
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
 
+    socket.on("participantNextQuestion", () => this.particpantNext()
+
+  );
+
     socket.on(
       "submittedAnswersUpdate",
       (answers) => (this.submittedAnswers = answers)
@@ -193,20 +197,21 @@ export default {
       socket.emit("submitAnswer", {
         pollId: this.pollId,
         answer: answer,
+        //voter: this.userId,
         voter: this.userId,
       });
 
       console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
-      //socket.emit("runQuestionResults", this.pollId);
+    
+      socket.emit("runQuestionResults", this.pollId);
       this.hasVoted= true;
-
       //flyttat socket.on top answer update till created delen
 
       //FÖR ATT KOLLA OM ALLA RÖSTAT O GÅ VIDARE ENDAST DÅ
       // Check if all users have answered
-      const totalParticipants = poll.participants.length;
+      /*const totalParticipants = poll.participants.length;
       const totalVotes = Object.values(answers).reduce((sum, option) => sum + option.count, 0);
       const savedAnswers = poll.answers[currentQuestion];
 
@@ -215,13 +220,15 @@ export default {
       socket.emit("runQuestionResults", this.pollId, savedAnswers);
       console.log(`Emitting result for poll ${pollId}, question ${currentQuestion}:`, result);
 
-      // Emit to sockets or return the result for further processing
+      // Emit to sockets or return the result for further processing*/
       return result;
-    }
-  },
+    },
+  //},
    
-
     switchView(){
+    
+      //const answers = poll.answers[currentQuestion];
+      
        // If it's the last question, transition to final view
       if (this.currentQuestionIndex === this.questions.length - 1) {
         console.log("Last question answered. Switching to final view.");
@@ -267,6 +274,7 @@ export default {
     },
 
     nextQuestion: function () {
+      
       // Check if the current question is NOT the last question
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.currentQuestionIndex += 1; // Increment the index
@@ -284,11 +292,28 @@ export default {
     
       }
     },
+    adminNext(){
+      socket.emit("nextQuestion", this.pollId, this.userId);
+      console.log("IN Admin NExt")
+    },
 
     particpantNext(){
-      console.log("participant next")
-      this.nextQuestion()
-    },  
+      if( this.view === "question_view"){
+        console.log("participant next result")
+       
+        this.switchView()
+      }
+      
+      else if( this.view === "results_view" || this.view ==="final_view"){
+        console.log("participant next question");
+        if(this.isAdmin){
+          socket.emit("votingReset", this.pollId)
+        }
+          this.nextQuestion()
+        }
+      
+  },
+      
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
