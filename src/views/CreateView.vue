@@ -18,9 +18,11 @@
             {{ count }}
           </button>
         </div>
-        <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
-          {{ this.uiLabels.next || "Next" }}
-        </button>
+        <div class="action-buttons">
+          <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
+            {{ this.uiLabels.next || "Next" }}
+          </button>
+        </div>
       </div>
 
       <!-- Step 2: Select time per question -->
@@ -38,12 +40,14 @@
             {{ time }}
           </button>
         </div>
-        <button v-on:click="backStep">
-          {{ this.uiLabels.back || "back" }}
-        </button>
-        <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
-          {{ this.uiLabels.createGame || "Create Game" }}
-        </button>
+        <div class="action-buttons">
+          <button v-on:click="backStep">
+            {{ this.uiLabels.back || "back" }}
+          </button>
+          <button id="create-game-button" v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
+            {{ this.uiLabels.createGame || "Create Game" }}
+          </button>
+        </div>
       </div>
 
       <!-- Step 3: Display poll data -->
@@ -93,7 +97,7 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
     socket.on("pollData", (data) => (this.pollData = data));
     socket.emit("getUILabels", this.lang);
-    this.generateAdminID()
+    this.generateAdminID();
   },
 
   methods: {
@@ -109,11 +113,6 @@ export default {
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
       console.log("User ID stored:", localStorage.getItem("userId"));
-    },
-
-    makeUserAdmin(){
-
-
     },
 
     finalizeQuestions: function () {
@@ -139,7 +138,7 @@ export default {
     },
 
     createPoll: function () {
-      this.generateAdminID();
+      //this.generateAdminID();
 
       this.generatePollID();
 
@@ -153,12 +152,6 @@ export default {
         questionCount: this.selectedQuestionCount,
         timerCount: this.selectedTime,
       });
-
-      /*
-      socket.emit("setQuestionCount", {
-        pollId: this.pollId,
-        questionCount: this.selectedQuestionCount,
-      });*/
 
       socket.emit("joinPoll", { pollId: this.pollId });
 
@@ -215,13 +208,13 @@ body {
 
 /* Buttons */
 button {
-  padding: 15px 30px;
-  background-color: pink;
+  padding: 15px 25px;
+  background-color: rgb(252, 160, 198);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
@@ -246,7 +239,27 @@ button:disabled {
 .time-per-question-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   margin-top: 20px;
+}
+
+/* Add spacing between the time buttons and the action buttons */
+.action-buttons {
+  margin-top: 40px; /* Adjust this value as needed */
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Keeps space between the buttons themselves */
+}
+
+#create-game-headline {
+  color: rgb(255, 205, 226);
+}
+
+#create-game-button {
+  background-color: rgb(252, 63, 173);
+}
+
+#create-game-button:hover {
+  background-color: rgb(219, 34, 142);
 }
 </style>

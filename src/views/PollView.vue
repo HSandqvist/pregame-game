@@ -1,15 +1,15 @@
 <template>
   <div>
-    <h1>Poll id: {{ pollId }} User: {{ this.userId }}</h1>
+    <h1>Poll id: {{ pollId }}</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
     <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
-    <h3>All Questions:</h3>
+    <!-- <h3>All Questions:</h3>
     <ul>
       <li v-for="(q, index) in questions" :key="index">
         {{ q }}
       </li>
-    </ul>
+    </ul> -->
 
     <div v-if="view === 'question_view'">
       <!-- Render the question component -->

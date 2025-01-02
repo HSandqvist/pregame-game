@@ -94,8 +94,8 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  font-family: Arial, sans-serif;
+  /*background: linear-gradient(135deg, #f8f9fa, #e9ecef);*/
+  /*font-family: Arial, sans-serif;*/
   text-align: center;
   position: relative;
 }
@@ -103,7 +103,7 @@ export default {
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
-  color: #343a40;
+  color: rgb(255, 205, 226);
   margin-bottom: 2rem;
 }
 
@@ -117,15 +117,16 @@ export default {
 /* Button styles */
 .btn {
   padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  background-color: rgb(252, 160, 198);
   color: white;
   text-decoration: none;
   font-size: 1.2rem;
+  font-weight: bold;
   border-radius: 0.5rem;
   text-align: center;
   cursor: pointer;
 }
 .btn:hover {
-  background-color: #0056b3;
+  background-color: rgb(255, 131, 203);
 }
 </style>
