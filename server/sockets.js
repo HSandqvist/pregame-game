@@ -75,6 +75,13 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("startGame");
   });
 
+  socket.on("nextQuestion", function (pollId, userId ) {
+    // Notify all clients in the poll room that the poll has started
+    console.log("In socket Admin next")
+    io.emit("participantNextQuestion", pollId, userId);
+  });
+
+
   /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
     // Get the specified question and update the current question in the poll
@@ -111,6 +118,11 @@ function sockets(io, socket, data) {
     }
   });
 
+  socket.on("votingReset", function(pollId){
+    data.votingReset(pollId);
+    console.log("är i socket on votingReset")
+  });
+
   // Event: använda för handling när resultatet per fråga ska visas?
   socket.on("runQuestionResults", function (pollId) {
     //NEDAN BORDE TYP GÖRAS NÄR TIDEN TAGIT SLUT FÖR EN FRÅGA?
@@ -124,7 +136,7 @@ function sockets(io, socket, data) {
     console.log(`Emitting topAnswerUpdate: ${topAnswer}, ${maxVotes}`); // Log data before emitting
     // Emit the most voted answer to all clients in the poll room
     //io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes }); //uppdatera för alla som är inne i pollen
-    socket.emit("topAnswerUpdate", { topAnswer, maxVotes });
+    io.emit("topAnswerUpdate", { topAnswer, maxVotes });
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
@@ -161,6 +173,14 @@ function sockets(io, socket, data) {
         isAdmin: false,
         error: "Poll does not exist",
       }); // Error handling
+    }
+  });
+
+  socket.on("checkLobbyExists", (pollId, callback) => {
+    if (data.pollExists(pollId)) {
+      callback({ exists: true }); // Respond with true if the poll exists
+    } else {
+      callback({ exists: false }); // Respond with false if the poll doesn't exist
     }
   });
 

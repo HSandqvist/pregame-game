@@ -97,7 +97,9 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
     socket.on("pollData", (data) => (this.pollData = data));
     socket.emit("getUILabels", this.lang);
+
     this.generateAdminID();
+
   },
 
   methods: {

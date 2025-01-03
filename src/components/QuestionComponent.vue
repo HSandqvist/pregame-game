@@ -22,6 +22,7 @@
     <!-- Drop zone -->
     <div class="drop-zone" @dragover.prevent @drop="onDrop">
       Drop answer here
+
     </div>
   </div>
 
