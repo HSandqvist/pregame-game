@@ -14,7 +14,7 @@
         placeholder="Enter Lobby ID"
         class="lobby-input"
       />
-      <button class="btn" @click="attemptJoin">Join Game</button>
+      <button class="btn" @click="attemptJoin">Join Game </button>
     </div>
 
     <!-- Show action buttons if not joining a game -->
