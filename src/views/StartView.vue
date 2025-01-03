@@ -1,7 +1,9 @@
 <template>
   <div class="frontpage">
     <!-- Language switcher component -->
-    <LanguageSwitcher @language-changed="updateLanguage" />
+    <div class="language-switcher-container">
+      <LanguageSwitcher @language-changed="updateLanguage" />
+    </div>
 
     <!-- Title of the game -->
     <h1 class="game-title">Pre(game)<sup>2</sup></h1>
@@ -17,12 +19,11 @@
       <button class="btn" v-on:click="showPinEntry">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
-      
     </div>
 
     <div>
       <input type="text" v-model="inputedID" />
-      <button v-on:click="quickEnterTEST" > QUICK JOIN </button>
+      <button v-on:click="quickEnterTEST">QUICK JOIN</button>
     </div>
   </div>
 </template>
@@ -45,7 +46,7 @@ export default {
       lang: localStorage.getItem("lang") || "en", // Language preference
       joinGameClicked: false, // Tracks whether "Join Game" was clicked
       userId: null,
-      inputedID: ""
+      inputedID: "",
     };
   },
   created: function () {
@@ -60,12 +61,11 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
-//TESTING METHODS
-    quickEnterTEST(){
-      localStorage.removeItem("userId")
+    //TESTING METHODS
+    quickEnterTEST() {
+      localStorage.removeItem("userId");
       this.$router.push(`/lobby/${this.inputedID}`);
     },
-
 
     //TESTING METHODS
 
@@ -128,5 +128,17 @@ export default {
 }
 .btn:hover {
   background-color: rgb(255, 131, 203);
+}
+
+/* Wrapper for LanguageSwitcher */
+.language-switcher-container {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  z-index: 10; /* Ensures it stays above other elements */
+}
+
+.language-toggle {
+  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
 </style>
