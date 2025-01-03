@@ -1,9 +1,7 @@
 <template>
   <div class="frontpage">
     <!-- Language switcher component -->
-    <div class="language-switcher-container">
-      <LanguageSwitcher @language-changed="updateLanguage" />
-    </div>
+    <LanguageSwitcher @language-changed="updateLanguage" />
 
     <!-- Title of the game -->
     <h1 class="game-title">Pre(game)<sup>2</sup></h1>
@@ -27,13 +25,6 @@
       <button class="btn" @click="showPinEntry">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
-
-    </div>
-
-    <div>
-      <input type="text" v-model="inputedID" />
-      <button v-on:click="quickEnterTEST">QUICK JOIN</button>
-
     </div>
   </div>
 </template>
@@ -53,10 +44,8 @@ export default {
       uiLabels: {}, // Dynamic UI labels for multilingual support
       lang: localStorage.getItem("lang") || "en", // Language preference
       joinGameClicked: false, // Tracks whether "Join Game" was clicked
-
-      userId: null,
-      inputedID: "",
-
+      inputedID: "", // Holds the entered lobby ID
+      errorMessage: "", // Error message for invalid Lobby ID
     };
   },
   created() {
@@ -72,13 +61,20 @@ export default {
       socket.emit("getUILabels", this.lang);
     },
 
-    //TESTING METHODS
-    quickEnterTEST() {
-      localStorage.removeItem("userId");
-      this.$router.push(`/lobby/${this.inputedID}`);
+    // Show Join Game input
+    showPinEntry() {
+      this.joinGameClicked = true;
     },
 
+    // Attempt to join a lobby
+    attemptJoin() {
+      const lobbyId = this.inputedID.trim();
 
+      if (!lobbyId) {
+        this.errorMessage = "Please enter a valid Lobby ID.";
+        alert(this.errorMessage);
+        return;
+      }
 
       // Validate lobby existence
       socket.emit("checkLobbyExists", lobbyId, (response) => {
@@ -102,9 +98,8 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  /*background: linear-gradient(135deg, #f8f9fa, #e9ecef);*/
-  /*font-family: Arial, sans-serif;*/
-
+  background: linear-gradient(to right, rgb(210, 66, 133), purple); /* Updated background to match CreateView */
+  font-family: Arial, sans-serif;
   text-align: center;
   position: relative;
   color: white;
@@ -113,8 +108,6 @@ export default {
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
-  color: rgb(255, 205, 226);
-
   margin-bottom: 2rem;
   font-family: "Limelight", cursive; /* Match font family from CreateView */
 }
@@ -139,16 +132,11 @@ export default {
 
 /* Button styles */
 .btn {
-
-  padding: 0.75rem 1.5rem;
-  background-color: rgb(252, 160, 198);
+  padding: 15px 30px;
+  background-color: pink;
   color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-radius: 0.5rem;
-  text-align: center;
-
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 18px;
   font-weight: bold;
@@ -161,17 +149,15 @@ export default {
   background-color: rgb(255, 131, 203);
 }
 
-
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  z-index: 10; /* Ensures it stays above other elements */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
-
+/* Container for action buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 </style>
