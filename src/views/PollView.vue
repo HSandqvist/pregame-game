@@ -29,7 +29,7 @@
 
      <!-- Amount of votes only visible by admin -->
       <p v-if="isAdmin">
-        {{this.submittedAnswers.length }} out of {{ participants.length }} has voted
+        {{this.numberOfVotes }} out of {{ participants.length }} has voted
       </p>
     </div>
 
@@ -55,7 +55,7 @@
 
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
-      <button @click="toResults">Endgame</button>
+      <button @click="adminToResults">Endgame</button>
       </div >
     </div>
 
@@ -104,6 +104,7 @@ export default {
       pollId: "inactive poll",
       submittedAnswers: {},
       isAdmin: false,
+      numberOfVotes: 0,
 
       questionCount: 0,
       questions: [], // Array of all questions
@@ -153,6 +154,9 @@ export default {
     socket.on("participantNextQuestion", () => this.particpantNext()
 
   );
+  //LISTENER FOR GAME END
+  socket.on("finishGame" ,() => this.toResults()
+      );
 
     socket.on(
       "submittedAnswersUpdate",
@@ -197,8 +201,15 @@ export default {
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
+
+      //Uppdaterar röstare. Kan vara problematisk
+      socket.on("updateNumberOfVotes", () => {
+        if(this.isAdmin){
+        this.numberOfVotes += 1}
+        socket.off("updateNumberOfVotes");
+      })
     });
-    
+
   },
 
   methods: {
@@ -212,13 +223,13 @@ export default {
         //voter: this.userId,
         voter: this.userId,
       });
-
       console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
      
       socket.emit("runQuestionResults", this.pollId);
       this.hasVoted= true;
+      socket.emit("playerVoted", this.userId)
       //flyttat socket.on top answer update till created delen
 
       return result;
@@ -293,6 +304,7 @@ export default {
       }
       
       this.hasVoted= false;
+      this.numberOfVotes= 0;
     },
     
     adminNext(){
@@ -327,10 +339,23 @@ export default {
         console.error("Invalid question index:", index);
       }
     },
+    adminToResults(){
+      socket.emit("toResults", this.pollId, this.userId);
+      console.log("IN Admin FINAL")
+
+    },
 
     toResults: function () {
       console.log("game finished, going to result view");
       this.$router.push(`/result/${this.pollId}`);
+    },
+  },
+  watch: {
+    autoResolveQuestion() {
+     
+      if (this.participants.length === this.numberOfVotes) {
+        this.adminNext(); // Trigger action if condition changes to true
+      }
     },
   },
 };

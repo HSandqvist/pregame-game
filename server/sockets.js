@@ -41,7 +41,6 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("questionUpdate", questionData);
   });
 
-
   // Event: Join a poll
   socket.on("joinPoll", function (d) {
     // Add the client to the specified poll room
@@ -79,6 +78,13 @@ function sockets(io, socket, data) {
     console.log("In socket Admin next")
     io.emit("participantNextQuestion", pollId, userId);
   });
+
+  socket.on("toResults", function (pollId, userId ){
+    console.log("in to Results socket");
+    io.emit("finishGame");
+  }
+
+)
 
 
   /*// Event: Run a specific question in a poll
@@ -161,6 +167,16 @@ function sockets(io, socket, data) {
 
     console.log(`Answer received: ${answer} for poll ${pollId}`);
   });
+
+  //Player voted function
+
+  socket.on("playerVoted", function (thePlayer){
+
+
+    io.emit("updateNumberOfVotes")
+  }
+
+) 
 
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {
