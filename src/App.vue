@@ -2,7 +2,6 @@
 // Import RouterView from Vue Router
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
-import { RouterView } from "vue-router";
 
 
 /*
@@ -26,7 +25,13 @@ function handleLanguageChange(newLang) {
   localStorage.setItem('lang', newLang);
   socket.emit("getUILabels", newLang);
 }
-  */
+*/
+
+import { RouterView } from "vue-router";
+
+
+
+
 </script>
 
 <template>

@@ -147,12 +147,6 @@ export default {
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
     });
-
-    /*socket.on("topAnswerUpdate", ({ topAnswer, maxVotes }) => {
-      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
-      this.topAnswer = topAnswer;
-      this.maxVotes = maxVotes;
-    });*/
   },
 
   methods: {

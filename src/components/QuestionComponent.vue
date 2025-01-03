@@ -1,10 +1,12 @@
 <template>
   <div>
+
     <h1>Who's most likely to...</h1>
+
     <h2>{{ question.q }}</h2>
 
-    <!-- Debugging: Check if question.q is valid -->
-    <p v-if="!question.q">Question is not available!</p>
+    <!-- Debugging - Check if question.q is valid -->
+    <p v-if="!question.q"> Question is not available! </p>
 
     <!-- Draggable answer options -->
     <div class="answer-options">
@@ -22,6 +24,7 @@
     <!-- Drop zone -->
     <div class="drop-zone" @dragover.prevent @drop="onDrop">
       Drop answer here
+      <!-- lägga in här med UI lables på bra sätt -->
     </div>
   </div>
 
