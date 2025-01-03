@@ -1,9 +1,5 @@
 <template>
   <div>
-<<<<<<< HEAD
-    <h1>Poll id: {{ pollId }}</h1>
-    <hr />
-=======
     <h1>Poll id: {{ pollId }} User: {{ this.userId }} </h1>
     <h1 v-if="isAdmin"> You are the host</h1>
     <!-- Render the QuestionComponent and pass the current question as a prop -->
@@ -19,7 +15,6 @@
       </li>
     </ul>-->
 
->>>>>>> main
     <div v-if="view === 'question_view'">
       <!-- Render the question component -->
       <QuestionComponent 
@@ -205,10 +200,6 @@ export default {
         socket.off("updateNumberOfVotes");
       })
     });
-<<<<<<< HEAD
-=======
-
->>>>>>> main
   },
 
   methods: {
