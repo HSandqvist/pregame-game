@@ -1,16 +1,7 @@
 <template>
   <div>
     <h1>Poll id: {{ pollId }}</h1>
-    <!-- Render the QuestionComponent and pass the current question as a prop -->
     <hr />
-    <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
-    <!-- <h3>All Questions:</h3>
-    <ul>
-      <li v-for="(q, index) in questions" :key="index">
-        {{ q }}
-      </li>
-    </ul> -->
-
     <div v-if="view === 'question_view'">
       <!-- Render the question component -->
       <QuestionComponent
@@ -46,22 +37,7 @@
       <!-- /div -->
     </div>
 
-    <!-- Navigation to change the current question 
-    <button @click="prevQuestion" :disabled="currentQuestionIndex === 0">
-      Previous
-    </button>-->
-
-    <!-- Visa array av svaren
-    <h3>Saved answers:</h3>
-    <div>
-      <p id="topAnswer">Top Answer:</p>
-      <p id="topVotes">Votes:</p>
-    </div>
-    <ul>
-      <li v-for="(votes, name) in submittedAnswers[pollId]" :key="name">
-        {{ name }}: {{ votes }} votes
-      </li>
-    </ul> -->
+   
   </div>
 </template>
 
@@ -69,8 +45,6 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
-//import questionsEn from "@/assets/questions-en.json";
-//import questionsSv from "@/assets/questions-sv.json";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";

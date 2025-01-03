@@ -25,15 +25,6 @@
     </div>
   </div>
 
-  <!-- <div class="button-container">
-      <button
-        v-for="(participant, index) in participants"
-        :key="index"
-        @click="answer(participant)"
-      >
-        {{ participant }}
-      </button>
-    </div> -->
 </template>
 
 <script>
@@ -81,35 +72,6 @@ export default {
 <style>
 /* Siracha - lite skriv-aktig men läsbar */
 @import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
-
-/* NEDAN KAN TAS BORT*/
-/* Wrapper for the buttons */
-button {
-  margin: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  background-color: rgb(252, 160, 198);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: rgb(255, 131, 203);
-}
-
-button-container {
-  display: flex;
-  flex-wrap: wrap; /* Allow buttons to wrap to the next line if necessary */
-  justify-content: center; /* Center align buttons */
-  gap: 1rem; /* Space between buttons */
-}
-/* OVAN KAN TAS BORT*/
-
-
-
 
 
 /* Draggable answer options */
