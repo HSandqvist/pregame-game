@@ -205,7 +205,13 @@ export default {
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {
         if(this.isAdmin){
-        this.numberOfVotes += 1}
+        this.numberOfVotes += 1
+      
+        if(this.numberOfVotes === this.participants.length){
+          
+          this.adminNext()
+        }}
+        
         socket.off("updateNumberOfVotes");
       })
     });
@@ -350,13 +356,6 @@ export default {
       this.$router.push(`/result/${this.pollId}`);
     },
   },
-  watch: {
-    autoResolveQuestion() {
-     
-      if (this.participants.length === this.numberOfVotes) {
-        this.adminNext(); // Trigger action if condition changes to true
-      }
-    },
-  },
+
 };
 </script>

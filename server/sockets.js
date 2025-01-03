@@ -172,7 +172,6 @@ function sockets(io, socket, data) {
 
   socket.on("playerVoted", function (thePlayer){
 
-
     io.emit("updateNumberOfVotes")
   }
 
