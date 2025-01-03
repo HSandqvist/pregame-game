@@ -59,22 +59,7 @@
       </div >
     </div>
 
-    <!-- Navigation to change the current question 
-    <button @click="prevQuestion" :disabled="currentQuestionIndex === 0">
-      Previous
-    </button>-->
-
-    <!-- Visa array av svaren
-    <h3>Saved answers:</h3>
-    <div>
-      <p id="topAnswer">Top Answer:</p>
-      <p id="topVotes">Votes:</p>
-    </div>
-    <ul>
-      <li v-for="(votes, name) in submittedAnswers[pollId]" :key="name">
-        {{ name }}: {{ votes }} votes
-      </li>
-    </ul> -->
+   
   </div>
 </template>
 
@@ -215,7 +200,6 @@ export default {
         socket.off("updateNumberOfVotes");
       })
     });
-
   },
 
   methods: {
