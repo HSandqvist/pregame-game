@@ -1,29 +1,56 @@
 <template>
   <div>
+<<<<<<< HEAD
     <h1>Poll id: {{ pollId }}</h1>
     <hr />
+=======
+    <h1>Poll id: {{ pollId }} User: {{ this.userId }} </h1>
+    <h1 v-if="isAdmin"> You are the host</h1>
+    <!-- Render the QuestionComponent and pass the current question as a prop -->
+    <hr />
+    <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
+     
+    <!-- Redo att ta bort all questions nu, lägg till om debug behövs 
+
+    <h3>All Questions:</h3>
+    <ul>
+      <li v-for="(q, index) in questions" :key="index">
+        {{ q }}
+      </li>
+    </ul>-->
+
+>>>>>>> main
     <div v-if="view === 'question_view'">
       <!-- Render the question component -->
-      <QuestionComponent
+      <QuestionComponent 
         v-bind:question="currentQuestion"
         v-bind:participants="currentQuestion.a"
-        v-on:answer="submitAnswer($event)"
+        v-on:answer="submitAnswer($event)" 
+        :voting="hasVoted"
       />
+      <button v-if="isAdmin" v-on:click="adminNext()"> 
+        Show result
+      </button>
+
+     <!-- Amount of votes only visible by admin -->
+      <p v-if="isAdmin">
+        {{this.numberOfVotes }} out of {{ participants.length }} has voted
+      </p>
     </div>
 
-    <div v-if="view === 'results_view'">
+    <div v-if="view === 'results_view'" >
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
-      <!-- add so only admin can use buttons -->
-      <!-- div v-if="isAdmin === true" -->
+      <!-- so only admin can use buttons -->
+      <div v-if="isAdmin === true">
       <button
-        @click="nextQuestion"
+        @click="adminNext"
         :disabled="currentQuestionIndex === questions.length - 1"
       >
         Next question
       </button>
-      <!-- /div -->
+      </div>
     </div>
 
     <!-- testar!! för finalview-->
@@ -31,10 +58,10 @@
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
 
-      <!-- add so only admin can use buttons -->
-      <!-- div v-if="isAdmin === true" -->
-      <button @click="toResults">Endgame</button>
-      <!-- /div -->
+      <!-- so only admin can use buttons -->
+      <div v-if="isAdmin === true">
+      <button @click="adminToResults">Endgame</button>
+      </div >
     </div>
 
    
@@ -66,6 +93,8 @@ export default {
       participants: [], // List of participants for the question
       pollId: "inactive poll",
       submittedAnswers: {},
+      isAdmin: false,
+      numberOfVotes: 0,
 
       questionCount: 0,
       questions: [], // Array of all questions
@@ -74,7 +103,7 @@ export default {
       siteUserId: null,
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
-
+      hasVoted: false,
       view: "question_view", // 'question_view' or 'results_view'
     };
   },
@@ -85,11 +114,20 @@ export default {
 
     // User ID    // Set the user ID from route params
     this.userId = this.$route.params.userId;
+    
+    this.checkAdminStatus()
 
+  
     socket.emit("getCurrentParticipant", {
       pollId: this.pollId,
       userId: this.userId,
+
+      
     });
+    socket.emit("participantsUpdate")
+    socket.on("participantsUpdate", (p) => (this.participants = p));
+    //Listen for admin to press next
+    
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -102,6 +140,13 @@ export default {
       this.currentQuestion = q;
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
+
+    socket.on("participantNextQuestion", () => this.particpantNext()
+
+  );
+  //LISTENER FOR GAME END
+  socket.on("finishGame" ,() => this.toResults()
+      );
 
     socket.on(
       "submittedAnswersUpdate",
@@ -146,7 +191,24 @@ export default {
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
+
+      //Uppdaterar röstare. Kan vara problematisk
+      socket.on("updateNumberOfVotes", () => {
+        if(this.isAdmin){
+        this.numberOfVotes += 1
+      
+        if(this.numberOfVotes === this.participants.length){
+          
+          this.adminNext()
+        }}
+        
+        socket.off("updateNumberOfVotes");
+      })
     });
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
   },
 
   methods: {
@@ -157,16 +219,27 @@ export default {
       socket.emit("submitAnswer", {
         pollId: this.pollId,
         answer: answer,
-        voter: voter.name,
+        //voter: this.userId,
+        voter: this.userId,
       });
       console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
+     
       socket.emit("runQuestionResults", this.pollId);
-
+      this.hasVoted= true;
+      socket.emit("playerVoted", this.userId)
       //flyttat socket.on top answer update till created delen
 
-      // If it's the last question, transition to final view
+      return result;
+    },
+  //},
+   
+    switchView(){
+    
+      //const answers = poll.answers[currentQuestion];
+      
+       // If it's the last question, transition to final view
       if (this.currentQuestionIndex === this.questions.length - 1) {
         console.log("Last question answered. Switching to final view.");
         this.view = "final_view";
@@ -175,6 +248,29 @@ export default {
         this.view = "results_view";
         console.log("Changed to result view.");
       }
+    },
+    
+    checkAdminStatus(callback) {
+     
+      // Emit admin check request
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+
+      // Listen for the server's response
+      socket.on("adminCheckResult", (data) => {
+        if (data.isAdmin) {
+          console.log("You are the admin for this poll.");
+          this.isAdmin = true; // Set admin flag
+        } else if (data.error) {
+          console.error(data.error); // Handle errors (e.g., poll does not exist)
+          alert(data.error);
+          return; // Stop further execution
+        } else {
+          console.log("You are not the admin for this poll.");
+          this.isAdmin = false; // Set participant flag
+        }
+        // Execute the callback after admin check
+        if (typeof callback === "function") callback();
+      });
     },
 
     // Update the question with server data or a randomly selected question
@@ -188,6 +284,7 @@ export default {
     },
 
     nextQuestion: function () {
+      
       // Check if the current question is NOT the last question
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.currentQuestionIndex += 1; // Increment the index
@@ -202,8 +299,35 @@ export default {
         console.log("No more questions. Switching to final view."); //printas aldrig
 
         this.view = "final_view";
+    
       }
+      
+      this.hasVoted= false;
+      this.numberOfVotes= 0;
     },
+    
+    adminNext(){
+      socket.emit("nextQuestion", this.pollId, this.userId);
+      console.log("IN Admin NExt")
+    },
+
+    particpantNext(){
+      if( this.view === "question_view"){
+        console.log("participant next result")
+       
+        this.switchView()
+      }
+      
+      else if( this.view === "results_view" || this.view ==="final_view"){
+        console.log("participant next question");
+        if(this.isAdmin){
+          socket.emit("votingReset", this.pollId)
+        }
+          this.nextQuestion()
+        }
+      
+  },
+      
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
@@ -214,11 +338,17 @@ export default {
         console.error("Invalid question index:", index);
       }
     },
+    adminToResults(){
+      socket.emit("toResults", this.pollId, this.userId);
+      console.log("IN Admin FINAL")
+
+    },
 
     toResults: function () {
       console.log("game finished, going to result view");
       this.$router.push(`/result/${this.pollId}`);
     },
   },
+
 };
 </script>

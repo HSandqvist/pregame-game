@@ -1,5 +1,3 @@
-import e from "express";
-
 const polls = {};
 // Define the sockets function to handle WebSocket events
 function sockets(io, socket, data) {
@@ -75,6 +73,20 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("startGame");
   });
 
+  socket.on("nextQuestion", function (pollId, userId ) {
+    // Notify all clients in the poll room that the poll has started
+    console.log("In socket Admin next")
+    io.emit("participantNextQuestion", pollId, userId);
+  });
+
+  socket.on("toResults", function (pollId, userId ){
+    console.log("in to Results socket");
+    io.emit("finishGame");
+  }
+
+)
+
+
   /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
     // Get the specified question and update the current question in the poll
@@ -101,6 +113,7 @@ function sockets(io, socket, data) {
       if (participantData) {
         // Emit the participant data back to the client
         socket.emit("currentParticipant", participantData);
+        io.emit("participantsUpdate", poll.participants);
       } else {
         // Emit an error if no participant with the given userId was found
         socket.emit("currentParticipant", { error: "Participant not found" });
@@ -109,6 +122,11 @@ function sockets(io, socket, data) {
       // Emit an error if the poll does not exist or has no participants
       socket.emit("currentParticipant", { error: "Poll not found" });
     }
+  });
+
+  socket.on("votingReset", function(pollId){
+    data.votingReset(pollId);
+    console.log("är i socket on votingReset")
   });
 
   // Event: använda för handling när resultatet per fråga ska visas?
@@ -124,7 +142,7 @@ function sockets(io, socket, data) {
     console.log(`Emitting topAnswerUpdate: ${topAnswer}, ${maxVotes}`); // Log data before emitting
     // Emit the most voted answer to all clients in the poll room
     //io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes }); //uppdatera för alla som är inne i pollen
-    socket.emit("topAnswerUpdate", { topAnswer, maxVotes });
+    io.emit("topAnswerUpdate", { topAnswer, maxVotes });
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
@@ -150,6 +168,15 @@ function sockets(io, socket, data) {
     console.log(`Answer received: ${answer} for poll ${pollId}`);
   });
 
+  //Player voted function
+
+  socket.on("playerVoted", function (thePlayer){
+
+    io.emit("updateNumberOfVotes")
+  }
+
+) 
+
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {
     const { pollId, userId } = d; // Extract pollId and userId from the client
@@ -161,6 +188,14 @@ function sockets(io, socket, data) {
         isAdmin: false,
         error: "Poll does not exist",
       }); // Error handling
+    }
+  });
+
+  socket.on("checkLobbyExists", (pollId, callback) => {
+    if (data.pollExists(pollId)) {
+      callback({ exists: true }); // Respond with true if the poll exists
+    } else {
+      callback({ exists: false }); // Respond with false if the poll doesn't exist
     }
   });
 
@@ -205,15 +240,6 @@ function sockets(io, socket, data) {
     socket.emit("questionsForGame", poll.questions);
     //io.to(pollId).emit("questionsForGame", poll.questions);//denna rad funkar inte...? varför?
   });
-
-  socket.on("getCategoriesWithAnswers", function(pollId) {    
-    const categoriesWithAnswers = data.polls[pollId].categoryWinners;
-    socket.emit("categoriesWithAnswers", categoriesWithAnswers)
-  });
-
-
-
-
 }
 
 // Export the sockets function for use in other modules

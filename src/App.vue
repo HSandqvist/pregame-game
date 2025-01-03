@@ -2,6 +2,7 @@
 // Import RouterView from Vue Router
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
+<<<<<<< HEAD
 
 
 /*
@@ -32,12 +33,12 @@ import { RouterView } from "vue-router";
 
 
 
+=======
+import { RouterView } from 'vue-router'
+>>>>>>> main
 </script>
 
 <template>
-  <!-- Language Switcher placed at the top -->
-  <!-- <LanguageSwitcher @language-changed="handleLanguageChange" /> -->
-
   <!-- RouterView is the placeholder for the current route's component -->
   <!-- When the route changes, this will automatically display the appropriate component -->
   <RouterView />
@@ -46,15 +47,7 @@ import { RouterView } from "vue-router";
 <style>
 /* Add component-specific styles here if needed */
 /* Currently, no styles are defined for this component */
-/* Limelight font */
-@import url("https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap");
-
-/* Laxend font - fet boxig stil*/
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Sriracha&display=swap');
-
-/* Siracha - lite skriv-aktig men läsbar, användas till text i textfiler? */
-@import url('https://fonts.googleapis.com/css2?family=Sriracha&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap');
 
 /* Global font styles */
 body {
@@ -66,21 +59,13 @@ body {
 }
 
 /* Headings */
-h1 {
+h1, h2 {
   font-family: "Limelight", cursive;
   color: white;
 }
 
-h2 {
-  font-family: "Lexend Deca", sans-serif;
-  color: white;
-}
-
 /* General text */
-p,
-button,
-input,
-select {
+p, button, input, select {
   font-family: "Truculenta", sans-serif;
 }
 </style>

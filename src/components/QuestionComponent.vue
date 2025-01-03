@@ -1,33 +1,29 @@
 <template>
   <div>
 
-    <h1>Who's most likely to...</h1>
+    <h3>Which player?</h3>
 
     <h2>{{ question.q }}</h2>
 
     <!-- Debugging - Check if question.q is valid -->
     <p v-if="!question.q"> Question is not available! </p>
 
-    <!-- Draggable answer options -->
-    <div class="answer-options">
-      <div
-        v-for="(participant, index) in participants"
-        :key="index"
-        class="draggable"
-        draggable="true"
-        @dragstart="onDragStart(participant)"
-      >
-        {{ participant }}
-      </div>
+    <div v-for="(participant, index) in participants" :key="index">
+      <button v-if="!voting" @click="answer(participant)" >{{ participant }} </button>
     </div>
-
-    <!-- Drop zone -->
-    <div class="drop-zone" @dragover.prevent @drop="onDrop">
-      Drop answer here
-      <!-- lägga in här med UI lables på bra sätt -->
-    </div>
+    
+    <p v-if="voting"> Waiting for answers... </p>
   </div>
 
+  <!-- <div class="button-container">
+      <button
+        v-for="(participant, index) in participants"
+        :key="index"
+        @click="answer(participant)"
+      >
+        {{ participant }}
+      </button>
+    </div> -->
 </template>
 
 <script>
@@ -36,43 +32,22 @@ export default {
   props: {
     question: Object, // The question object containing the question text and answer options
     participants: Array, // List of participants, // Already randomized in the parent
+    voting: Boolean
   },
   emits: ["answer"], // Declare the custom event "answer" emitted by this component
 
-  data() {
-    return {
-      draggedParticipant: null, // Temporarily holds the dragged participant
-    };
-  },
-
   methods: {
-    // When dragging starts, store the dragged participant
-    onDragStart(participant) {
-      this.draggedParticipant = participant;
-    },
-
-    // When an item is dropped in the drop zone
-    onDrop() {
-      if (this.draggedParticipant) {
-        // Emit the dragged participant as the selected answer
-        this.$emit("answer", this.draggedParticipant);
-
-        // Clear the temporary variable
-        this.draggedParticipant = null;
-      }
-    },
-
-    /*
     // Method to handle answer selection
     answer: function (participant) {
       // Emit the "answer" event to the parent component with the selected answer as payload
       this.$emit("answer", participant);
-    },*/
+    },
   },
 };
 </script>
 
 <style>
+
 /* Siracha - lite skriv-aktig men läsbar */
 @import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
 
@@ -142,4 +117,7 @@ export default {
   background-color: rgba(252, 160, 198, 0.1);
   transform: scale(1.05);
 }
+=======
+/* ADD CSS LATER ex knappar brevid varandra */
+>>>>>>> main
 </style>
