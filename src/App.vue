@@ -2,40 +2,9 @@
 // Import RouterView from Vue Router
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
-<<<<<<< HEAD
 
-
-/*
-// Import the LanguageSwitcher component
-import LanguageSwitcher from "./components/LanguageSwitcher.vue";
-
-// Import the WebSocket library and initialize the socket connection
-import io from "socket.io-client";
-const socket = io("localhost:3000");
-
-import { ref } from "vue";
-
-const lang = ref(localStorage.getItem("lang") || "en");
-
-// Function to handle language change event
-function handleLanguageChange(newLang) {
-  lang.value = newLang;
-  console.log("Language changed to:", newLang);
-
-  //Update UI labels for the selected language
-  localStorage.setItem('lang', newLang);
-  socket.emit("getUILabels", newLang);
-}
-*/
-
-import { RouterView } from "vue-router";
-
-
-
-
-=======
 import { RouterView } from 'vue-router'
->>>>>>> main
+
 </script>
 
 <template>

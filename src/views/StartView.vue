@@ -1,8 +1,9 @@
 <template>
   <div class="frontpage">
-    <!-- Language switcher component -->
-    <LanguageSwitcher @language-changed="updateLanguage" />
-
+    <div class="language-switcher-container">
+      <!-- Language switcher component -->
+      <LanguageSwitcher @language-changed="updateLanguage" />
+    </div>
     <!-- Title of the game -->
     <h1 class="game-title">Pre(game)<sup>2</sup></h1>
 
@@ -14,7 +15,7 @@
         placeholder="Enter Lobby ID"
         class="lobby-input"
       />
-      <button class="btn" @click="attemptJoin">Join Game </button>
+      <button class="btn" @click="attemptJoin">Join Game</button>
     </div>
 
     <!-- Show action buttons if not joining a game -->
@@ -25,9 +26,7 @@
       <button class="btn" @click="showPinEntry">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
-
     </div>
-
   </div>
 </template>
 
@@ -49,7 +48,6 @@ export default {
 
       inputedID: "", // Holds the entered lobby ID
       errorMessage: "", // Error message for invalid Lobby ID
-
     };
   },
   created() {
@@ -83,15 +81,16 @@ export default {
       // Validate lobby existence
       socket.emit("checkLobbyExists", lobbyId, (response) => {
         if (response.exists) {
-          localStorage.removeItem("userId")
+          localStorage.removeItem("userId");
           this.$router.push(`/lobby/${lobbyId}`);
         } else {
           this.errorMessage = "Lobby does not exist. Please check the ID.";
           alert(this.errorMessage);
         }
-      }),*/
+      });
     },
-  };
+  },
+};
 </script>
 
 <style scoped>
@@ -102,7 +101,11 @@ export default {
   justify-content: center;
   height: 100vh;
 
-  background: linear-gradient(to right, rgb(210, 66, 133), purple); /* Updated background to match CreateView */
+  background: linear-gradient(
+    to right,
+    rgb(210, 66, 133),
+    purple
+  ); /* Updated background to match CreateView */
   font-family: Arial, sans-serif;
 
   text-align: center;
@@ -139,8 +142,6 @@ export default {
 
 /* Button styles */
 .btn {
-
-
   padding: 0.75rem 1.5rem;
   background-color: rgb(252, 160, 198);
   color: white;
@@ -179,6 +180,7 @@ export default {
 }
 .language-toggle {
   justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
+}
 
 .btn:disabled {
   opacity: 0.5;
@@ -190,6 +192,16 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
 
+/* Wrapper for LanguageSwitcher */
+.language-switcher-container {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  z-index: 10; /* Ensures it stays above other elements */
+}
+.language-toggle {
+  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
 </style>
