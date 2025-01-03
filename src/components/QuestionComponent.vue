@@ -1,14 +1,18 @@
 <template>
   <div>
-    <h3>Who's most likely to...</h3>
+    <h3>Which player?</h3>
     <h2>{{ question.q }}</h2>
 
     <!-- Debugging: Check if question.q is valid -->
     <p v-if="!question.q">Question is not available!</p>
 
     <div v-for="(participant, index) in participants" :key="index">
-      <button @click="answer(participant)" >{{ participant }} </button>
+      <button v-if="!voting" @click="answer(participant)" >{{ participant }} </button>
     </div>
+    
+    <p v-if="voting"> Waiting for answers... </p>
+
+    
   
   </div>
 
@@ -22,6 +26,7 @@
   <!-- Display the answer text inside the button 
       {{ a }}
     </button>*/-->
+
 </template>
 
 <script>
@@ -30,6 +35,7 @@ export default {
   props: {
     question: Object, // The question object containing the question text and answer options
     participants: Array, // List of participants, // Already randomized in the parent
+    voting: Boolean
   },
   emits: ["answer"], // Declare the custom event "answer" emitted by this component
 

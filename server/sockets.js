@@ -41,6 +41,7 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("questionUpdate", questionData);
   });
 
+
   // Event: Join a poll
   socket.on("joinPoll", function (d) {
     // Add the client to the specified poll room
@@ -106,6 +107,7 @@ function sockets(io, socket, data) {
       if (participantData) {
         // Emit the participant data back to the client
         socket.emit("currentParticipant", participantData);
+        io.emit("participantsUpdate", poll.participants);
       } else {
         // Emit an error if no participant with the given userId was found
         socket.emit("currentParticipant", { error: "Participant not found" });
