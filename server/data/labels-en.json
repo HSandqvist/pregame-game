@@ -12,12 +12,12 @@
 	"changeLanguage": "Byt till svenska",
 
 "CREATEVIEW":"", 
-
+	
 	"numberOfQuestions": "Number of questions",
 	"secondsPerQuestion": "Seconds per question ",
 
 "LOBBYVIEW": "",
-	"pleaseEnterYourName": "Please enter your name",
+	"pleaseEnterYourName": "Enter your name",
 	"captureYourAvatar": "Capture your avatar",
 	"startCamera": "Start camera",
 	"takePicture": "Take picture",

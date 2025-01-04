@@ -12,20 +12,18 @@
       <input
         type="text"
         v-model="inputedID"
-        placeholder="Enter Lobby ID"
+        placeholder="Enter Lobby ID" 
         class="lobby-input"
+        
       />
       <button class="btn" @click="attemptJoin">Join Game</button>
     </div>
 
     <!-- Show action buttons if not joining a game -->
     <div v-else class="action-buttons">
-      <router-link class="btn" to="/create/">
-        {{ uiLabels.createGame || "Create Game" }}
-      </router-link>
-      <button class="btn" @click="showPinEntry">
-        {{ uiLabels.participateGame || "Join Game" }}
-      </button>
+      <router-link class="btn" to="/create/">{{ uiLabels.createGame || "Create Game" }}</router-link>
+      <button class="btn" @click="showPinEntry">{{ uiLabels.participateGame || "Join Game" }}</button>
+
     </div>
   </div>
 </template>
@@ -33,7 +31,13 @@
 <script>
 import io from "socket.io-client"; // Import WebSocket library
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+
+
+// ---- FOR Normal TESTING ----
 const socket = io("localhost:3000"); // Initialize WebSocket connection
+
+// ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
+//const socket = io("192.168.68.58"); // Initialize mutliple joiners
 
 export default {
   name: "StartView",
@@ -77,7 +81,6 @@ export default {
         alert(this.errorMessage);
         return;
       }
-
       // Validate lobby existence
       socket.emit("checkLobbyExists", lobbyId, (response) => {
         if (response.exists) {
@@ -88,6 +91,7 @@ export default {
           alert(this.errorMessage);
         }
       });
+
     },
   },
 };
@@ -100,14 +104,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
-
-  background: linear-gradient(
-    to right,
-    rgb(210, 66, 133),
-    purple
-  ); /* Updated background to match CreateView */
   font-family: Arial, sans-serif;
-
   text-align: center;
   position: relative;
   color: white;
@@ -116,7 +113,6 @@ export default {
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
-
   color: rgb(255, 205, 226);
   margin-bottom: 2rem;
   font-family: "Limelight", cursive; /* Match font family from CreateView */
@@ -142,44 +138,25 @@ export default {
 
 /* Button styles */
 .btn {
+  all: unset; /* Ta bort alla standardstilar */
   padding: 0.75rem 1.5rem;
+  width: 160px;
   background-color: rgb(252, 160, 198);
   color: white;
   text-decoration: none;
-  font-size: 1.2rem;
+  font-size: 18px;
   font-weight: bold;
   border-radius: 0.5rem;
   text-align: center;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
-  text-decoration: none;
+  line-height: 1.5; /* Ställ in vertikal linjehöjd */
+  height: auto; /* Undvik att knappar har en fast höjd */
 }
 
-/* Container for action buttons */
-.action-buttons {
-  display: flex; /* Arrange buttons in a row */
-  flex-direction: row; /* Ensure buttons are side-by-side */
-  justify-content: center; /* Center the buttons horizontally */
-  align-items: center; /* Align buttons vertically */
-  gap: 1.5rem; /* Add spacing between the buttons */
-  margin-top: 2rem; /* Optional: Add spacing from the title */
-}
 .btn:hover {
   background-color: rgb(255, 131, 203);
-}
-
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  z-index: 10; /* Ensures it stays above other elements */
-}
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
 
 .btn:disabled {
@@ -189,9 +166,12 @@ export default {
 
 /* Container for action buttons */
 .action-buttons {
-  display: flex;
+  display: flex; /* Arrange buttons in a row */
   flex-direction: column;
   gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem; /* Optional: Add spacing from the title */
 }
 
 /* Wrapper for LanguageSwitcher */
@@ -199,9 +179,13 @@ export default {
   position: absolute;
   top: 1rem; /* Distance from the top */
   right: 1rem; /* Distance from the right */
+  display: flex;
+  justify-content: flex-end;
   z-index: 10; /* Ensures it stays above other elements */
 }
+
 .language-toggle {
   justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
+
 </style>

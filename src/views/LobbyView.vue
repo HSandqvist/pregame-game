@@ -8,7 +8,7 @@
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
       <h1>
-        {{ this.uiLabels.pleaseEnterYourName || "Please enter your name" }}:
+        {{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:
       </h1>
       <input type="text" v-model="userName" />
 
@@ -111,6 +111,11 @@
         >
           Start Game
         </button>
+
+        <!-- Leave Poll Button -->
+        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
+          Leave Poll
+        </button>
       </div>
     </div>
   </div>
@@ -124,7 +129,11 @@
 <script>
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
+
 const socket = io("localhost:3000");
+
+// ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
+//const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
 
 export default {
   name: "LobbyView",
@@ -182,6 +191,24 @@ export default {
   },
 
   methods: {
+    leavePoll() {
+      // Emit an event to the server to remove the participant
+      socket.emit("leavePoll", {
+        pollId: this.pollId,
+        userId: this.userId,
+      });
+
+      // Reset local state
+      this.joined = false;
+      this.userName = "";
+      this.avatar = null;
+      this.step = 1; // Go back to the first step
+
+      // Optionally, navigate back to the start view
+      if (!this.isAdmin) {
+        this.$router.push("/");
+      }
+    },
     // Move to the next step
     nextStep() {
       if (this.step == 3) {
@@ -195,11 +222,11 @@ export default {
       console.log(this.step);
     },
 
-    adminStartGame: function() {
+    adminStartGame: function () {
       socket.emit("startGame", this.pollId);
     },
 
-    participantStartGame: function() {
+    participantStartGame: function () {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
@@ -275,7 +302,7 @@ export default {
           );
         });
     },
-    
+
     // Stop the camera stream
     stopCamera: function () {
       if (this.stream) {
@@ -352,10 +379,10 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
-      if (!this.avatar) {
-        alert("Please select or capture an avatar!");
-        return;
-      }
+      //if (!this.avatar) {
+      //alert("Please select or capture an avatar!");
+      //return;
+      //}
 
       socket.emit("participateInPoll", {
         userId: this.userId,
@@ -508,11 +535,11 @@ video {
 
 .participants-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  /* Responsiv layout */
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  /* Avstånd mellan deltagare */
-  margin: 20px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* Inkludera padding i bredden */
 }
 
 .participant-item.current-user img.avatar {
@@ -582,6 +609,9 @@ img.avatar.host {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
+  .global-music-control button {
+    font-size: 8px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -589,6 +619,24 @@ img.avatar.host {
     grid-template-columns: repeat(1, 1fr);
     /* En bild per rad på mycket små skärmar */
   }
+}
+
+/* Style for the name input box */
+input[type="text"] {
+  width: 100%;
+  /* Makes it span the full width of the container */
+  max-width: 150px;
+  /* Optional: Limit the max width */
+  padding: 8px;
+  /* Increases the size inside the box */
+  font-size: 18px;
+  /* Adjusts text size */
+  border: 1px solid #df2f8d;
+  border-radius: 0.5rem;
+  /* Rounded corners */
+  box-sizing: border-box;
+  /* text placed in center */
+  text-align: center;
 }
 
 .global-music-control {
@@ -599,7 +647,8 @@ img.avatar.host {
 }
 
 .global-music-control button {
-  padding: 10px 18px;
+  padding: 8px 16px;
+  font-size: 14px;
   background-color: pink;
   color: white;
   border: none;
@@ -607,7 +656,7 @@ img.avatar.host {
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   transition: all 0.2s ease;
   text-decoration: none;
 }
