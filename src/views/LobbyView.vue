@@ -352,6 +352,9 @@ export default {
 .submit-section {
   margin-bottom: 20px;
 }
+.waiting-area {
+  margin-top: 50px;
+}
 
 button:disabled {
   opacity: 0.5;
@@ -375,11 +378,11 @@ video {
 
 .participants-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  /* Responsiv layout */
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  /* Avstånd mellan deltagare */
-  margin: 20px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* Inkludera padding i bredden */
 }
 
 .participant-item.current-user img.avatar {
@@ -449,6 +452,9 @@ img.avatar.host {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
+  .global-music-control button {
+    font-size: 8px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -466,7 +472,8 @@ img.avatar.host {
 }
 
 .global-music-control button {
-  padding: 10px 18px;
+  padding: 8px 16px;
+  font-size: 14px;  
   background-color: pink;
   color: white;
   border: none;
@@ -474,7 +481,7 @@ img.avatar.host {
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   transition: all 0.2s ease;
   text-decoration: none;
 }
