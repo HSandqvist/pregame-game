@@ -79,6 +79,13 @@ function sockets(io, socket, data) {
     io.emit("participantNextQuestion", pollId, userId);
   });
 
+  socket.on("toResults", function (pollId, userId ){
+    console.log("in to Results socket");
+    io.emit("finishGame");
+  }
+
+)
+
 
   /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
@@ -106,6 +113,7 @@ function sockets(io, socket, data) {
       if (participantData) {
         // Emit the participant data back to the client
         socket.emit("currentParticipant", participantData);
+        io.emit("participantsUpdate", poll.participants);
       } else {
         // Emit an error if no participant with the given userId was found
         socket.emit("currentParticipant", { error: "Participant not found" });
@@ -159,6 +167,15 @@ function sockets(io, socket, data) {
 
     console.log(`Answer received: ${answer} for poll ${pollId}`);
   });
+
+  //Player voted function
+
+  socket.on("playerVoted", function (thePlayer){
+
+    io.emit("updateNumberOfVotes")
+  }
+
+) 
 
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {

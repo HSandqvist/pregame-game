@@ -14,18 +14,16 @@
         placeholder="Enter Lobby ID"
         class="lobby-input"
       />
-      <button class="btn" @click="attemptJoin">Join Game</button>
+      <button class="btn" @click="attemptJoin">Join Game </button>
     </div>
 
     <!-- Show action buttons if not joining a game -->
     <div v-else class="action-buttons">
-      <router-link class="btn" to="/create/">
-        {{ uiLabels.createGame || "Create Game" }}
-      </router-link>
-      <button class="btn" @click="showPinEntry">
-        {{ uiLabels.participateGame || "Join Game" }}
-      </button>
+      <router-link class="btn" to="/create/">{{ uiLabels.createGame || "Create Game" }}</router-link>
+      <button class="btn" @click="showPinEntry">{{ uiLabels.participateGame || "Join Game" }}</button>
+
     </div>
+
   </div>
 </template>
 
@@ -44,8 +42,10 @@ export default {
       uiLabels: {}, // Dynamic UI labels for multilingual support
       lang: localStorage.getItem("lang") || "en", // Language preference
       joinGameClicked: false, // Tracks whether "Join Game" was clicked
+
       inputedID: "", // Holds the entered lobby ID
       errorMessage: "", // Error message for invalid Lobby ID
+
     };
   },
   created() {
@@ -99,6 +99,7 @@ export default {
   justify-content: center;
   height: 100vh;
   font-family: Arial, sans-serif;
+
   text-align: center;
   position: relative;
   color: white;
@@ -107,6 +108,8 @@ export default {
 /* Style for the game title */
 .game-title {
   font-size: 3rem;
+
+  color: rgb(255, 205, 226);
   margin-bottom: 2rem;
   font-family: "Limelight", cursive; /* Match font family from CreateView */
 }
@@ -131,21 +134,49 @@ export default {
 
 /* Button styles */
 .btn {
-  padding: 15px 30px;
-  background-color: pink;
+  all: unset; /* Ta bort alla standardstilar */
+  padding: 0.75rem 1.5rem;
+  width:160px;
+  background-color: rgb(252, 160, 198);
   color: white;
-  border: none;
-  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none; /* Ta bort kantlinje */
+  border-radius: 0.5rem;
+  text-align: center;
   cursor: pointer;
   font-size: 18px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
   text-decoration: none;
+  line-height: 1.5; /* Ställ in vertikal linjehöjd */
+  height: auto; /* Undvik att knappar har en fast höjd */
 }
 
+/* Container for action buttons */
+.action-buttons {
+  display: flex; /* Arrange buttons in a row */
+  flex-direction: row; /* Ensure buttons are side-by-side */
+  justify-content: center; /* Center the buttons horizontally */
+  align-items: center; /* Align buttons vertically */
+  gap: 1.5rem; /* Add spacing between the buttons */
+  margin-top: 2rem; /* Optional: Add spacing from the title */
+}
 .btn:hover {
   background-color: rgb(255, 131, 203);
+}
+
+/* Wrapper for LanguageSwitcher */
+.language-switcher-container {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  z-index: 10; /* Ensures it stays above other elements */
+}
+.language-toggle {
+  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
 
 .btn:disabled {
@@ -158,5 +189,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
 }
 </style>

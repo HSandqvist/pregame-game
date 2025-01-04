@@ -6,11 +6,12 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <!-- RouterView is the placeholder for the current route's component -->
-  <!-- When the route changes, this will automatically display the appropriate component -->
-  <RouterView />
 
-  <div class="star">
+  <div class="app-wrapper">
+  <!-- Animated stars -->
+    <div class="star">
+    <div></div>
+    <div></div>
     <div></div>
     <div></div>
     <div></div>
@@ -22,6 +23,12 @@ import { RouterView } from 'vue-router'
     <div></div>
     <div></div>
   </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+      <RouterView />
+    </div>
+</div>
 </template>
 
 <style>
@@ -29,13 +36,24 @@ import { RouterView } from 'vue-router'
 /* Currently, no styles are defined for this component */
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap');
 
-/* Global font styles */
-body {
+.app-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: auto; /* Prevent scrollbars */
   font-family: "Truculenta", sans-serif;
   margin: 0;
-  padding: 0; 
-  background: linear-gradient(135deg, rgb(102, 0, 153), rgb(210, 66, 133) , rgb(102, 0, 153));
+  padding: 0;
+  background: linear-gradient(135deg, rgb(102, 0, 153), rgb(210, 66, 133), rgb(102, 0, 153));
   color: white;
+}
+.star {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 .star div{
@@ -44,7 +62,6 @@ body {
   height: 50px;
   background-color: rgba(255, 255, 255, 0.8); /* Vit stjärna med transparens */
   clip-path: polygon(50% 0,79% 90%,2% 35%,98% 35%,21% 90%); 
-  border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
 .star div:nth-child(1){
@@ -55,7 +72,7 @@ body {
 
 .star div:nth-child(2){
   top: 70%;
-  left:50%%;
+  left:50%;
   animation: animate 7s linear infinite
 }
 
@@ -107,6 +124,27 @@ body {
   animation: animate 5s linear infinite
 }
 
+.star div:nth-child(11){
+  top: 90%;
+  left:90%;
+  animation: animate 7s linear infinite
+}
+
+.star div:nth-child(12){
+  top: 89%;
+  left:50%;
+  animation: animate 13s linear infinite
+}
+/* Main content */
+.main-content {
+  position: relative;
+  z-index: 1; /* Innehållet ligger framför stjärnorna */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 @keyframes animate{
   0%{
     transform: scale(0) translateY(0) rotate(0);
@@ -132,4 +170,5 @@ input,
 select {
   font-family: "Truculenta", sans-serif;
 }
+
 </style>
