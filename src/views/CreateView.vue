@@ -192,7 +192,6 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to right, rgb(210, 66, 133), purple);
   font-family: Arial, sans-serif;
   color: white;
 }

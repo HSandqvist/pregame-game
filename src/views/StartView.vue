@@ -98,7 +98,6 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(to right, rgb(210, 66, 133), purple); /* Updated background to match CreateView */
   font-family: Arial, sans-serif;
   text-align: center;
   position: relative;
