@@ -17,12 +17,22 @@
 	"numberOfQuestions": "Antal frågor",
 
 "LOBBYVIEW": "",
-	"pleaseEnterYourName": "Vänligen skriv in ditt namn",
+	"pleaseEnterYourName": "Skriv in ditt namn",
 	"captureYourAvatar": "Ta din avatarbild",
 	"startCamera": "Starta Kameran",
 	"takePicture": "Ta bild",
 	"yourAvatar": "Din avatar",
-	"participateInPoll": "Delta in spelet"
+	"participateInPoll": "Delta i spelet",
 
+"POLLVIEW": "",
+	"whichPlayer": "Vilken spelare?",
+	"dropAnswerHere": "Dra svar hit",
+	"nextQuestion": "Nästa fråga",
+	"waitingForAnswers": "Väntar på svar...",
+	"showResult": "Visa resultat",
+	"endgame": "Avsluta spel",
+
+"RESULTVIEW": "",
+	"showEndResults": "Visa slutresultat"
 
 }
