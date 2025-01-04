@@ -34,10 +34,10 @@ import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import Lang
 
 
 // ---- FOR Normal TESTING ----
-//const socket = io("localhost:3000"); // Initialize WebSocket connection
+const socket = io("localhost:3000"); // Initialize WebSocket connection
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
+//const socket = io("192.168.68.58"); // Initialize mutliple joiners
 
 export default {
   name: "StartView",

@@ -6,7 +6,6 @@ import { readFileSync } from "fs"; // Import the readFileSync function for readi
 
 function Data() {
   this.polls = {}; // Object to store all polls
-
   this.categories = {}; //Store categories from external json file
 }
 
@@ -106,9 +105,6 @@ Data.prototype.addQuestion = function (pollId, q) {
 Data.prototype.getQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-
-    //poll.currentQuestion =+ 1; // Update the current question index //BEHÖVS?
-
     return poll.questions[poll.currentQuestion];
   }
   return {}; // Return an empty object if the poll doesn't exist
@@ -157,7 +153,7 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
   }
 };
 
-Data.prototype.votingReset = function(pollId) {
+Data.prototype.votingReset = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;   //ger ett index?? 

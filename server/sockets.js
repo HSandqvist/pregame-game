@@ -25,7 +25,7 @@ function sockets(io, socket, data) {
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
   });*/
 
-  // Event: Add a new question to a poll
+  // Event: Add a new question to a poll //KOLLA VAD DENNA GÖR EXAKT!!
   socket.on("addQuestion", function (d) {
     const pollId = d.pollId;
     const question = d.q; // The question text
@@ -60,7 +60,6 @@ function sockets(io, socket, data) {
   socket.on("joinPoll", function (d) {
     // Add the client to the specified poll room
     socket.join(d.pollId);
-    //data.addParticipant(d.pollId, d.myName);
     // Emit the current question data to the client
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
     // Emit the submitted answers for the current question to the client
@@ -80,6 +79,7 @@ function sockets(io, socket, data) {
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit("participantsUpdate", data.getParticipants(d.pollId));
+    //console.log("participants update körs från socket", data.getParticipants(d.pollId))
   });
 
   // Event: Start a poll
@@ -97,9 +97,7 @@ function sockets(io, socket, data) {
   socket.on("toResults", function (pollId, userId ){
     console.log("in to Results socket");
     io.emit("finishGame");
-  }
-
-)
+  });
 
 
   /*// Event: Run a specific question in a poll
@@ -183,14 +181,11 @@ function sockets(io, socket, data) {
     console.log(`Answer received: ${answer} for poll ${pollId}`);
   });
 
-  //Player voted function
-
+  //Player voted function //behövs thePlayer här? används ej
   socket.on("playerVoted", function (thePlayer){
 
     io.emit("updateNumberOfVotes")
-  }
-
-) 
+  });
 
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {

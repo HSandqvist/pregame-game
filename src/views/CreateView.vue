@@ -73,11 +73,11 @@ import io from "socket.io-client";
 import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
-//const socket = io("localhost:3000");
+const socket = io("localhost:3000");
 
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
+//const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
 
 
 export default {
@@ -193,14 +193,15 @@ export default {
 
 <style scoped>
 /* General styling */
+/* Body and container adjustments */
 body {
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  font-family: Arial, sans-serif;
-  color: white;
+  width: 100vh;
+  background: none; /* If body or parent has background */
 }
 
 /* Buttons */
@@ -238,6 +239,7 @@ button:disabled {
   justify-content: center;
   gap: 30px;
   margin-top: 20px;
+  background: none; /* If body or parent has background */
 }
 /* Add spacing between the time buttons and the action buttons */
 .action-buttons {
@@ -245,6 +247,7 @@ button:disabled {
   display: flex;
   justify-content: center;
   gap: 20px; /* Keeps space between the buttons themselves */
+  background: none; /* If body or parent has background */
 }
 
 #create-game-headline {
