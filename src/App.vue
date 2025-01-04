@@ -2,7 +2,9 @@
 // Import RouterView from Vue Router
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
+
 import { RouterView } from 'vue-router'
+
 </script>
 
 <template>
@@ -34,13 +36,24 @@ import { RouterView } from 'vue-router'
 <style>
 /* Add component-specific styles here if needed */
 /* Currently, no styles are defined for this component */
+
+
+/* Limelight font */
+
 @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Sriracha&display=swap');
+/* Siracha - lite skriv-aktig men läsbar, användas till text i textfiler? */
+@import url('https://fonts.googleapis.com/css2?family=Sriracha&display=swap');
 
 .app-wrapper {
   position: relative;
   width: 100%;
   height: 100vh;
   overflow: auto; /* Prevent scrollbars */
+}
+
+/* Global font styles */
+body {
   font-family: "Truculenta", sans-serif;
   margin: 0;
   padding: 0;
@@ -157,11 +170,16 @@ import { RouterView } from 'vue-router'
 }
 
 /* Headings */
-h1,
-h2 {
+h1 {
   font-family: "Limelight", cursive;
   color: white;
 }
+
+h2 {
+ font-family: "Lexend Deca", sans-serif;
+ color: white;
+}
+
 
 /* General text */
 p,
