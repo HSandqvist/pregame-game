@@ -1,5 +1,5 @@
 <template>
-  <body>
+  
     <div class="create-game">
       <h1 id="create-game-headline">
         {{ this.uiLabels.createGame || "Create Game" }}
@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-  </body>
+  
 </template>
 
 <script>
@@ -193,15 +193,6 @@ export default {
 
 <style scoped>
 /* General styling */
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-family: Arial, sans-serif;
-  color: white;
-}
 
 /* Buttons */
 button {
