@@ -91,7 +91,6 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
-      siteUserId: null,
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
       hasVoted: false,
@@ -116,6 +115,7 @@ export default {
     });
     socket.emit("participantsUpdate");
     socket.on("participantsUpdate", (p) => (this.participants = p));
+    console.log("participant update säger", this.participants, this.participants.length)
     //Listen for admin to press next
 
     // Get this participant
@@ -131,6 +131,7 @@ export default {
     }); // Update the current question
 
     socket.on("participantNextQuestion", () => this.particpantNext());
+
     //LISTENER FOR GAME END
     socket.on("finishGame", () => this.toResults());
 

@@ -134,7 +134,7 @@ export default {
       pollId: "inactive poll", // Placeholder for poll ID
 
       //user
-      userId: null, //alla ha egen sida sen hej
+      userId: "", //alla ha egen sida sen hej
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
@@ -159,13 +159,21 @@ export default {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
 
+    //set user id
+    this.setUserId();
+
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.emit("getUILabels", this.lang);
-    socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
-    socket.on("participantsUpdate", () => this.checkAtLeastThree());
+    //socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
+    //socket.on("participantsUpdate", () => this.checkAtLeastThree());
+    socket.on("participantsUpdate", (p) => {
+      this.participants = p;
+      this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
+      console.log("participants är", this.participants);
+    });
     //Listen for start game from server
-    socket.on("startGame", () => this.participatStartGame());
+    socket.on("startGame", () => this.participantStartGame());
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
@@ -191,17 +199,21 @@ export default {
       socket.emit("startGame", this.pollId);
     },
 
-    participatStartGame() {
+    participantStartGame() {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
-    // Function to check if the user is an admin
-    checkAdminStatus(callback) {
+    setUserId: function () {
       if (localStorage.userId) {
         this.userId = localStorage.getItem("userId");
       } else {
         this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
       }
+    },
+
+    // Function to check if the user is an admin
+    checkAdminStatus: function (callback) {
+      //userid setting låg här nyss
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
@@ -222,15 +234,16 @@ export default {
         if (typeof callback === "function") callback();
       });
     },
+
     // Move to the previous step
-    backStep() {
+    backStep: function () {
       if (this.step > 1) {
         this.step--;
       }
     },
 
     // Start the camera stream
-    startCamera() {
+    startCamera: function () {
       this.isPictureTaken = false;
       this.cameraState = true;
 
@@ -262,7 +275,7 @@ export default {
         });
     },
     // Stop the camera stream
-    stopCamera() {
+    stopCamera: function () {
       if (this.stream) {
         console.log("stopping stream", this.stream);
         const tracks = this.stream.getTracks();
@@ -274,7 +287,7 @@ export default {
       }
     },
     // Capture the image from the video stream
-    captureImage() {
+    captureImage: function () {
       const video = this.$refs.video;
 
       this.isPictureTaken = true;
@@ -305,7 +318,7 @@ export default {
       }
     },
 
-    toggleMusic() {
+    toggleMusic: function () {
       const audio = this.$refs.backgroundMusic;
       if (!audio) {
         console.error("Audio element not found!");
@@ -321,8 +334,9 @@ export default {
       }
       this.isMusicPlaying = !this.isMusicPlaying;
     },
+
     // Handle manual avatar upload
-    handleAvatarUpload(event) {
+    handleAvatarUpload: function (event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -332,13 +346,15 @@ export default {
         reader.readAsDataURL(file); // Convert image to base64
       }
     },
+
     // Participate in the poll
-    participateInPoll() {
+    participateInPoll: function () {
       if (!this.avatar) {
         alert("Please select or capture an avatar!");
         return;
       }
 
+      console.log("userid är innan participate in poll", this.userId);
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -346,6 +362,7 @@ export default {
         avatar: this.avatar,
         isAdmin: this.isAdmin,
       });
+
       this.joined = true;
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
@@ -355,7 +372,7 @@ export default {
       this.nextStep(); //hoppa till nästa steg
     },
 
-    checkAtLeastThree() {
+    checkAtLeastThree: function () {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }

@@ -6,7 +6,6 @@ import { readFileSync } from "fs"; // Import the readFileSync function for readi
 
 function Data() {
   this.polls = {}; // Object to store all polls
-
   this.categories = {}; //Store categories from external json file
 }
 
