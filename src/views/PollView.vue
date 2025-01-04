@@ -326,9 +326,7 @@ export default {
 };
 </script>
 
-
 <style>
-
 /* General Button Styling */
 button {
   padding: 15px 25px;
