@@ -41,7 +41,20 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("questionUpdate", questionData);
   });
 
-  
+  socket.on("leavePoll", function (d) {
+    const { pollId, userId } = d;
+    const poll = data.getPoll(pollId);
+
+    if (poll) {
+      // Remove the participant from the poll
+      poll.participants = poll.participants.filter(
+        (participant) => participant.userId !== userId
+      );
+
+      // Notify all clients in the poll room about the updated participant list
+      io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
+    }
+  });
 
   // Event: Join a poll
   socket.on("joinPoll", function (d) {
