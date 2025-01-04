@@ -1,15 +1,8 @@
 <template>
   <div>
-    <h3>{{ this.uiLabels.whichPlayer|| "Which player?" }}</h3>
+    <h3>{{ this.uiLabels.whichPlayer || "Which player?" }}</h3>
 
     <h2>{{ question.q }}</h2>
-
-    <!-- Debugging - Check if question.q is valid -->
-    <!-- <p v-if="!question.q"> Question is not available! </p>
-
-    <div v-for="(participant, index) in participants" :key="index">
-      <button v-if="!voting" @click="answer(participant)" >{{ participant }} </button>
-    </div> -->
 
     <!-- Draggable answer options -->
     <div v-if="!voting" class="answer-options">
@@ -32,16 +25,6 @@
 
     <p v-if="voting"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </p>
   </div>
-
-  <!-- <div class="button-container">
-      <button
-        v-for="(participant, index) in participants"
-        :key="index"
-        @click="answer(participant)"
-      >
-        {{ participant }}
-      </button>
-    </div> -->
 </template>
 
 <script>

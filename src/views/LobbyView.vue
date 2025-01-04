@@ -165,12 +165,11 @@ export default {
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     socket.emit("getUILabels", this.lang);
-    //socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
-    //socket.on("participantsUpdate", () => this.checkAtLeastThree());
+
     socket.on("participantsUpdate", (p) => {
       this.participants = p;
       this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
-      console.log("participants är", this.participants);
+      //console.log("participants är", this.participants);
     });
     //Listen for start game from server
     socket.on("startGame", () => this.participantStartGame());
@@ -195,11 +194,12 @@ export default {
       }
       console.log(this.step);
     },
-    adminStartGame() {
+
+    adminStartGame: function() {
       socket.emit("startGame", this.pollId);
     },
 
-    participantStartGame() {
+    participantStartGame: function() {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
@@ -213,7 +213,8 @@ export default {
 
     // Function to check if the user is an admin
     checkAdminStatus: function (callback) {
-      //userid setting låg här nyss
+      //userid set in created by separate function instead! else problems!!
+
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
@@ -274,6 +275,7 @@ export default {
           );
         });
     },
+    
     // Stop the camera stream
     stopCamera: function () {
       if (this.stream) {
@@ -286,6 +288,7 @@ export default {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
     },
+
     // Capture the image from the video stream
     captureImage: function () {
       const video = this.$refs.video;
@@ -354,7 +357,6 @@ export default {
         return;
       }
 
-      console.log("userid är innan participate in poll", this.userId);
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -367,7 +369,6 @@ export default {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
-      //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
 
       this.nextStep(); //hoppa till nästa steg
     },

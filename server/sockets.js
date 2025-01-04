@@ -64,7 +64,7 @@ function sockets(io, socket, data) {
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit("participantsUpdate", data.getParticipants(d.pollId));
-    console.log("participants update körs från socket", data.getParticipants(d.pollId))
+    //console.log("participants update körs från socket", data.getParticipants(d.pollId))
   });
 
   // Event: Start a poll

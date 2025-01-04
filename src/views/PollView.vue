@@ -1,19 +1,9 @@
 <template>
   <div>
-    <h1>Poll id: {{ pollId }} User: {{ this.userId }}</h1>
-    <h3 v-if="isAdmin">You are the host</h3>
+    <h1>Poll id: {{ pollId }} </h1>
+    <!-- h3 v-if="isAdmin">You are the host</h3 -->
     <!-- Render the QuestionComponent and pass the current question as a prop -->
-    <hr />
-    <!-- Render all questions from the questions array, TA BORT SEN NÄR ALLT FUNKAR -->
-
-    <!-- Redo att ta bort all questions nu, lägg till om debug behövs 
-
-    <h3>All Questions:</h3>
-    <ul>
-      <li v-for="(q, index) in questions" :key="index">
-        {{ q }}
-      </li>
-    </ul>-->
+    <br />
 
     <div v-if="view === 'question_view'">
       <!-- Render the question component -->
@@ -23,12 +13,19 @@
         v-on:answer="submitAnswer($event)"
         :voting="hasVoted"
       />
-      <button v-if="isAdmin" v-on:click="adminNext()"> {{ this.uiLabels.showResult || "Show result" }} </button>
 
-      <!-- Amount of votes only visible by admin -->
-      <p v-if="isAdmin">
-        {{ this.numberOfVotes }} out of {{ this.participants.length }} has voted
-      </p>
+      <!-- Special admin functions -->
+      <div class="admin-functions-in-poll">
+        <button v-if="isAdmin" v-on:click="adminNext()">
+          {{ this.uiLabels.showResult || "Show result" }}
+        </button>
+
+        <!-- Amount of votes only visible by admin -->
+        <p v-if="isAdmin">
+          {{ this.numberOfVotes }} out of {{ this.participants.length }} has
+          voted
+        </p>
+      </div>
     </div>
 
     <div v-if="view === 'results_view'">
@@ -41,7 +38,7 @@
           @click="adminNext"
           :disabled="currentQuestionIndex === questions.length - 1"
         >
-          {{this.uiLabels.nextQuestion || "Next question"}}
+          {{ this.uiLabels.nextQuestion || "Next question" }}
         </button>
       </div>
     </div>
@@ -53,7 +50,9 @@
 
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
-        <button @click="adminToResults"> {{ this.uiLabels.endgame || "Engame" }}</button>
+        <button @click="adminToResults">
+          {{ this.uiLabels.endgame || "Engame" }}
+        </button>
       </div>
     </div>
   </div>
@@ -115,7 +114,11 @@ export default {
     });
     socket.emit("participantsUpdate");
     socket.on("participantsUpdate", (p) => (this.participants = p));
-    console.log("participant update säger", this.participants, this.participants.length)
+    console.log(
+      "participant update säger",
+      this.participants,
+      this.participants.length
+    );
     //Listen for admin to press next
 
     // Get this participant
@@ -281,12 +284,12 @@ export default {
       this.numberOfVotes = 0;
     },
 
-    adminNext: function() {
+    adminNext: function () {
       socket.emit("nextQuestion", this.pollId, this.userId);
       console.log("In admin next");
     },
 
-    particpantNext: function() {
+    particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
 
@@ -310,7 +313,7 @@ export default {
       }
     },
 
-    adminToResults: function() {
+    adminToResults: function () {
       socket.emit("toResults", this.pollId, this.userId);
       console.log("In Admin FINAL");
     },
@@ -322,3 +325,43 @@ export default {
   },
 };
 </script>
+
+
+<style>
+
+/* General Button Styling */
+button {
+  padding: 15px 25px;
+  background-color: rgb(252, 63, 173);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  margin-right: 10px; /* Adds spacing between buttons */
+}
+
+button:hover {
+  background-color: rgb(219, 34, 142);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Adds a shadow on hover */
+}
+
+button:disabled {
+  background-color: #cccccc; /* Grey out disabled buttons */
+  cursor: not-allowed;
+}
+
+.admin-functions-in-poll button {
+  margin-top: 10px; /* Adds spacing between buttons and other admin elements */
+}
+
+/* Admin functions container styling */
+.admin-functions-in-poll {
+  margin-top: 50px; /* Adds spacing above the admin functions */
+  padding: 10px; /* Optional padding within the container */
+  /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
+}
+</style>
