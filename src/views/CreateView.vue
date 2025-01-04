@@ -18,9 +18,11 @@
             {{ count }}
           </button>
         </div>
+      <div class="action-buttons">
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
           {{ this.uiLabels.next || "Next" }}
         </button>
+        </div>
       </div>
 
       <!-- Step 2: Select time per question -->
@@ -38,12 +40,18 @@
             {{ time }}
           </button>
         </div>
-        <button v-on:click="backStep">
-          {{ this.uiLabels.back || "back" }}
-        </button>
-        <button v-on:click="finalizeTime" :disabled="!tempTimePerQuestion">
-          {{ this.uiLabels.createGame || "Create Game" }}
-        </button>
+        <div class="action-buttons">
+          <button v-on:click="backStep">
+            {{ this.uiLabels.back || "back" }}
+          </button>
+          <button
+            id="create-game-button"
+            v-on:click="finalizeTime"
+            :disabled="!tempTimePerQuestion"
+          >
+            {{ this.uiLabels.createGame || "Create Game" }}
+          </button>
+        </div>
       </div>
 
       <!-- Step 3: Display poll data -->
@@ -63,8 +71,14 @@ import questionsSv from "@/assets/questions-sv.json";
 
 import io from "socket.io-client";
 import { toHandlers } from "vue";
+
 // Initialize the WebSocket connection to the server
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
+
+
+// ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
+const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
+
 
 export default {
   name: "CreateView",
@@ -149,12 +163,6 @@ export default {
         timerCount: this.selectedTime,
       });
 
-      /*
-      socket.emit("setQuestionCount", {
-        pollId: this.pollId,
-        questionCount: this.selectedQuestionCount,
-      });*/
-
       socket.emit("joinPoll", { pollId: this.pollId });
 
       socket.emit("thisIsAdminId", {
@@ -184,7 +192,6 @@ export default {
 </script>
 
 <style scoped>
-/* @import url('https://fonts.googleapis.com/css2?family=Limelight&family=Truculenta:opsz,wght@12..72,100..900&display=swap'); */
 /* General styling */
 body {
   margin: 0;
@@ -192,31 +199,19 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to right, rgb(210, 66, 133), purple);
   font-family: Arial, sans-serif;
   color: white;
 }
 
-/* h1 {
-  font-family: "Limelight", sans-serif;
-  font-size: 50pt;
-  margin-bottom: 10px;
-} */
-
-/* h2 {
-  font-family: "Truculenta", sans-serif;
-  margin-top: -10px;
-} */
-
 /* Buttons */
 button {
-  padding: 15px 30px;
-  background-color: pink;
+  padding: 15px 25px;
+  background-color: rgb(252, 160, 198);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
@@ -241,7 +236,26 @@ button:disabled {
 .time-per-question-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   margin-top: 20px;
+}
+/* Add spacing between the time buttons and the action buttons */
+.action-buttons {
+  margin-top: 40px; /* Adjust this value as needed */
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Keeps space between the buttons themselves */
+}
+
+#create-game-headline {
+  color: rgb(255, 205, 226);
+}
+
+#create-game-button {
+  background-color: rgb(252, 63, 173);
+}
+
+#create-game-button:hover {
+  background-color: rgb(219, 34, 142);
 }
 </style>
