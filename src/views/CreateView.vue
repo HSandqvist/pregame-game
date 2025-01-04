@@ -1,6 +1,9 @@
 <template>
-  
     <div class="create-game">
+      <div class="language-switcher-container">
+      <!-- Language switcher component -->
+        <LanguageSwitcher @language-changed="updateLanguage" />
+      </div>
       <h1 id="create-game-headline">
         {{ this.uiLabels.createGame || "Create Game" }}
       </h1>
@@ -70,6 +73,7 @@ import questionsEn from "@/assets/questions-en.json"; //läsas in i server istä
 import questionsSv from "@/assets/questions-sv.json";
 
 import io from "socket.io-client";
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
@@ -82,6 +86,9 @@ const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
 
 export default {
   name: "CreateView",
+  components: {
+    LanguageSwitcher,
+  },
   data: function () {
     return {
       step: 1, // Current step of the game creation process
@@ -111,6 +118,12 @@ export default {
   },
 
   methods: {
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+
     generatePollID: function () {
       this.pollId = Math.floor(100000 + Math.random() * 900000).toString();
     },
@@ -193,7 +206,17 @@ export default {
 
 <style scoped>
 /* General styling */
-
+.create-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  position: relative;
+  color: white;
+}
 /* Buttons */
 button {
   padding: 15px 25px;
@@ -249,4 +272,19 @@ button:disabled {
 #create-game-button:hover {
   background-color: rgb(219, 34, 142);
 }
+
+/* Wrapper for LanguageSwitcher */
+.language-switcher-container {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10; /* Ensures it stays above other elements */
+}
+
+.language-toggle {
+  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
+}
+
 </style>
