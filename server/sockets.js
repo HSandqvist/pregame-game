@@ -240,6 +240,12 @@ function sockets(io, socket, data) {
     socket.emit("questionsForGame", poll.questions);
     //io.to(pollId).emit("questionsForGame", poll.questions);//denna rad funkar inte...? varför?
   });
+
+  socket.on("getCategoriesWithAnswers", function(pollId) {   
+    const categoriesWithAnswers = data.polls[pollId].categoryWinners;
+    socket.emit("categoriesWithAnswers", categoriesWithAnswers)
+  });
+ 
 }
 
 // Export the sockets function for use in other modules
