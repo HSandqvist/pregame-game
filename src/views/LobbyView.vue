@@ -90,6 +90,9 @@
           Start Game
         </button>
 
+        <!-- Leave Poll Button -->
+        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">Leave Poll</button>
+
       </div>
     </div>
   </div>
@@ -102,7 +105,11 @@
 <script>
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
-const socket = io("localhost:3000");
+
+//const socket = io("localhost:3000");
+
+// ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
+const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
 
 export default {
   name: "LobbyView",
@@ -156,6 +163,25 @@ export default {
   },
 
   methods: {
+
+    leavePoll() {
+      // Emit an event to the server to remove the participant
+      socket.emit("leavePoll", {
+        pollId: this.pollId,
+        userId: this.userId,
+      });
+
+      // Reset local state
+      this.joined = false;
+      this.userName = "";
+      this.avatar = null;
+      this.step = 1; // Go back to the first step
+
+      // Optionally, navigate back to the start view
+      if(!this.isAdmin){
+          this.$router.push("/");
+        }
+    },
     // Move to the next step
     nextStep() {
       if (this.step == 3) {
@@ -215,6 +241,7 @@ export default {
     startCamera() {
       this.isPictureTaken = false;
       this.cameraState = true;
+      
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -316,10 +343,11 @@ export default {
     },
     // Participate in the poll
     participateInPoll() {
-      if (!this.avatar) {
-        alert("Please select or capture an avatar!");
-        return;
-      }
+      
+      //if (!this.avatar) {
+        //alert("Please select or capture an avatar!");
+        //return;
+      //}
 
       socket.emit("participateInPoll", {
         userId: this.userId,

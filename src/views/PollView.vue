@@ -70,7 +70,10 @@ import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
+
+// ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
+const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
 
 export default {
   name: "PollView",
@@ -343,3 +346,5 @@ export default {
 
 };
 </script>
+
+

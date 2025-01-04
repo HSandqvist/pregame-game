@@ -7,7 +7,8 @@ const httpServer = createServer();
 // Initialize a new Socket.io server instance and configure it
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173", // Allow requests from the specified frontend origin
+    //THIS SHOULD BE CHANGED AFTER DEVLPOMENT
+    origin: "*", // Allow requests from the specified frontend origin
     methods: ["GET"], // Specify allowed HTTP methods
     credentials: true // Enable sending credentials (e.g., cookies) with cross-origin requests
   }
