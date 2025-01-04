@@ -52,7 +52,6 @@ export default {
       submittedAnswers: {},
       resultsShown: false, // Track whether the results have been shown
 
-
       categoriesAnswers: {},
     };
   },

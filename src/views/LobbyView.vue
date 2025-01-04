@@ -4,95 +4,117 @@
       {{ isMusicPlaying ? "Turn Music Off" : "Turn Music On" }}
     </button>
   </div>
-  <div>
+  <div class="center-container">
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
-      <h1>{{ this.uiLabels.pleaseEnterYourName || "Please enter your name" }}:</h1>
+      <h1>
+        {{ this.uiLabels.pleaseEnterYourName || "Please enter your name" }}:
+      </h1>
       <input type="text" v-model="userName" />
-      <button v-on:click="nextStep" :disabled="!userName">{{ this.uiLabels.next || "Next" }}</button>
 
+      <div class="action-buttons">
+        <button v-on:click="nextStep" :disabled="!userName">
+          {{ this.uiLabels.next || "Next" }}
+        </button>
+      </div>
     </div>
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <h1>{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}: </h1>
+      <h1>{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:</h1>
 
-      <p v-if="!isPictureTaken">
-        <video ref="video" width="320" height="240" autoplay></video>
-      </p>
+      <div class="camera-picture-container">
+        <!-- Camera view -->
+        <div class="camera-view">
+          <p v-if="!isPictureTaken">
+            <video ref="video" width="320" height="240" autoplay></video>
+          </p>
 
-      <!-- show the picture before creating final avatar -->
-      <p v-if="isPictureTaken">
-        <img :src="avatar" alt="User Avatar" width="320" height="240" />
-      </p>
+          <!-- show the picture before creating final avatar -->
+          <p v-if="isPictureTaken">
+            <img :src="avatar" alt="User Avatar" width="320" height="240" />
+          </p>
+        </div>
 
-      <button v-on:click="startCamera" :disabled="cameraState">
-        {{ this.uiLabels.startCamera || "Start camera" }}
-      </button>
-      <button v-on:click="captureImage" :disabled="!cameraState">
-        {{ this.uiLabels.takePicture || "Take picture" }}
-      </button>
-
-      <button v-on:click="nextStep" :disabled="!isPictureTaken">{{ this.uiLabels.next || "Next" }}</button>
-      <button v-on:click="backStep">{{ this.uiLabels.back || "Back" }}</button>
+        <!-- Camera buttons-->
+        <div class="camera-buttons">
+          <button v-on:click="startCamera" :disabled="cameraState">
+            {{ this.uiLabels.startCamera || "Start camera" }}
+          </button>
+          <button v-on:click="captureImage" :disabled="!cameraState">
+            {{ this.uiLabels.takePicture || "Take picture" }}
+          </button>
+        </div>
+      </div>
+      <!-- Action buttons-->
+      <div class="action-buttons">
+        <button v-on:click="backStep">
+          {{ this.uiLabels.back || "Back" }}
+        </button>
+        <button v-on:click="nextStep" :disabled="!isPictureTaken">
+          {{ this.uiLabels.next || "Next" }}
+        </button>
+      </div>
     </div>
 
     <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>Your Avatar: {{ this.userName }} </h1>
+      <h1>Your Avatar: {{ this.userName }}</h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
-      <div class="submit-section">
-        <button v-on:click="nextStep" id="submitNameButton">
-          {{ this.uiLabels.ready }} ready
+      <div class="action-buttons">
+        <button v-on:click="backStep">Back</button>
+        <button
+          v-on:click="participateInPoll"
+          id="submitNameButton"
+          :disabled="joined"
+        >
+          {{ this.uiLabels.participateInPoll || "Participate in poll" }}
         </button>
-        <button v-on:click="backStep"> Back </button>
       </div>
     </div>
-
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
       <h1>Lobby for poll: {{ pollId }}</h1>
-      <p>Number of participants: {{ participants.length }}</p>
-      <p>Participants:</p>
+      <h2>Number of participants: {{ participants.length }}</h2>
+      <h3>Participants:</h3>
 
       <!-- Participants grid -->
       <div class="participants-grid">
-        <div v-for="(participant, index) in participants" :key="index"
-          :class="['participant-item', { 'current-user': participant.userId === userId }]">
-
+        <div
+          v-for="(participant, index) in participants"
+          :key="index"
+          :class="[
+            'participant-item',
+            { 'current-user': participant.userId === userId },
+          ]"
+        >
           <!-- Participant avatar -->
-          <img :src="participant.avatar" alt="User Avatar" class="avatar" :class="{ host: participant.isAdmin }" />
+          <img
+            :src="participant.avatar"
+            alt="User Avatar"
+            class="avatar"
+            :class="{ host: participant.isAdmin }"
+          />
 
           <p>{{ participant.name }}</p>
         </div>
       </div>
 
-      <!-- Admin or participant tags -->
-      <h2 v-if="isAdmin" class="admin-tag">You are the Admin!</h2>
-      <h2 v-else class="participant-tag">You are a Participant</h2>
-
-      <!-- User details -->
-      <img :src="avatar" alt="User Avatar" class="avatar" />
-      <h3>{{ this.userName }}</h3>
-
       <!-- Actions -->
       <div class="submit-section">
-        <button v-on:click="participateInPoll" id="submitNameButton" :disabled="joined">
-          {{ this.uiLabels.participateInPoll || "Participate in poll" }}
-        </button>
-
-
-        <button v-on:click="backStep" :disabled="joined"> {{ this.uiLabels.back || "Back" }} </button>
-
-        <button v-if="isAdmin" v-on:click="adminStartGame" :disabled="!joined || !atLeastThree">
+        <button
+          v-if="isAdmin"
+          v-on:click="adminStartGame"
+          :disabled="!joined || !atLeastThree"
+        >
           Start Game
         </button>
-
       </div>
     </div>
   </div>
+
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
     Your browser does not support the audio element.
@@ -119,7 +141,6 @@ export default {
       isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
       adminId: null, //placeholder for eventual adminId, if present
 
-
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
@@ -132,8 +153,7 @@ export default {
 
       //music
       isMusicPlaying: false,
-    }
-
+    };
   },
   created: function () {
     // Set the poll ID from the route parameter
@@ -145,14 +165,13 @@ export default {
     socket.on("participantsUpdate", (p) => (this.participants = p)); // Update participants list
     socket.on("participantsUpdate", () => this.checkAtLeastThree());
     //Listen for start game from server
-    socket.on("startGame", () => this.participatStartGame())
+    socket.on("startGame", () => this.participatStartGame());
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
-
   },
 
   methods: {
@@ -166,7 +185,7 @@ export default {
       } else if (this.step < 5) {
         this.step++;
       }
-      console.log(this.step)
+      console.log(this.step);
     },
     adminStartGame() {
       socket.emit("startGame", this.pollId);
@@ -207,7 +226,6 @@ export default {
     backStep() {
       if (this.step > 1) {
         this.step--;
-
       }
     },
 
@@ -275,7 +293,7 @@ export default {
         this.avatar = canvas.toDataURL("image/png");
 
         // Log to check the base64 image
-        console.log("Avatar captured")
+        console.log("Avatar captured");
         //console.log("Captured Avatar: ", this.avatar);
 
         this.cameraState = false; // Disable camera actions
@@ -330,32 +348,129 @@ export default {
       });
       this.joined = true;
       if (this.participants.length >= 3) {
-        this.atLeastThree = true
+        this.atLeastThree = true;
       }
       //this.$router.push(`/poll/${this.pollId}/${this.userId}`); //all participants show their own page in poll to save their answers
+
+      this.nextStep(); //hoppa till nästa steg
     },
+
     checkAtLeastThree() {
       if (this.participants.length >= 3) {
-        this.atLeastThree = true
+        this.atLeastThree = true;
       }
-    }
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Add styles for each section as negit eded */
+/* Utility class for centering containers */
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures it takes up the full viewport height */
+  text-align: center;
+}
+
+/* Adjust other containers to ensure consistent styling */
 .avatar-container,
 .camera-container,
 .name-entry-section,
-.avatar-upload-section,
-.submit-section {
-  margin-bottom: 20px;
+.waiting-area {
+  width: 100%; /* Ensures it spans the full width of the parent */
+  max-width: 400px; /* Optional: Limit the container width */
+  margin: auto; /* Center the container horizontally */
+  padding: 20px; /* Optional: Add padding */
+  box-sizing: border-box; /* Include padding in width/height calculations */
 }
 
+/* General Button Styling */
+button {
+  padding: 15px 25px;
+  background-color: rgb(252, 160, 198);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: rgb(255, 131, 203);
+}
+
+/* Action Buttons Container */
+.action-buttons {
+  margin-top: 50px; /* Adds spacing from the content above */
+  display: flex; /* Align buttons horizontally */
+  justify-content: center; /* Center the buttons */
+  gap: 20px; /* Space between buttons */
+}
+
+/* Camera and camera buttons styling*/
+.camera-picture-container {
+  display: flex; /* Arrange items in a row */
+  align-items: center; /* Center items vertically */
+  justify-content: space-between; /* Add space between camera view and buttons */
+  gap: 20px; /* Optional: Space between elements */
+}
+
+.camera-view {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 320px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.camera-buttons {
+  display: flex; /* Arrange buttons in a column */
+  flex-direction: column; /* Keep buttons stacked vertically */
+  gap: 10px; /* Space between buttons */
+}
+
+.camera-buttons button {
+  padding: 12px 20px;
+  background-color: rgb(225, 95, 150); /* Darker pink */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.camera-buttons button:hover {
+  background-color: rgb(205, 85, 140); /* Darker hover effect */
+}
+
+/*  When button is disabled styling */
+/* General styling for all buttons */
 button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none; /* Prevent any mouse interactions */
+  opacity: 0.5; /* Make the button appear transparent */
+  cursor: not-allowed; /* Change the cursor to indicate the button is disabled */
+  transition: none; /* Disable any hover or transition effects */
+}
+
+/* Special styling for button: */
+#submitNameButton {
+  background-color: rgb(252, 63, 173);
+}
+
+#submitNameButton:hover {
+  background-color: rgb(219, 34, 142);
 }
 
 /* Avatar styles */

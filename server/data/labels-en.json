@@ -22,5 +22,16 @@
 	"startCamera": "Start camera",
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
-	"participateInPoll": "Participate in game"
+	"participateInPoll": "Participate in game",
+
+"POLLVIEW": "",
+	"whichPlayer": "Which player?",
+	"dropAnswerHere": "Drop answer here",
+	"nextQuestion": "Next question",
+	"waitingForAnswers": "Waiting for answers...",
+	"showResult": "Show result",
+	"endgame": "Endgame",
+	"showEndResults": "Show results"
 }
+
+
