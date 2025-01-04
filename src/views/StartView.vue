@@ -79,7 +79,6 @@ export default {
         alert(this.errorMessage);
         return;
       }
-
       // Validate lobby existence
       socket.emit("checkLobbyExists", lobbyId, (response) => {
         if (response.exists) {
@@ -89,9 +88,12 @@ export default {
           this.errorMessage = "Lobby does not exist. Please check the ID.";
           alert(this.errorMessage);
         }
-      }),*/
-    },
-  };
+      });
+
+      }
+    }
+  }
+
 </script>
 
 <style scoped>
@@ -179,7 +181,7 @@ export default {
 }
 .language-toggle {
   justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
-
+}
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -192,4 +194,5 @@ export default {
   gap: 1rem;
 
 }
+
 </style>
