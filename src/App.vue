@@ -3,13 +3,25 @@
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
 
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
+
+import InstructionButton from '@/components/InstructionButton.vue';
+
+// Dynamiska instruktioner för varje vy
+const instructionsMap = {
+  '/': 'Välkommen till startsidan! Här kan du skapa eller gå med i ett spel.',
+  '/create': 'På denna sida kan du skapa ett nytt spel genom att ange detaljer.',
+  '/lobby': 'Detta är lobbyn. Vänta tills alla deltagare är redo innan du startar spelet.',
+  '/poll': 'På denna sida kan du rösta på dina medspelare genom att dra och släppa deras avatarer.',
+};
 
 </script>
 
 <template>
 
   <div class="app-wrapper">
+    <InstructionButton :instructions="currentInstructions" />
+
   <!-- Animated stars -->
     <div class="star">
     <div></div>

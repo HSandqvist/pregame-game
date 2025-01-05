@@ -101,6 +101,7 @@ export default {
   border: 2px solid #ccc;
   cursor: grab;
   transition: transform 0.2s ease;
+  -webkit-user-drag: none;
 }
 
 .participant-avatar:active {
