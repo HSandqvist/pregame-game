@@ -472,19 +472,23 @@ export default {
         avatar: this.avatar,
         isAdmin: this.isAdmin,
       });
-
+    
       this.joined = true;
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
 
       this.nextStep(); //hoppa till nästa steg
+      
+      this.$router.push("/waiting/" + this.pollId);
+      
     },
 
     checkAtLeastThree: function () {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
+      
     },
   },
 };

@@ -82,6 +82,14 @@ function sockets(io, socket, data) {
     //console.log("participants update körs från socket", data.getParticipants(d.pollId))
   });
 
+  socket.on("getParticipants", function (pollId) {
+
+    io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
+  });
+
+  
+
+
   // Event: Start a poll
   socket.on("startGame", function (pollId) {
     // Notify all clients in the poll room that the poll has started
