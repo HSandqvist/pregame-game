@@ -52,6 +52,7 @@ export default {
   data: function () {
     return {
       lang: localStorage.getItem("lang") || "en", // Language preference
+      uiLabels: {},
       pollId: "",
       question: "",
       submittedAnswers: {},
