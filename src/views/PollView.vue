@@ -9,7 +9,7 @@
       <!-- Render the question component -->
       <QuestionComponent
         v-bind:question="currentQuestion"
-        v-bind:participants="currentQuestion.a"
+        v-bind:participants="participants"
         v-on:answer="submitAnswer($event)"
         :voting="hasVoted"
       />
@@ -218,7 +218,6 @@ export default {
       socket.emit("playerVoted", this.userId);
       //flyttat socket.on top answer update till created delen
 
-      return result;
     },
 
     switchView() {

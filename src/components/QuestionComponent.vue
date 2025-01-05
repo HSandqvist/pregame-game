@@ -13,7 +13,11 @@
         draggable="true"
         @dragstart="onDragStart(participant)"
       >
-        {{ participant }}
+      <img
+          :src="participant.avatar"
+          alt="Participant Avatar"
+          class="participant-avatar"
+        />
       </div>
     </div>
 
@@ -52,6 +56,8 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
+    console.log("Participants data:", this.participants);
+
   },
 
   methods: {
@@ -86,28 +92,39 @@ export default {
 /* Siracha - lite skriv-aktig men läsbar */
 @import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
 
+.participant-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Makes the avatars round */
+  object-fit: cover; /* Ensures the image fills the container without distortion */
+  border: 2px solid #ccc;
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.participant-avatar:active {
+  transform: scale(1.1); /* Slightly enlarge the avatar when dragging */
+}
+
 /* Draggable answer options */
 .draggable {
-  width: 120px; /* Set a fixed width for the answer boxes */
-  height: 50px; /* Set a fixed height for the answer boxes */
-  margin: 0.5rem;
-  padding: 0.5rem; /* Adjust padding for better content fit */
-  background-color: rgb(252, 160, 198);
-  color: white;
-  border-radius: 5px;
-  text-align: center;
-  cursor: grab;
-  user-select: none;
-  display: flex; /* Flexbox for centering text */
+  display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0.5rem;
+}
 
-  /* font styling specific */
-  font-family: "Siracha", Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  font-weight: bold;
+.drop-zone {
+  width: 140px;
+  height: 140px;
+  border: 6px dotted rgb(252, 160, 198);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem auto;
+  background-color: rgba(252, 160, 198, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .draggable:active {
@@ -125,27 +142,7 @@ export default {
 }
 
 /* Drop zone for answers */
-.drop-zone {
-  width: 140px; /* Slightly larger than the answer boxes */
-  height: 60px; /* Slightly taller than the answer boxes */
-  padding: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 6px dotted rgb(252, 160, 198);
-  border-radius: 10px;
-  text-align: center;
-  color: rgb(252, 160, 198);
-  font-size: 1rem;
-  display: flex; /* Flexbox for centering text */
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin: 0 auto; /* Center the drop zone horizontally */
 
-  /* font styling specific */
-  font-family: "Siracha", Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  font-weight: bold;
-}
 
 .drop-zone:hover {
   background-color: rgba(252, 160, 198, 0.1);
