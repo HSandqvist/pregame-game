@@ -5,6 +5,10 @@
     </button>
   </div>
   <div class="center-container">
+    <div class="language-switcher-container">
+      <!-- Language switcher component -->
+      <LanguageSwitcher @language-changed="updateLanguage" />
+    </div>
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
       <h1>
@@ -59,7 +63,7 @@
 
     <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <h1>Your Avatar: {{ this.userName }}</h1>
+      <h1>{{ this.uiLabels.yourAvatar || "Your avatar" }}: {{ userName }}</h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
@@ -76,9 +80,9 @@
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
-      <h1>Lobby for poll: {{ pollId }}</h1>
-      <h2>Number of participants: {{ participants.length }}</h2>
-      <h3>Participants:</h3>
+      <h1>{{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}</h1>
+      <h2>{{ this.uiLabels.numberOfPlayers || "Number of players" }}: {{ participants.length }}</h2>
+      <h3>{{ this.uiLabels.players || "Players" }}:</h3>
 
       <!-- Participants grid -->
       <div class="participants-grid">
@@ -109,12 +113,12 @@
           v-on:click="adminStartGame"
           :disabled="!joined || !atLeastThree"
         >
-          Start Game
+          {{ this.uiLabels.startGame || "Start Game" }}
         </button>
 
         <!-- Leave Poll Button -->
         <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
-          Leave Poll
+          {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
       </div>
     </div>
@@ -129,6 +133,7 @@
 <script>
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 
 const socket = io("localhost:3000");
 
@@ -137,6 +142,9 @@ const socket = io("localhost:3000");
 
 export default {
   name: "LobbyView",
+  components: {
+    LanguageSwitcher,
+  },
   data: function () {
     return {
       step: 1, // Tracks the current step
@@ -191,6 +199,12 @@ export default {
   },
 
   methods: {
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+
     leavePoll() {
       // Emit an event to the server to remove the participant
       socket.emit("leavePoll", {
@@ -413,11 +427,14 @@ export default {
 /* Utility class for centering containers */
 .center-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   min-height: 100vh; /* Ensures it takes up the full viewport height */
   text-align: center;
+  position: relative;
+  color: white;
 }
 
 /* Adjust other containers to ensure consistent styling */
@@ -664,4 +681,19 @@ input[type="text"] {
 .global-music-control button:hover {
   background-color: rgb(255, 131, 203);
 }
+
+/* Wrapper for LanguageSwitcher */
+.language-switcher-container {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10; /* Ensures it stays above other elements */
+}
+
+.language-toggle {
+  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
+}
+
 </style>
