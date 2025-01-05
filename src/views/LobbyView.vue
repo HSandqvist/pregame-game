@@ -1,7 +1,11 @@
 <template>
-  <div class="global-music-control">
+  <div class="global-music-control" v-if="isAdmin">
     <button @click="toggleMusic">
-      {{ isMusicPlaying ? "Turn Music Off" : "Turn Music On" }}
+      <img 
+      :src="isMusicPlaying ? musicIconOn : musicIconOff"
+      alt="Music Icon" 
+        class="music-icon" 
+      />
     </button>
   </div>
   <div class="center-container">
@@ -134,6 +138,8 @@
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+import musicIconOn from '@/assets/img/musicIcon.png';
+import musicIconOff from '@/assets/img/musicIconOff.png';
 
 const socket = io("localhost:3000");
 
@@ -170,6 +176,9 @@ export default {
 
       //music
       isMusicPlaying: false,
+      musicIconOn, // Importera den ljusa ikonen
+      musicIconOff,
+      lobbyviewMusic,
     };
   },
   created: function () {
@@ -372,11 +381,14 @@ export default {
       audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
 
       if (this.isMusicPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
+    audio.pause();
+    this.isMusicPlaying = false; // Sätt musiken till av
+  } else {
+    // Återställ ljudets position till början om det är pausat
+    audio.currentTime = 0;
+    audio.play();
+    this.isMusicPlaying = true; // Sätt musiken till på
       }
-      this.isMusicPlaying = !this.isMusicPlaying;
     },
 
     // Handle manual avatar upload
@@ -626,9 +638,6 @@ img.avatar.host {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
-  .global-music-control button {
-    font-size: 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -664,22 +673,30 @@ input[type="text"] {
 }
 
 .global-music-control button {
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 3px;
   background-color: pink;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%; /* Gör ikonen rund */
   cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  transition: all 0.2s ease;
-  text-decoration: none;
+  display: flex; /* Använd flexbox för att centrera ikonen */
+
 }
 
+.music-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
+}
+
+
 .global-music-control button:hover {
-  background-color: rgb(255, 131, 203);
+  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
+}
+
+.music-icon:hover {
+  transform: scale(1.1); /* Liten zoom vid hover */
 }
 
 /* Wrapper for LanguageSwitcher */
