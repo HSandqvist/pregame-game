@@ -99,6 +99,7 @@ export default {
       view: "question_view", // 'question_view' or 'results_view'
 
       uiLabels: {}, // UI labels for different languages
+      lang: localStorage.getItem("lang") || "en", // Language preference
     };
   },
 
@@ -146,7 +147,11 @@ export default {
       (answers) => (this.submittedAnswers = answers)
     ); // Update the submitted answers
 
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.on("uiLabels", (labels) => {
+    console.log("Received labels:", labels); // Debugging
+    this.uiLabels = labels;
+  });
+
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
 
