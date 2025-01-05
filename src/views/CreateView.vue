@@ -77,11 +77,11 @@ import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
-//const socket = io("localhost:3000");
+const socket = io("localhost:3000");
 
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
+//const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
 
 
 export default {

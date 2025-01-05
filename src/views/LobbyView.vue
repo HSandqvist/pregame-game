@@ -174,10 +174,10 @@ import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 
-//const socket = io("localhost:3000");
+const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
+//const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
 
 export default {
   name: "LobbyView",
