@@ -49,6 +49,7 @@ export default {
     return {
       draggedParticipant: null, // Temporarily holds the dragged participant
       uiLabels: {}, // UI labels for different languages
+      lang: localStorage.getItem("lang") || "en", // Language preference
     };
   },
 

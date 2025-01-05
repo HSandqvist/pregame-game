@@ -2,6 +2,7 @@
 "GENERIC":"",
 	"next" : "Nästa",
 	"back": "Tillbaka",
+	"result": "Resultat",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
@@ -19,6 +20,7 @@
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Skriv in ditt namn",
 	"captureYourAvatar": "Ta din avatarbild",
+	"chooseYourAvatar": "Välj din avatar",
 	"startCamera": "Starta Kameran",
 	"takePicture": "Ta bild",
 	"yourAvatar": "Din avatar",
@@ -27,10 +29,19 @@
 	"numberOfPlayers": "Antal spelare",
 	"players": "Spelare",
 	"leaveLobby": "Lämna lobby",
+	"choosePreMadeAvatar": "Välj en färdig avatar",
+	"takeAPictureInstead": "Ta en bild istället",
 
 "POLLVIEW": "",
-	"whichPlayer": "Vilken spelare?",
-	"dropAnswerHere": "Dra svar hit",
+
+	"QUESTION COMPONENT": "",
+		"whichPlayer": "Vilken spelare?",
+		"dropAnswerHere": "Dra svar hit",
+
+	"RESULT QUESTION COMPONENT":"",
+		"topAnswer":"Mest röster:",
+		"amountVotes":"Antal röster:",
+
 	"nextQuestion": "Nästa fråga",
 	"waitingForAnswers": "Väntar på svar...",
 	"showResult": "Visa resultat",

@@ -22,14 +22,24 @@
         <h2>{{ category }}</h2>
         <p>Top voted: {{ topVoted }}</p>
       </div>
+      
     </div>
+    <div v-if="resultsShown">
+      <button v-on:click="returnToStart" class="center-button">
+
+Start a new game
+</button>
+   </div>
   </div>
+  
 
   <!-- ANVÄNDS EJ NU -->
   <!-- Render the BarsComponent to visualize answers -->
   <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers" />
   <!-- Display the raw data of submitted answers -->
   <!-- <span>{{ submittedAnswers }}</span> -->
+
+   
 </template>
 
 <script>
@@ -42,7 +52,7 @@ import io from "socket.io-client";
 const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-//const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
+//const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
 
 export default {
   name: "ResultView",
@@ -52,6 +62,7 @@ export default {
   data: function () {
     return {
       lang: localStorage.getItem("lang") || "en", // Language preference
+      uiLabels: {},
       pollId: "",
       question: "",
       submittedAnswers: {},
@@ -105,6 +116,11 @@ export default {
 
       socket.emit("getCategoriesWithAnswers", this.pollId);
     },
+    returnToStart(){
+      alert("Returning to start");
+
+      this.$router.push("/");
+    }
   },
 };
 </script>

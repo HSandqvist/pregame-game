@@ -3,6 +3,7 @@
 "GENERIC":"",
 	"next" : "Next",
 	"back": "Back",
+	"result": "Result",
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
@@ -19,6 +20,7 @@
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Enter your name",
 	"captureYourAvatar": "Capture your avatar",
+	"chooseYourAvatar": "Choose your avatar",
 	"startCamera": "Start camera",
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
@@ -27,15 +29,26 @@
 	"numberOfPlayers": "Number of players",
 	"players": "Players",
 	"leaveLobby": "Leave Lobby",
+	"choosePreMadeAvatar": "Choose pre-made avatar",
+	"takeAPictureInstead": "Take a picture instead",
+	
 
 "POLLVIEW": "",
-	"whichPlayer": "Which player?",
-	"dropAnswerHere": "Drop answer here",
+
+	"QUESTION COMPONENT": "",
+		"whichPlayer": "Which player?",
+		"dropAnswerHere": "Drop answer here",
+
+	"RESULT QUESTION COMPONENT":"",
+			"topAnswer": "Top result:",
+			"amountVotes": "Votes:",
+
 	"nextQuestion": "Next question",
 	"waitingForAnswers": "Waiting for answers...",
 	"showResult": "Show result",
 	"endgame": "Endgame",
 	"showEndResults": "Show results"
+
 }
 
 
