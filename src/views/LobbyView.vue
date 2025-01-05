@@ -499,6 +499,14 @@ button:hover {
   flex-direction: column; /* Keep buttons stacked vertically */
   gap: 10px; /* Space between buttons */
 }
+/* Add spacing between the time buttons and the action buttons */
+.submit-section {
+  margin-top: 40px; /* Adjust this value as needed */
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Keeps space between the buttons themselves */
+  background: none; /* If body or parent has background */
+}
 
 .camera-buttons button {
   padding: 12px 20px;
