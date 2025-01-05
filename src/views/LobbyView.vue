@@ -25,9 +25,10 @@
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <h1>{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:</h1>
+      <h1 v-if="!choseCustomAvatar">{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:</h1>
+      <h1 v-if="choseCustomAvatar">{{ this.uiLabels.chooseYourAvatar || "Choose your avatar" }}:</h1>
 
-      <div class="camera-picture-container">
+      <div class="camera-picture-container" v-if="!choseCustomAvatar">
         <!-- Camera view -->
         <div class="camera-view">
           <p v-if="!isPictureTaken">
@@ -38,8 +39,8 @@
           <p v-if="isPictureTaken">
             <img :src="avatar" alt="User Avatar" width="320" height="240" />
           </p>
+          <!-- Show the custom avatar -->
         </div>
-
         <!-- Camera buttons-->
         <div class="camera-buttons">
           <button v-on:click="startCamera" :disabled="cameraState">
@@ -49,12 +50,49 @@
             {{ this.uiLabels.takePicture || "Take picture" }}
           </button>
         </div>
+
       </div>
+      <div class="camera-picture-container" v-if="choseCustomAvatar">
+        
+      <div class="camera-view" >
+          <p >
+            <img :src="avatar" alt="User Avatar" width="320" height="240" />
+          </p>
+          </div>
+          <div class="camera-buttons">
+          <button v-on:click="choseOptionOne">
+            {{ this.uiLabels.gorankan || "Gorankan" }}
+          </button>
+          <button v-on:click="choseOptionTwo">
+            {{ this.uiLabels.liankan || "Liankan" }}
+          </button>
+          <button v-on:click="choseOptionThree">
+            {{ this.uiLabels.plankan || "Plankan" }}
+            </button>
+          <button v-on:click="choseOptionFour">
+            {{ this.uiLabels.bankan || "Bankan" }}
+            </button>
+        </div>
+
+        </div>
+
+
       <!-- Action buttons-->
       <div class="action-buttons">
-        <button v-on:click="backStep">
+    
+        <button v-on:click="backStep" :disabled="disableSwitcher">
           {{ this.uiLabels.back || "Back" }}
         </button>
+
+        <button v-on:click="chooseAvatar" v-if="!choseCustomAvatar" :disabled="disableSwitcher">
+          {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
+        </button>
+
+
+        <button v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
+          {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
+        </button>
+
         <button v-on:click="nextStep" :disabled="!isPictureTaken">
           {{ this.uiLabels.next || "Next" }}
         </button>
@@ -120,6 +158,7 @@
         <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
+        
       </div>
     </div>
   </div>
@@ -135,10 +174,10 @@ import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-//const socket = io("192.168.0.195:3000"); // Initialize mutliple joiners
+const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
 
 export default {
   name: "LobbyView",
@@ -157,6 +196,7 @@ export default {
       avatar: null, // Avatar image data
       isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
       adminId: null, //placeholder for eventual adminId, if present
+      choseCustomAvatar: false,
 
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
@@ -288,6 +328,7 @@ export default {
     startCamera: function () {
       this.isPictureTaken = false;
       this.cameraState = true;
+      this.disableSwitcher=true;
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -295,12 +336,10 @@ export default {
         tracks.forEach((track) => track.stop());
         this.stream = null;
       }
-
       // Stop the video element from using the old stream
       if (this.$refs.video) {
         this.$refs.video.srcObject = null;
       }
-
       //start new camera stream
       navigator.mediaDevices
         .getUserMedia({ video: true })
@@ -308,6 +347,7 @@ export default {
           this.stream = stream;
           this.$refs.video.srcObject = stream;
           console.log("Camera stream is active:", stream);
+          
         })
         .catch((error) => {
           console.error("Error accessing camera:", error);
@@ -328,6 +368,7 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
+      this.disableSwitcher=false;
     },
 
     // Capture the image from the video stream
@@ -361,7 +402,33 @@ export default {
         console.error("Video stream is not available.");
       }
     },
+    chooseAvatar(){
+      this.stopCamera();
+      this.choseCustomAvatar= true;
+      this.isPictureTaken = true;
+    },
 
+    choseOptionOne(){
+      this.avatar = "/src/assets/img/Gorankan.png"
+    },
+
+    choseOptionTwo(){
+      this.avatar = "/src/assets/img/Liankan.png" 
+    },
+    choseOptionThree(){
+      this.avatar = "/src/assets/img/Plankan.png"
+    },
+    choseOptionFour(){
+      this.avatar = "/src/assets/img/Bankan.png"
+    },
+    
+    returnToPictureMode(){
+      
+      this.choseCustomAvatar= false;
+      this.isPictureTaken = false;
+      this.avatar = null;
+    },
+    
     toggleMusic: function () {
       const audio = this.$refs.backgroundMusic;
       if (!audio) {
