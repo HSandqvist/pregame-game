@@ -295,14 +295,25 @@ Data.prototype.loadRandomAnswers = function (pollId) {
     while (selectedAnswers.length < 3) {
       const randomUsername =
         participants[Math.floor(Math.random() * participants.length)].name;
-
+      
       // Prevent the same person from being chosen multiple times
       if (!selectedAnswers.includes(randomUsername)) {
         selectedAnswers.push(randomUsername);
       }
     }
+
+      // Randomize three unique users
+    /*while (selectedAnswers.length < 3) {
+      const randomUser =
+        participants[Math.floor(Math.random() * participants.length)];
+      
+      // Prevent the same person from being chosen multiple times
+      if (!selectedAnswers.includes(randomUser)) {
+        selectedAnswers.push(randomUser);
+      }
+    }
     return selectedAnswers; // Return an array of 3 random usernames
-  }
+  }*/
   return []; // Return empty array if poll doesn't exist
 };
 //};

@@ -144,9 +144,8 @@ function sockets(io, socket, data) {
 
   // Event: använda för handling när resultatet per fråga ska visas?
   socket.on("runQuestionResults", function (pollId) {
-    //NEDAN BORDE TYP GÖRAS NÄR TIDEN TAGIT SLUT FÖR EN FRÅGA?
     // Run the question logic (determine the top answer)
-    const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly
+    const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly   //NAMN RUNQUESTION BRA NAMN FÖR DETTA?
 
     console.log(
       `Socket runQuestionResults: Top answer for question: ${topAnswer} with ${maxVotes} votes.`
@@ -159,10 +158,10 @@ function sockets(io, socket, data) {
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
-    io.to(pollId).emit("questionUpdate", question);
+    io.to(pollId).emit("questionUpdate", question); //ANVÄNDS DENNA VERKLIGEN?
 
     // Emit the submitted answers //NÖDVÄNDIGT?
-    io.to(pollId).emit(
+    io.to(pollId).emit(   //ANVÄNDS DENNA VERKLIGEN?
       "submittedAnswersUpdate",
       data.getSubmittedAnswers(pollId)
     );
@@ -183,7 +182,6 @@ function sockets(io, socket, data) {
 
   //Player voted function //behövs thePlayer här? används ej
   socket.on("playerVoted", function (thePlayer){
-
     io.emit("updateNumberOfVotes")
   });
 

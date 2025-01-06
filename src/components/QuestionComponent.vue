@@ -20,7 +20,6 @@
     <!-- Drop zone -->
     <div v-if="!voting" class="drop-zone" @dragover.prevent @drop="onDrop">
       {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
-      <!-- lägga in här med UI lables på bra sätt -->
     </div>
 
     <p v-if="voting"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </p>
@@ -36,7 +35,7 @@ export default {
   name: "QuestionComponent",
   props: {
     question: Object, // The question object containing the question text and answer options
-    participants: Array, // List of participants, // Already randomized in the parent
+    participants: Array, // List of participants, // Already randomized in data
     voting: Boolean,
   },
   emits: ["answer"], // Declare the custom event "answer" emitted by this component
