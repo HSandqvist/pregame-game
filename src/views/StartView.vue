@@ -1,5 +1,6 @@
 <template>
   <div class="frontpage">
+    <InstructionButton viewKey="STARTVIEW" />
     <div class="language-switcher-container">
       <!-- Language switcher component -->
       <LanguageSwitcher @language-changed="updateLanguage" />
@@ -36,6 +37,8 @@
 <script>
 import io from "socket.io-client"; // Import WebSocket library
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+
 
 // ---- FOR Normal TESTING ----
 const socket = io("localhost:3000"); // Initialize WebSocket connection
@@ -46,6 +49,7 @@ export default {
   name: "StartView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
   },
   data() {
     return {

@@ -118,11 +118,7 @@ export default {
     });
     socket.emit("participantsUpdate");
     socket.on("participantsUpdate", (p) => (this.participants = p));
-    console.log(
-      "participant update säger",
-      this.participants,
-      this.participants.length
-    );
+    console.log("participant update säger", this.participants, this.participants.length);
     //Listen for admin to press next
 
     // Get this participant

@@ -47,8 +47,17 @@
 	"waitingForAnswers": "Waiting for answers...",
 	"showResult": "Show result",
 	"endgame": "Endgame",
-	"showEndResults": "Show results"
+	"showEndResults": "Show results",
 
-}
+	"INSTRUCTIONS": {
+		"STARTVIEW": "Welcome to the start page! Here you can create or join a game.",
+		"CREATEVIEW": "On this page, you can create a new game by entering the details.",
+		"LOBBYVIEW": "This is the lobby. Wait until all participants are ready before starting the game.",
+		"POLLVIEW": "On this page, you can vote for your teammates by dragging and dropping their avatars.",
+		"RESULTVIEW": "View the results of the game here."
+	  }
+	}
+
+
 
 
