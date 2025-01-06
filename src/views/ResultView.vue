@@ -43,13 +43,19 @@
         <h2> TOP... {{ category }}</h2>
         <h1> {{ topVoted }}! </h1>
       </div>
-    </div>
 
+
+    </div>
+      <div v-if="resultsShown">
+      <button v-on:click="returnToStart" class="center-button">
+
+      Start new game!
+      </button>
+      </div>
       
     </div>
-  </div>
-  
 
+  
   <!-- ANVÄNDS EJ NU -->
   <!-- Render the BarsComponent to visualize answers -->
   <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers" />
@@ -182,10 +188,9 @@ export default {
         this.showPopup = false;
       }
     },
-    
+
     returnToStart(){
       alert("Returning to start");
-
       this.$router.push("/");
     }
   },
