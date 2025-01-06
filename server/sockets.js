@@ -145,7 +145,7 @@ function sockets(io, socket, data) {
   // Event: använda för handling när resultatet per fråga ska visas?
   socket.on("runQuestionResults", function (pollId) {
     // Run the question logic (determine the top answer)
-    const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly   //NAMN RUNQUESTION BRA NAMN FÖR DETTA?
+    const { topAnswer, maxVotes, topAvatar } = data.runQuestion(pollId); // Now we get the result directly   //NAMN RUNQUESTION BRA NAMN FÖR DETTA?
 
     console.log(
       `Socket runQuestionResults: Top answer for question: ${topAnswer} with ${maxVotes} votes.`
@@ -154,7 +154,7 @@ function sockets(io, socket, data) {
     console.log(`Emitting topAnswerUpdate: ${topAnswer}, ${maxVotes}`); // Log data before emitting
     // Emit the most voted answer to all clients in the poll room
     //io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes }); //uppdatera för alla som är inne i pollen
-    io.emit("topAnswerUpdate", { topAnswer, maxVotes });
+    io.emit("topAnswerUpdate", { topAnswer, maxVotes, topAvatar });
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
@@ -177,7 +177,7 @@ function sockets(io, socket, data) {
     // Submit the answer via the data function
     data.submitAnswer(pollId, answer, voter);
 
-    console.log(`Answer received: ${answer} for poll ${pollId}`);
+    console.log(`Answer received: ${answer.name} for poll ${pollId}`);
   });
 
   //Player voted function //behövs thePlayer här? används ej
