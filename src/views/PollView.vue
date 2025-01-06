@@ -116,6 +116,7 @@ export default {
       userId: this.userId,
     });
     socket.emit("participantsUpdate");
+    
     socket.on("participantsUpdate", (p) => (this.participants = p));
     console.log(
       "participant update säger",

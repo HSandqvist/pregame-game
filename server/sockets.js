@@ -83,10 +83,14 @@ function sockets(io, socket, data) {
   });
 
   socket.on("getParticipants", function (pollId) {
-
-    io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
+    console.log("getParticipants event triggered for pollId:", pollId);
+    io.emit("participantsUpdate", data.getParticipants(pollId));
   });
+  socket.on("getPolls", function (pollId) {
 
+    socket.emit("pollsUpdate", data.getPoll(pollId));
+  }
+);
   
 
 

@@ -44,7 +44,7 @@
         <button
           v-if="isAdmin"
           v-on:click="adminStartGame"
-          :disabled="!joined || !atLeastThree"
+          :disabled="!joined || atLeastThree <3"
         >
           {{ this.uiLabels.startGame || "Start Game" }}
         </button>
@@ -86,12 +86,14 @@ export default {
 
       //user
       userId: "", //alla ha egen sida sen hej
+      tempUserID: "",
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
       isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
       adminId: null, //placeholder for eventual adminId, if present
       choseCustomAvatar: false,
+      pollData: {}, // Poll data received from the server
 
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
@@ -108,20 +110,33 @@ export default {
 
     //set user id
   
-
+  
     // Listen for server events
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.on("uiLabels", (labels) => (this.uiLabels = labels));
+     // Update UI labels
     socket.emit("getUILabels", this.lang);
 
-
-    socket.on("participantsUpdate", (p) => {
-      this.participants = p;
-      this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
-      //console.log("participants är", this.participants);
+    socket.on("pollsUpdate", (data) => {
+      console.log("pollData event received:");
+      this.pollData = data;
+      console.log(data);
     });
 
+    socket.emit("getPolls", this.pollId);
+    socket.emit("getParticipants", this.pollId);
     
-
+    
+    
+    socket.on("participantsUpdate", (p) => {
+      console.log("participantsUpdate event received:");
+      this.participants = p;
+      this.checkAtLeastThree(); 
+      this.tempUserID= localStorage.getItem("userId")  
+  
+      // Ensure the check runs after the participants array is updated
+      //console.log("participants är", this.participants);
+    });
+   
 
     //Listen for start game from server
     socket.on("startGame", () => this.participantStartGame());
@@ -131,6 +146,8 @@ export default {
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
+
+    saveInfo();
   },
 
   methods: {
@@ -138,6 +155,14 @@ export default {
     updateLanguage(lang) {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
+    },
+    saveInfo(){
+      this.userId = this.tempUserID;
+    console.log("userId är", this.userId);
+    if( this.userId === this.pollData.adminId) {
+        this.isAdmin = true;
+        console.log("Admin status granted to userId:", this.userId);
+      };
     },
 
     leavePoll() {
