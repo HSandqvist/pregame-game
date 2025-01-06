@@ -292,7 +292,7 @@ Data.prototype.loadRandomAnswers = function (pollId) {
     const selectedAnswers = [];
 
     // Randomize three unique usernames
-    while (selectedAnswers.length < 3) {
+    /*while (selectedAnswers.length < 3) {
       const randomUsername =
         participants[Math.floor(Math.random() * participants.length)].name;
       
@@ -301,9 +301,11 @@ Data.prototype.loadRandomAnswers = function (pollId) {
         selectedAnswers.push(randomUsername);
       }
     }
+    return selectedAnswers; // Return an array of 3 random usernames
+*/
 
       // Randomize three unique users
-    /*while (selectedAnswers.length < 3) {
+    while (selectedAnswers.length < 3) {
       const randomUser =
         participants[Math.floor(Math.random() * participants.length)];
       
@@ -312,8 +314,8 @@ Data.prototype.loadRandomAnswers = function (pollId) {
         selectedAnswers.push(randomUser);
       }
     }
-    return selectedAnswers; // Return an array of 3 random usernames
-  }*/
+    return selectedAnswers; // Return an array of 3 random users
+  }
   return []; // Return empty array if poll doesn't exist
 };
 //};

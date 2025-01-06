@@ -13,7 +13,7 @@
         draggable="true"
         @dragstart="onDragStart(participant)"
       >
-        {{ participant }}
+        {{ participant.name }}
       </div>
     </div>
 
