@@ -20,6 +20,7 @@
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Skriv in ditt namn",
 	"captureYourAvatar": "Ta din avatarbild",
+	"chooseYourAvatar": "Välj din avatar",
 	"startCamera": "Starta Kameran",
 	"takePicture": "Ta bild",
 	"yourAvatar": "Din avatar",
@@ -28,6 +29,8 @@
 	"numberOfPlayers": "Antal spelare",
 	"players": "Spelare",
 	"leaveLobby": "Lämna lobby",
+	"choosePreMadeAvatar": "Välj en färdig avatar",
+	"takeAPictureInstead": "Ta en bild istället",
 
 "POLLVIEW": "",
 

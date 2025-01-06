@@ -20,6 +20,7 @@
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Enter your name",
 	"captureYourAvatar": "Capture your avatar",
+	"chooseYourAvatar": "Choose your avatar",
 	"startCamera": "Start camera",
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
@@ -28,6 +29,9 @@
 	"numberOfPlayers": "Number of players",
 	"players": "Players",
 	"leaveLobby": "Leave Lobby",
+	"choosePreMadeAvatar": "Choose pre-made avatar",
+	"takeAPictureInstead": "Take a picture instead",
+	
 
 "POLLVIEW": "",
 
