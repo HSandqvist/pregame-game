@@ -1,27 +1,33 @@
 <template>
     <div class="instruction-button-container">
       <button @click="toggleInstructions" class="instruction-button">?</button>
+
       <div v-if="showInstructions" class="instructions-popup">
         <h3>{{ uiLabels.instructions || "Instructions" }}</h3>
         <p>{{ instructions }}</p>
-        <button @click="toggleInstructions">Close</button>
+        <button @click="toggleInstructions">X</button>
       </div>
     </div>
   </template>
   
   <script>
+  import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
+
+
   export default {
     name: "InstructionButton",
-    props: {
-        viewKey: {
-        type: String,
-        required: true,
+    components:{
+        LanguageSwitcher,
     },
+    props: {
+        lang: { type: String, default: "en" },
+    viewKey: { type: String, required: true },
+    uiLabels: { type: Object, default: () => ({}) },
+
     },
     data() {
       return {
         showInstructions: false,
-        lang: localStorage.getItem("lang") || "en",
         labels: {}, // Placeholder for language-specific labels
         };
     },
@@ -29,27 +35,33 @@
         instructions() {
       return this.labels?.INSTRUCTIONS?.[this.viewKey] || "No instructions available.";
     },
-    uiLabels() {
-      return this.labels.GENERIC || {};
-    },
+   
     },
     methods: {
       toggleInstructions() {
         this.showInstructions = !this.showInstructions;
       },
       async loadLabels() {
-      try {
-        // Dynamisk sökväg baserat på valt språk
-        const response = await fetch(`/server/data/labels-${this.lang}.json`);
-        if (response.ok) {
-          this.labels = await response.json(); // Ladda JSON-data
-        } else {
-          console.error("Failed to load language file:", response.status);
-        }
-      } catch (error) {
-        console.error("Error loading labels:", error);
-      }
-    },
+  let response;
+
+  if (this.lang == "en") {
+    response = await fetch("/server/data/labels-en.json");
+  } else {
+    response = await fetch("/server/data/labels-sv.json");
+  }
+
+  if (!response.ok) {
+    console.error("Failed to load language file:", response.status);
+    return;
+  }
+
+  this.labels = await response.json();
+},
+    
+    updateLanguage(newLang) {
+    this.lang = newLang;
+    this.loadLabels();
+  },
   },
   watch: {
     // Kolla om språket ändras i localStorage och ladda om labels
@@ -61,7 +73,7 @@
   },
     created() {
     console.log("Labels loaded:", this.labels); // Kontrollera att labels innehåller INSTRUCTIONS
-
+ // Listen for UI label updates from the server
     this.loadLabels();
     },
   };

@@ -1,4 +1,6 @@
 <template>
+  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
+
   <div>
     <h1>Poll id: {{ pollId }} </h1>
     <!-- h3 v-if="isAdmin">You are the host</h3 -->
@@ -62,6 +64,8 @@
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -75,6 +79,7 @@ export default {
   components: {
     QuestionComponent, // Register the QuestionComponent
     ResultQuestionComponent, //Register the ResultQuestionComponent
+    InstructionButton,
   },
   data: function () {
     return {
@@ -329,7 +334,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* General Button Styling */
 button {
   padding: 15px 25px;
