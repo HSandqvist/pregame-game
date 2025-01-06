@@ -22,8 +22,8 @@
 
         <!-- Amount of votes only visible by admin -->
         <p v-if="isAdmin">
-          {{ this.numberOfVotes }} out of {{ this.participants.length }} has
-          voted
+          {{ this.numberOfVotes }} {{this.uiLabels.outOf || "out of"}} {{ this.participants.length }} 
+          {{this.uiLabels.hasVoted || "has voted"}}
         </p>
       </div>
     </div>

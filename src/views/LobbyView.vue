@@ -109,7 +109,7 @@
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep"> {{ this.uiLabels.back || "Back" }}</button>
         <button
           v-on:click="participateInPoll"
           id="submitNameButton"
@@ -169,7 +169,7 @@
 
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
-    Your browser does not support the audio element.
+    {{this.uiLabels.music || "Your browser does not support the audio element." }}
   </audio>
 </template>
 

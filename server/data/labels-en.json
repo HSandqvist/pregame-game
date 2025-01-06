@@ -4,6 +4,7 @@
 	"next" : "Next",
 	"back": "Back",
 	"result": "Result",
+	"music": "Your browser does not support the audio element.",
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
@@ -38,6 +39,8 @@
 	"QUESTION COMPONENT": "",
 		"whichPlayer": "Which player?",
 		"dropAnswerHere": "Drop answer here",
+		"outOf": "out of",
+		"hasVoted": "has Voted",
 
 	"RESULT QUESTION COMPONENT":"",
 			"topAnswer": "Top result:",
