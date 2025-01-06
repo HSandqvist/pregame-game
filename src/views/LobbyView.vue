@@ -1,4 +1,5 @@
 <template>
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
   <div class="global-music-control" v-if="isAdmin">
     <button @click="toggleMusic">
       <img 
@@ -179,6 +180,8 @@ import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import musicIconOn from '@/assets/img/musicIcon.png';
 import musicIconOff from '@/assets/img/musicIconOff.png';
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+
 
 const socket = io("localhost:3000");
 
@@ -189,6 +192,7 @@ export default {
   name: "LobbyView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
   },
   data: function () {
     return {

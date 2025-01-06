@@ -1,4 +1,6 @@
 <template>
+    <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
+
   <div class="result-view">
     <!-- Display the selected language and current question -->
     <!-- lang: {{ lang }} -->
@@ -68,6 +70,8 @@
 <script>
 // @ is an alias to /src
 import BarsComponent from "@/components/BarsComponent.vue";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+
 // Initialize the WebSocket connection
 
 
@@ -81,6 +85,7 @@ export default {
   name: "ResultView",
   components: {
     BarsComponent, // Register the BarsComponent
+    InstructionButton,
   },
   data: function () {
     return {

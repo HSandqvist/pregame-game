@@ -1,6 +1,6 @@
 <template>
+  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="CREATEVIEW" />
     <div class="create-game">
-      <InstructionButton viewKey="CREATEVIEW" />
       <div class="language-switcher-container">
       <!-- Language switcher component -->
         <LanguageSwitcher @language-changed="updateLanguage" />
