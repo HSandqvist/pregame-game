@@ -9,7 +9,7 @@
       <!-- Render the question component -->
       <QuestionComponent
         v-bind:question="currentQuestion"
-        v-bind:participants="participants"
+        v-bind:participants="currentQuestion.a"
         v-on:answer="submitAnswer($event)"
         :voting="hasVoted"
       />

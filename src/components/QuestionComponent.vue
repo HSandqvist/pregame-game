@@ -57,7 +57,7 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
-    console.log("Participants data:", this.participants);
+    //console.log("Participants data:", this.participants);
 
   },
 

@@ -34,7 +34,7 @@ Data.prototype.createPoll = function (
   lang = "en",
   adminId,
   questionCount,
-  timerCount,
+  timerCount
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
@@ -127,7 +127,7 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion;
-    
+
     if (typeof poll.answers[currentQuestion] !== "object") {
       poll.answers[currentQuestion] = {};
     }
@@ -137,7 +137,7 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
     // Initialize answer count and voters if not already present
     if (!answers[answer]) {
       answers[answer] = { count: 0, voters: [] };
-      console.log("")
+      console.log("");
     }
 
     // Increment the count for this answer
@@ -156,26 +156,33 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
 Data.prototype.votingReset = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-    const currentQuestion = poll.currentQuestion;   //ger ett index?? 
+    const currentQuestion = poll.currentQuestion; //ger ett index??
     console.log("data votingreset har currentquestion:", currentQuestion);
     // Save the winner to the category using the complementary function
-    this.updateCategoryWinner(pollId, poll.questions[currentQuestion].q, this.globalTopAnswer);
+    this.updateCategoryWinner(
+      pollId,
+      poll.questions[currentQuestion].q,
+      this.globalTopAnswer
+    );
 
     // Move to the next question
     poll.currentQuestion += 1; // Increment to the next question
     poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
-    console.log("data votingreset har uppdaterat currentquestion till:", currentQuestion);
-    } 
+    console.log(
+      "data votingreset har uppdaterat currentquestion till:",
+      currentQuestion
+    );
+  }
 };
 
 Data.prototype.runQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-    const currentQuestion = poll.currentQuestion;   //ger ett index?? 
+    const currentQuestion = poll.currentQuestion; //ger ett index??
     console.log("data runQuestion har currentquestion:", currentQuestion);
 
     // Determine the top answer for the current question
-    const answers = poll.answers[currentQuestion];    
+    const answers = poll.answers[currentQuestion];
     let maxVotes = 0;
     let topAnswer = null;
 
@@ -185,7 +192,7 @@ Data.prototype.runQuestion = function (pollId) {
       if (count > maxVotes) {
         maxVotes = count;
         topAnswer = answer;
-        this.globalTopAnswer= topAnswer;
+        this.globalTopAnswer = topAnswer;
       }
     }
 
@@ -195,7 +202,7 @@ Data.prototype.runQuestion = function (pollId) {
     );
 
     // Return the topAnswer and maxVotes (to sockets then to clients)
-    return {topAnswer , maxVotes };
+    return { topAnswer, maxVotes };
   }
 };
 
@@ -257,8 +264,8 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
     for (let i = 0; i < questionCount; i++) {
       const randomQuestion = this.loadRandomQuestion(); // Load random question
       const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
-      
-      questions.push({ q: randomQuestion, a: selectedRandomAnswers }); 
+
+      questions.push({ q: randomQuestion, a: selectedRandomAnswers });
       //questions.push({ q: randomQuestion, a: selectedRandomAnswers });
     }
 
@@ -291,17 +298,17 @@ Data.prototype.loadRandomAnswers = function (pollId) {
     const participants = poll.participants;
     const selectedAnswers = [];
 
-    // Randomize three unique usernames
+    // Randomize three unique users
     while (selectedAnswers.length < 3) {
-      const randomUsername =
-        participants[Math.floor(Math.random() * participants.length)].name;
+      const randomUser =
+        participants[Math.floor(Math.random() * participants.length)];
 
       // Prevent the same person from being chosen multiple times
-      if (!selectedAnswers.includes(randomUsername)) {
-        selectedAnswers.push(randomUsername);
+      if (!selectedAnswers.includes(randomUser)) {
+        selectedAnswers.push(randomUser);
       }
     }
-    return selectedAnswers; // Return an array of 3 random usernames
+    return selectedAnswers; // Return an array of 3 random users
   }
   return []; // Return empty array if poll doesn't exist
 };
