@@ -1,5 +1,6 @@
 <template>
     <div class="create-game">
+      <InstructionButton viewKey="CREATEVIEW" />
       <div class="language-switcher-container">
       <!-- Language switcher component -->
         <LanguageSwitcher @language-changed="updateLanguage" />
@@ -71,6 +72,8 @@
 <script>
 import questionsEn from "@/assets/questions-en.json"; //läsas in i server istället
 import questionsSv from "@/assets/questions-sv.json";
+import InstructionButton from "@/components/InstructionButton.vue";
+
 
 import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
@@ -88,6 +91,7 @@ export default {
   name: "CreateView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
   },
   data: function () {
     return {
