@@ -40,7 +40,7 @@
 
     <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" :topAvatar="topAvatar" />
 
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
@@ -56,7 +56,7 @@
     <!-- testar!! för finalview-->
     <div v-if="view === 'final_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" :topAvatar="topAvatar" />
 
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
@@ -113,8 +113,11 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
+      
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
+      topAvatar: "",//Will store picture of the top voted person
+     
       hasVoted: false,
       view: "question_view", // 'question_view' or 'results_view'
 
@@ -205,10 +208,13 @@ export default {
 
     socket.on("topAnswerUpdate", (data) => {
       //console.log("Received data:", data); // Log the received data
-      const { topAnswer, maxVotes } = data;
+      const { topAnswer, maxVotes, topAvatar } = data;
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
+      this.topAvatar = topAvatar;
+
+      console.log("avataren är", topAvatar);
 
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {

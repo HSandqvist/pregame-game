@@ -135,16 +135,17 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
     const answers = poll.answers[currentQuestion];
 
     // Initialize answer count and voters if not already present
-    if (!answers[answer]) {
-      answers[answer] = { count: 0, voters: [] };
+    if (!answers[answer.name]) {
+      answers[answer.name] = { count: 0, voters: [], avatar: answer.avatar};
       console.log("");
     }
+    console.log("answers answer är", answer)
 
     // Increment the count for this answer
-    answers[answer].count += 1;
+    answers[answer.name].count += 1;
 
     // Log the voter for the option
-    answers[answer].voters.push(voter);
+    answers[answer.name].voters.push(voter);
 
     console.log(
       `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
@@ -184,14 +185,17 @@ Data.prototype.runQuestion = function (pollId) {
     // Determine the top answer for the current question
     const answers = poll.answers[currentQuestion];
     let maxVotes = 0;
-    let topAnswer = null;
+    let topAnswer = {};
+    let topAvatar = ""
 
     for (const [answer, answerdata] of Object.entries(answers)) {
-      const { count, voters } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
+      const { count, voters, avatar } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
 
       if (count > maxVotes) {
         maxVotes = count;
         topAnswer = answer;
+        topAvatar = avatar
+        //topAnswer = {answer, avatar};
         this.globalTopAnswer = topAnswer;
       }
     }
@@ -202,7 +206,7 @@ Data.prototype.runQuestion = function (pollId) {
     );
 
     // Return the topAnswer and maxVotes (to sockets then to clients)
-    return { topAnswer, maxVotes };
+    return { topAnswer, maxVotes, topAvatar };
   }
 };
 
