@@ -3,13 +3,14 @@
 // RouterView is a built-in component that dynamically
 // renders the component associated with the current route.
 
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 
 </script>
 
 <template>
 
   <div class="app-wrapper">
+
   <!-- Animated stars -->
     <div class="star">
     <div></div>
