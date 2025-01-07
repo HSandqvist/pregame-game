@@ -1,28 +1,23 @@
 <template>
   <div>
-    <h2>{{this.uiLabels.result || "Results"}}</h2>
-    <p> {{ this.uiLabels.topAnswer || "Top Answer:" }} {{ topAnswer }}</p>
-    <p> {{ this.uiLabels.amountVotes || "Votes:"}} {{ maxVotes }}</p>
-  </div>
+    <h2>{{ this.uiLabels.result || "Results" }}</h2>
 
-  <div>
-    <img
+    <div v-motion="motionGrowBigger">
+      <p v-motion="motionGlowText">
+        {{ topAnswer }} {{ this.uiLabels.topAnswer || "got most votes" }} 
+      </p>
+
+      <!-- p>{{ this.uiLabels.amountVotes || "Votes:" }} {{ maxVotes }}</p -->
+
+      <div>
+        <img
           :src="topAvatar"
           alt="Participant Top Avatar"
           class="top-avatar-picture"
         />
+      </div>
+    </div>
   </div>
-
-  <!-- Display category-level results if needed TA BORT sEN -->
-  <!-- 
-    <div v-if="categories">
-      <h3>Category Results:</h3>
-      <ul>
-        <li v-for="(votes, participant) in categories" :key="participant">
-          {{ participant }}: {{ votes }} votes
-        </li>
-      </ul>
-    </div> -->
 </template>
 
 <script>
@@ -30,19 +25,23 @@
 import io from "socket.io-client";
 const socket = io("localhost:3000");
 
+import { motionGlowText, motionGrowBigger } from "@/assets/motions.ts"; //Import motion settings
+
 export default {
   name: "ResultQuestionComponent",
   props: {
-    topAnswer: {typ: String, default:"", required: true },
+    topAnswer: { type: String, default: "", required: true },
     maxVotes: { type: Number, default: 0, required: true },
-    topAvatar: { typ: String, default:"", required: true },
-    //categories: { type: Object, default: () => ({}) }, // Optional category results
+    topAvatar: { type: String, default: "", required: true },
   },
 
   data() {
     return {
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
+
+      motionGlowText, // Motion settings
+      motionGrowBigger,
     };
   },
 
@@ -53,18 +52,16 @@ export default {
 
     console.log("avatar i reuslt question", this.topAvatar);
 
+    console.log("MotionPlugin available:", this.$motion); // Should print if MotionPlugin is working
+    console.log("motionGlowText:", this.motionGlowText);
   },
-
-
 };
 </script>
 
-
 <style>
-
 .top-avatar-picture {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%; /* Makes the avatars round */
   object-fit: cover; /* Ensures the image fills the container without distortion */
   border: 2px solid #ccc;

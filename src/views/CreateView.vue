@@ -1,79 +1,75 @@
 <template>
-    <div class="create-game">
-      <InstructionButton viewKey="CREATEVIEW" />
-      <div class="language-switcher-container">
-      <!-- Language switcher component -->
-        <LanguageSwitcher @language-changed="updateLanguage" />
-      </div>
-      <h1 id="create-game-headline">
-        {{ this.uiLabels.createGame || "Create Game" }}
-      </h1>
+  <div class="create-game">
+    <InstructionButton viewKey="CREATEVIEW" />
+    <!-- Language switcher component -->
+    <LanguageSwitcher @language-changed="updateLanguage" />
+    <h1 id="create-game-headline">
+      {{ this.uiLabels.createGame || "Create Game" }}
+    </h1>
 
-      <!-- Step 1: Select amount of questions -->
-      <div v-if="step === 1" class="amount-questions-section">
-        <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
-        <div class="amount-questions-buttons">
-          <button
-            v-for="count in [5, 10, 15]"
-            :key="count"
-            @click="tempQuestionsCount = count"
-            :class="{ selected: tempQuestionsCount === count }"
-          >
-            {{ count }}
-          </button>
-        </div>
+    <!-- Step 1: Select amount of questions -->
+    <div v-if="step === 1" class="amount-questions-section">
+      <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
+      <div class="amount-questions-buttons">
+        <button
+          v-for="count in [5, 10, 15]"
+          :key="count"
+          @click="tempQuestionsCount = count"
+          :class="{ selected: tempQuestionsCount === count }"
+        >
+          {{ count }}
+        </button>
+      </div>
       <div class="action-buttons">
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
           {{ this.uiLabels.next || "Next" }}
         </button>
-        </div>
-      </div>
-
-      <!-- Step 2: Select time per question -->
-      <div v-else-if="step === 2" class="time-per-question-section">
-        <h2>
-          {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
-        </h2>
-        <div class="time-per-question-buttons">
-          <button
-            v-for="time in [10, 20, 30]"
-            :key="time"
-            v-on:click="tempTimePerQuestion = time"
-            :class="{ selected: tempTimePerQuestion === time }"
-          >
-            {{ time }}
-          </button>
-        </div>
-        <div class="action-buttons">
-          <button v-on:click="backStep">
-            {{ this.uiLabels.back || "back" }}
-          </button>
-          <button
-            id="create-game-button"
-            v-on:click="finalizeTime"
-            :disabled="!tempTimePerQuestion"
-          >
-            {{ this.uiLabels.createGame || "Create Game" }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: Display poll data -->
-      <div v-else class="poll-container">
-        <div class="poll-data-section">
-          <router-link :to="'/result/' + pollId"> Check result </router-link>
-          Data: {{ pollData }}
-        </div>
       </div>
     </div>
-  
+
+    <!-- Step 2: Select time per question -->
+    <div v-else-if="step === 2" class="time-per-question-section">
+      <h2>
+        {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
+      </h2>
+      <div class="time-per-question-buttons">
+        <button
+          v-for="time in [10, 20, 30]"
+          :key="time"
+          v-on:click="tempTimePerQuestion = time"
+          :class="{ selected: tempTimePerQuestion === time }"
+        >
+          {{ time }}
+        </button>
+      </div>
+      <div class="action-buttons">
+        <button v-on:click="backStep">
+          {{ this.uiLabels.back || "back" }}
+        </button>
+        <button
+          id="create-game-button"
+          v-on:click="finalizeTime"
+          :disabled="!tempTimePerQuestion"
+        >
+          {{ this.uiLabels.createGame || "Create Game" }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Display poll data -->
+    <div v-else class="poll-container">
+      <div class="poll-data-section">
+        <router-link :to="'/result/' + pollId"> Check result </router-link>
+        Data: {{ pollData }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import questionsEn from "@/assets/questions-en.json"; //läsas in i server istället
 import questionsSv from "@/assets/questions-sv.json";
 import InstructionButton from "@/components/InstructionButton.vue";
-
 
 import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
@@ -82,10 +78,8 @@ import { toHandlers } from "vue";
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
 
-
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
 //const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
-
 
 export default {
   name: "CreateView",
@@ -278,19 +272,4 @@ button:disabled {
 #create-game-button:hover {
   background-color: rgb(219, 34, 142);
 }
-
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  display: flex;
-  justify-content: flex-end;
-  z-index: 10; /* Ensures it stays above other elements */
-}
-
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
-}
-
 </style>

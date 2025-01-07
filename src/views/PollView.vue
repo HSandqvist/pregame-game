@@ -13,6 +13,8 @@
         v-on:answer="submitAnswer($event)"
         :voting="hasVoted"
       />
+      
+      <br />
 
       <!-- Special admin functions -->
       <div class="admin-functions-in-poll">
@@ -31,6 +33,7 @@
     <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
       <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" :topAvatar="topAvatar" />
+      <br />
 
       <!-- so only admin can use buttons -->
       <div v-if="isAdmin === true">
@@ -57,6 +60,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script>
 // @ is an alias to /src
@@ -367,7 +372,7 @@ button:disabled {
 
 /* Admin functions container styling */
 .admin-functions-in-poll {
-  margin-top: 50px; /* Adds spacing above the admin functions */
+  margin-top: 100px; /* Adds spacing above the admin functions */
   padding: 10px; /* Optional padding within the container */
   /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
 }
