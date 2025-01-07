@@ -42,7 +42,7 @@
 		"hasVoted": "har röstat",
 
 	"RESULT QUESTION COMPONENT":"",
-		"topAnswer":"Mest röster:",
+		"topAnswer":"fick mest röster!",
 		"amountVotes":"Antal röster:",
 
 	"nextQuestion": "Nästa fråga",

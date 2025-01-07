@@ -1,19 +1,24 @@
 // Import the main CSS file for global styles
-import './assets/main.css'
+import './assets/main.css';
 
 // Import the createApp function from Vue to create the root application instance
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 // Import the root component of the application
-import App from './App.vue'
+import App from './App.vue';
+// Import the MotionPlugin
+import { MotionPlugin } from '@vueuse/motion';
 // Import the router instance for handling application routing
-import router from './router'
+import router from './router';
 
 // Create the Vue application instance using the root component
-const app = createApp(App)
+const app = createApp(App);
+
+// Use the MotionPlugin for motion/animation support
+app.use(MotionPlugin);
 
 // Install the router plugin to enable routing in the application
-app.use(router)
+app.use(router);
 
 // Mount the Vue application to the DOM element with the ID 'app'
 // This is where the Vue app starts rendering
-app.mount('#app')
+app.mount('#app'); 

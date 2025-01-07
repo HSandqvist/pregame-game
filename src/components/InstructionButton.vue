@@ -82,8 +82,8 @@
   <style scoped>
   .instruction-button-container {
     position: fixed;
-    top: 10px;
-    left: 10px;
+    top: 1rem;
+    left: 1rem;
     z-index: 1000;
   }
   

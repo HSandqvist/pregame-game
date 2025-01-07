@@ -1,12 +1,14 @@
 <template>
   <div class="frontpage">
-    <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="STARTVIEW"/>    
-    <div class="language-switcher-container">
-      <!-- Language switcher component -->
-      <LanguageSwitcher @language-changed="updateLanguage" />
-    </div>
+
+    <InstructionButton viewKey="STARTVIEW" />
+    <!-- Language switcher component -->
+    <LanguageSwitcher @language-changed="updateLanguage" />
+
     <!-- Title of the game -->
-    <h1 class="game-title">Pre(game)<sup>2</sup></h1>
+    <h1 class="game-title" v-motion="motionGrowBiggerAndGlow">
+      Pre(game) <sup>2</sup>
+    </h1>
 
     <!-- Input field for Lobby ID and Join Game button -->
     <div v-if="joinGameClicked" class="join-game-container">
@@ -23,13 +25,19 @@
           @keydown="handleBackspace(index, $event)"
         />
       </div>
-      <button class="btn" @click="attemptJoin">{{ uiLabels.participateGame || "Join Game" }}</button>
+      <button class="btn" @click="attemptJoin">
+        {{ uiLabels.participateGame || "Join Game" }}
+      </button>
     </div>
 
     <!-- Show action buttons if not joining a game -->
     <div v-else class="action-buttons">
-      <router-link class="btn" to="/create/">{{ uiLabels.createGame || "Create Game" }}</router-link>
-      <button class="btn" @click="showPinEntry">{{ uiLabels.participateGame || "Join Game" }}</button>
+      <router-link class="btn" to="/create/">{{
+        uiLabels.createGame || "Create Game"
+      }}</router-link>
+      <button class="btn" @click="showPinEntry">
+        {{ uiLabels.participateGame || "Join Game" }}
+      </button>
     </div>
   </div>
 </template>
@@ -39,6 +47,7 @@ import io from "socket.io-client"; // Import WebSocket library
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 
+import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 
 // ---- FOR Normal TESTING ----
 const socket = io("localhost:3000"); // Initialize WebSocket connection
@@ -59,6 +68,8 @@ export default {
 
       pin: Array(6).fill(""), // Holds the six digits of the PIN
       errorMessage: "", // Error message for invalid Lobby ID
+
+      motionGrowBiggerAndGlow, // Motion settings
     };
   },
   created() {
@@ -224,19 +235,5 @@ export default {
   justify-content: center;
   align-items: center;
   margin-top: 2rem; /* Optional: Add spacing from the title */
-}
-
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  display: flex;
-  justify-content: flex-end;
-  z-index: 10; /* Ensures it stays above other elements */
-}
-
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
 }
 </style>
