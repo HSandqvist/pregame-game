@@ -1,11 +1,12 @@
 <template>
   <div>
+    <div v-if="!voting">
     <h3>{{ this.uiLabels.whichPlayer || "Which player?" }}</h3>
 
-    <h2>{{ question.q }}</h2>
+    <h2 >{{ question.q }}</h2>
 
     <!-- Draggable answer options -->
-    <div v-if="!voting" class="answer-options">
+    <div  class="answer-options">
       <div
         v-for="(participant, index) in participants"
         :key="index"
@@ -22,11 +23,23 @@
     </div>
 
     <!-- Drop zone -->
-    <div v-if="!voting" class="drop-zone" @dragover.prevent @drop="onDrop">
+    <div  class="drop-zone" @dragover.prevent @drop="onDrop">
       {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
     </div>
+  </div>
 
-    <p v-if="voting"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </p>
+  <h2 v-if="voting">
+    <span 
+      v-for="(char, index) in textArray" 
+      :key="index" 
+      class="bouncing-char"
+      :style="{ animationDelay: getDelay(index) + 's' }"
+    >
+      {{ char }}
+    </span>
+  </h2>
+
+    <!-- h2 v-if="voting" v-motion="jumpingCharacter"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </h2 -->
   </div>
 </template>
 
@@ -60,7 +73,20 @@ export default {
 
   },
 
+  computed: {
+    textArray() {
+      // Split the text into an array of individual characters
+      return (this.uiLabels.waitingForAnswers || "Waiting for answers..").split('');
+    },
+  },
+
   methods: {
+    getDelay(index) {
+      // Apply a wave effect delay to each character, making it look like a wave
+      const waveDelay = Math.sin(index * 0.5) * 0.5; // Using sine for smooth wave pattern
+      return waveDelay;
+    },
+
     // When dragging starts, store the dragged participant
     onDragStart: function(participant) {
       this.draggedParticipant = participant;
@@ -143,10 +169,33 @@ export default {
 }
 
 /* Drop zone for answers */
-
-
 .drop-zone:hover {
   background-color: rgba(252, 160, 198, 0.1);
   transform: scale(1.05);
+}
+
+
+
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px); /* Bounce upwards */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.bouncing-char {
+  display: inline-block;
+  animation: bounce 5s ease-in-out infinite; /* Apply bounce animation */
+}
+
+h2 span {
+  display: inline-block;
+  margin: 0 2px; /* Small space between characters */
 }
 </style>

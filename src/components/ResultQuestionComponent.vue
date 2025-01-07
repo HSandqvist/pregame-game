@@ -1,11 +1,9 @@
 <template>
   <div>
-    <h2>{{ this.uiLabels.result || "Results" }}</h2>
-
     <div v-motion="motionGrowBigger">
-      <p v-motion="motionGlowText">
+      <h2 v-motion="motionGlowText">
         {{ topAnswer }} {{ this.uiLabels.topAnswer || "got most votes" }} 
-      </p>
+      </h2>
 
       <!-- p>{{ this.uiLabels.amountVotes || "Votes:" }} {{ maxVotes }}</p -->
 

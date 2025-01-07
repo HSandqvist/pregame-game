@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Poll id: {{ pollId }} </h1>
+    <h1 id="poll-id-headline">Poll ID: {{ pollId }}</h1>
     <!-- h3 v-if="isAdmin">You are the host</h3 -->
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <br />
@@ -13,7 +13,7 @@
         v-on:answer="submitAnswer($event)"
         :voting="hasVoted"
       />
-      
+
       <br />
 
       <!-- Special admin functions -->
@@ -32,36 +32,47 @@
 
     <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" :topAvatar="topAvatar" />
+      <ResultQuestionComponent
+        :topAnswer="topAnswer"
+        :maxVotes="maxVotes"
+        :topAvatar="topAvatar"
+      />
       <br />
 
       <!-- so only admin can use buttons -->
-      <div v-if="isAdmin === true">
-        <button
-          @click="adminNext"
-          :disabled="currentQuestionIndex === questions.length - 1"
-        >
-          {{ this.uiLabels.nextQuestion || "Next question" }}
-        </button>
+      <div class="admin-functions-in-poll">
+        <div v-if="isAdmin === true">
+          <button
+            @click="adminNext"
+            :disabled="currentQuestionIndex === questions.length - 1"
+          >
+            {{ this.uiLabels.nextQuestion || "Next question" }}
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- testar!! för finalview-->
     <div v-if="view === 'final_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" :topAvatar="topAvatar" />
+      <ResultQuestionComponent
+        :topAnswer="topAnswer"
+        :maxVotes="maxVotes"
+        :topAvatar="topAvatar"
+      />
+      <br />
 
       <!-- so only admin can use buttons -->
-      <div v-if="isAdmin === true">
-        <button @click="adminToResults">
-          {{ this.uiLabels.endgame || "Engame" }}
-        </button>
+      <div class="admin-functions-in-poll">
+        <div v-if="isAdmin === true">
+          <button @click="adminToResults">
+            {{ this.uiLabels.endgame || "Engame" }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
-
 
 <script>
 // @ is an alias to /src
@@ -98,11 +109,11 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
-      
+
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
-      topAvatar: "",//Will store picture of the top voted person
-     
+      topAvatar: "", //Will store picture of the top voted person
+
       hasVoted: false,
       view: "question_view", // 'question_view' or 'results_view'
 
@@ -126,7 +137,11 @@ export default {
     });
     socket.emit("participantsUpdate");
     socket.on("participantsUpdate", (p) => (this.participants = p));
-    console.log("participant update säger", this.participants, this.participants.length);
+    console.log(
+      "participant update säger",
+      this.participants,
+      this.participants.length
+    );
     //Listen for admin to press next
 
     // Get this participant
@@ -152,9 +167,9 @@ export default {
     ); // Update the submitted answers
 
     socket.on("uiLabels", (labels) => {
-    console.log("Received labels:", labels); // Debugging
-    this.uiLabels = labels;
-  });
+      console.log("Received labels:", labels); // Debugging
+      this.uiLabels = labels;
+    });
 
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
@@ -229,7 +244,6 @@ export default {
       this.hasVoted = true;
       socket.emit("playerVoted", this.userId);
       //flyttat socket.on top answer update till created delen
-
     },
 
     switchView() {
@@ -375,5 +389,9 @@ button:disabled {
   margin-top: 100px; /* Adds spacing above the admin functions */
   padding: 10px; /* Optional padding within the container */
   /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
+}
+
+#poll-id-headline {
+  color: rgb(252, 181, 212);
 }
 </style>
