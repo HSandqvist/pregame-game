@@ -179,6 +179,7 @@
 <script>
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 
 import musicIconOn from "@/assets/img/musicIcon.png";
@@ -746,13 +747,13 @@ input[type="text"] {
 
 .global-music-control {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  left: 4rem;
   z-index: 1000;
 }
 
 .global-music-control button {
-  padding: 3px;
+  padding: 1px;
   background-color: pink;
   color: white;
   border: none;
@@ -762,8 +763,8 @@ input[type="text"] {
 }
 
 .music-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
 }
