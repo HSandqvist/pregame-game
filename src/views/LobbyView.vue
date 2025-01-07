@@ -1,4 +1,5 @@
 <template>
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
   <div class="global-music-control" v-if="isAdmin">
     <button @click="toggleMusic">
       <img
@@ -107,7 +108,7 @@
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep"> {{ this.uiLabels.back || "Back" }}</button>
         <button
           v-on:click="participateInPoll"
           id="submitNameButton"
@@ -171,7 +172,7 @@
 
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
-    Your browser does not support the audio element.
+    {{this.uiLabels.music || "Your browser does not support the audio element." }}
   </audio>
 </template>
 
@@ -179,8 +180,10 @@
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+
 import musicIconOn from "@/assets/img/musicIcon.png";
 import musicIconOff from "@/assets/img/musicIconOff.png";
+
 
 const socket = io("localhost:3000");
 
@@ -191,6 +194,7 @@ export default {
   name: "LobbyView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
   },
   data: function () {
     return {

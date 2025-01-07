@@ -1,5 +1,6 @@
 <template>
   <div class="frontpage">
+
     <InstructionButton viewKey="STARTVIEW" />
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
@@ -91,9 +92,10 @@ export default {
   methods: {
     // Update language when changed in LanguageSwitcher
     updateLanguage(lang) {
-      this.lang = lang;
-      socket.emit("getUILabels", this.lang);
-    },
+  this.lang = lang;
+  localStorage.setItem("lang", lang); // Använd "lang" istället
+  socket.emit("getUILabels", this.lang);
+},
 
     // Show Join Game input
     showPinEntry() {

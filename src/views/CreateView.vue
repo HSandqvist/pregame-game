@@ -1,4 +1,5 @@
 <template>
+
   <div class="create-game">
     <InstructionButton viewKey="CREATEVIEW" />
     <!-- Language switcher component -->
@@ -19,6 +20,7 @@
         >
           {{ count }}
         </button>
+        
       </div>
       <div class="action-buttons">
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
@@ -42,6 +44,7 @@
           {{ time }}
         </button>
       </div>
+
       <div class="action-buttons">
         <button v-on:click="backStep">
           {{ this.uiLabels.back || "back" }}
@@ -64,6 +67,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
