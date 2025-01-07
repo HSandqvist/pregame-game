@@ -3,6 +3,7 @@
 	"next" : "Nästa",
 	"back": "Tillbaka",
 	"result": "Resultat",
+	"music": "Din webbläsare stödjer inte ljud.",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
@@ -37,6 +38,8 @@
 	"QUESTION COMPONENT": "",
 		"whichPlayer": "Vilken spelare?",
 		"dropAnswerHere": "Dra svar hit",
+		"outOf": "av",
+		"hasVoted": "har röstat",
 
 	"RESULT QUESTION COMPONENT":"",
 		"topAnswer":"Mest röster:",

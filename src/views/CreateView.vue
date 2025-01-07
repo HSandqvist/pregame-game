@@ -57,15 +57,7 @@
           </button>
         </div>
       </div>
-
-      <!-- Step 3: Display poll data -->
-      <div v-else class="poll-container">
-        <div class="poll-data-section">
-          <router-link :to="'/result/' + pollId"> Check result </router-link>
-          Data: {{ pollData }}
-        </div>
-      </div>
-    </div>
+</div>
   
 </template>
 
