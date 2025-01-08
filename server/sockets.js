@@ -55,6 +55,26 @@ function sockets(io, socket, data) {
       io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
     }
   });
+  socket.on("updatePollInfo", function (d) {
+
+  console.log("updateView körs från socket", d.pollId);
+
+  data.updateView(d.pollId, d.currentView);
+
+  const poll= data.getPoll(d.pollId, d.currentView);
+
+  console.log("updateView ändrar från socket", poll.currentView);
+  
+  io.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.view, currentQuestion: poll.currentQuestion})}
+
+);  
+socket.on("pollInfoUpdatePersonal", function (d) {
+
+  const poll= data.getPoll(d.pollId);
+
+  socket.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.view, currentQuestion: poll.currentQuestion} )
+}
+);
 
   // Event: Join a poll
   socket.on("joinPoll", function (d) {
@@ -140,6 +160,7 @@ function sockets(io, socket, data) {
   socket.on("votingReset", function(pollId){
     data.votingReset(pollId);
     console.log("är i socket on votingReset")
+
   });
 
   // Event: använda för handling när resultatet per fråga ska visas?
