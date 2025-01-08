@@ -160,14 +160,26 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
-    socket.emit("participantsUpdate");
-    socket.on("participantsUpdate", (p) => (this.participants = p));
-    console.log(
-      "participant update säger",
-      this.participants,
-      this.participants.length
-    );
+
+    console.log("Adding participantsUpdate listener");
+
+    //DENNA SOCKET KÖRS EJ AV OKLART ANLEDNING???
+    /*
+    socket.on("participantsUpdate", (participantData) => {
+      console.log("Participants updated:", participantData);
+      this.participants = participantData; // Ensure the array is directly assigned here.
+      console.log("längde particpant update", this.participants.length);
+    });
     //Listen for admin to press next
+*/
+
+    socket.emit("getAllParticipantsForGame", this.pollId);
+
+    socket.on("allParticpantsForGame", (participantData) => {
+      console.log("Participants uppdaterade:", participantData);
+      this.participants = participantData; // Ensure the array is directly assigned here.
+      console.log("längden av participants", this.participants.length);
+    });
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -175,12 +187,13 @@ export default {
       console.log("Participant name received:", participantData.name);
     });
 
+    //används ej
     // Listen for server events to update the question and submitted answers
-    socket.on("questionUpdate", (q) => {
+    /*socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
-
+*/
     socket.on("participantNextQuestion", () => this.particpantNext());
 
     //LISTENER FOR GAME END
@@ -234,7 +247,7 @@ export default {
       this.maxVotes = maxVotes;
       this.topAvatar = topAvatar;
 
-      console.log("avataren är", topAvatar);
+      //console.log("avataren är", topAvatar);
 
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {
@@ -245,7 +258,6 @@ export default {
             this.adminNext();
           }
         }
-
         socket.off("updateNumberOfVotes");
       });
     });
@@ -439,7 +451,8 @@ button:disabled {
   color: rgb(252, 181, 212);
 }
 
-global-music-control {
+
+.global-music-control {
   position: fixed;
   top: 1rem;
   left: 4rem;
@@ -470,5 +483,4 @@ global-music-control {
 .music-icon:hover {
   transform: scale(1.1); /* Liten zoom vid hover */
 }
-
 </style>

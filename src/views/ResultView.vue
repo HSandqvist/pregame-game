@@ -1,5 +1,5 @@
 <template>
-    <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
+  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
 
   <div class="result-view">
     <!-- Display the selected language and current question -->
@@ -7,7 +7,7 @@
 
     <!-- Button to fetch and display results -->
     <button
-      v-if="!resultsShown" 
+      v-if="!resultsShown"
       @click="fetchCategoriesWithAnswers"
       class="center-button"
     >
@@ -29,8 +29,8 @@
 
     <!-- Popup for individual category winners -->
     <div v-if="showPopup" class="popup">
-      <h2> TOP... {{ currentPopupCategory }}</h2>
-      <h1> {{ currentPopupWinner }}</h1>
+      <h2>TOP... {{ currentPopupCategory }}</h2>
+      <h1>{{ currentPopupWinner }}</h1>
     </div>
 
     <!-- Render the full results after popups -->
@@ -42,29 +42,22 @@
         :key="category"
         class="category"
       >
-        <h2> TOP... {{ category }}</h2>
-        <h1> {{ topVoted }}! </h1>
+        <h2>TOP... {{ category }}</h2>
+        <h1>{{ topVoted }}!</h1>
       </div>
-
-
     </div>
-      <div v-if="resultsShown">
+    <div v-if="resultsShown">
       <button v-on:click="returnToStart" class="center-button">
-
-      Start new game!
+        Start new game!
       </button>
-      </div>
-      
     </div>
+  </div>
 
-  
   <!-- ANVÄNDS EJ NU -->
   <!-- Render the BarsComponent to visualize answers -->
   <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers" />
   <!-- Display the raw data of submitted answers -->
   <!-- <span>{{ submittedAnswers }}</span> -->
-
-   
 </template>
 
 <script>
@@ -73,7 +66,6 @@ import BarsComponent from "@/components/BarsComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 
 // Initialize the WebSocket connection
-
 
 import io from "socket.io-client";
 const socket = io("localhost:3000");
@@ -97,7 +89,7 @@ export default {
       resultsShown: false, // Track whether the results have been shown
 
       categoriesAnswers: {},
-      
+
       //TESTAR med nedan
       showPopup: false, // Track if a popup is being displayed
       popupQueue: [], // Queue to hold the category winners for the popup
@@ -111,12 +103,13 @@ export default {
     this.pollId = this.$route.params.id;
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
-   
 
-    socket.on("submittedAnswersUpdate",
+    socket.on(
+      "submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
     ); // Update submitted answers
-    socket.on("questionUpdate", (update) => (this.question = update)); // Update the current question
+    //används ej
+    //socket.on("questionUpdate", (update) => (this.question = update)); // Update the current question
 
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
@@ -155,7 +148,7 @@ export default {
       // Process results once the answers arrive
       // behövs detta?
       socket.on("categoriesWithAnswers", (categories) => {
-        console.log("är i socket on categorieswith answers")
+        console.log("är i socket on categorieswith answers");
         this.categoriesAnswers = categories;
         this.handleResults();
       });
@@ -194,10 +187,10 @@ export default {
       }
     },
 
-    returnToStart(){
+    returnToStart() {
       alert("Returning to start");
       this.$router.push("/");
-    }
+    },
   },
 };
 </script>
@@ -211,7 +204,10 @@ export default {
   position: absolute; /* Make it position absolute */
   top: 50%; /* Move it 50% from the top of the screen */
   left: 50%; /* Move it 50% from the left of the screen */
-  transform: translate(-50%, -50%); /* Offset by 50% of its own size to center it exactly */
+  transform: translate(
+    -50%,
+    -50%
+  ); /* Offset by 50% of its own size to center it exactly */
   width: 100%; /* Make sure it spans full width */
   height: 100vh; /* Full viewport height */
 }
@@ -259,5 +255,4 @@ export default {
 .category {
   margin-bottom: 1rem;
 }
-
 </style>

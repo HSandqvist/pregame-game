@@ -178,7 +178,7 @@ export default {
         timerCount: this.selectedTime,
       });
 
-      socket.emit("joinPoll", { pollId: this.pollId });
+      socket.emit("joinPoll", this.pollId);
 
       socket.emit("thisIsAdminId", {
         pollId: this.pollId,
