@@ -1,10 +1,12 @@
 <template>
     <div class="instruction-button-container">
-      <button @click="toggleInstructions" class="instruction-button">?</button>
+      <button @click="toggleInstructions" class="instruction-button">
+        <span class="instruction-text">?</span>
+    </button>
 
       <div v-if="showInstructions" class="instructions-popup">
         <h3>{{ uiLabels.instructions || "Instructions" }}</h3>
-        <p>{{ instructions }}</p>
+        <p v-html="instructions"></p>
         <button @click="toggleInstructions">X</button>
       </div>
     </div>
@@ -20,11 +22,12 @@
         LanguageSwitcher,
     },
     props: {
-        lang: { type: String, default: "en" },
-    viewKey: { type: String, required: true },
-    uiLabels: { type: Object, default: () => ({}) },
-
+  lang: { type: String, default: "en" },
+  viewKey: { type: String, required: true },
+  uiLabels: { type: Object, default: () => ({}) },
+  showInstructions: { type: Boolean, default: true }, // Ny prop
     },
+    
     data() {
       return {
         showInstructions: false,
@@ -40,6 +43,11 @@
     methods: {
       toggleInstructions() {
         this.showInstructions = !this.showInstructions;
+      },
+      hideInstructions(){
+        if (this.showInstructions){
+        this.showInstructions=!this.showInstructions;
+        };
       },
       async loadLabels() {
   let response;
@@ -103,8 +111,11 @@
   .instruction-button:hover {
     background-color: rgb(255, 131, 203);
   }
-  
-  .instructions-popup {
+
+  .instruction-text:hover {
+    transform: scale(1.5); /* Liten zoom vid hover */
+  }
+    .instructions-popup {
     position: absolute;
     top: 50px;
     left: 0;
