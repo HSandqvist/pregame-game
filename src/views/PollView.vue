@@ -2,10 +2,10 @@
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
   <div class="global-music-control" v-if="isAdmin">
     <button @click="toggleMusic">
-      <img 
-      :src="isMusicPlaying ? musicIconOn : musicIconOff"
-      alt="Music Icon" 
-        class="music-icon" 
+      <img
+        :src="isMusicPlaying ? musicIconOn : musicIconOff"
+        alt="Music Icon"
+        class="music-icon"
       />
     </button>
   </div>
@@ -34,8 +34,9 @@
 
         <!-- Amount of votes only visible by admin -->
         <p v-if="isAdmin">
-          {{ this.numberOfVotes }} {{this.uiLabels.outOf || "out of"}} {{ this.participants.length }} 
-          {{this.uiLabels.hasVoted || "has voted"}}
+          {{ this.numberOfVotes }} {{ this.uiLabels.outOf || "out of" }}
+          {{ this.participants.length }}
+          {{ this.uiLabels.hasVoted || "has voted" }}
         </p>
       </div>
     </div>
@@ -94,9 +95,8 @@ import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import backgroundMusic from "@/assets/lobbyviewMusic/backgroundMusic.mp3";
-import musicIconOn from '@/assets/img/musicIcon.png';
-import musicIconOff from '@/assets/img/musicIconOff.png';
-
+import musicIconOn from "@/assets/img/musicIcon.png";
+import musicIconOff from "@/assets/img/musicIconOff.png";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -160,14 +160,26 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
-    socket.emit("participantsUpdate");
-    socket.on("participantsUpdate", (p) => (this.participants = p));
-    console.log(
-      "participant update säger",
-      this.participants,
-      this.participants.length
-    );
+
+    console.log("Adding participantsUpdate listener");
+
+    //DENNA SOCKET KÖRS EJ AV OKLART ANLEDNING???
+    /*
+    socket.on("participantsUpdate", (participantData) => {
+      console.log("Participants updated:", participantData);
+      this.participants = participantData; // Ensure the array is directly assigned here.
+      console.log("längde particpant update", this.participants.length);
+    });
     //Listen for admin to press next
+*/
+
+    socket.emit("getAllParticipantsForGame", this.pollId);
+
+    socket.on("allParticpantsForGame", (participantData) => {
+      console.log("Participants uppdaterade:", participantData);
+      this.participants = participantData; // Ensure the array is directly assigned here.
+      console.log("längden av participants", this.participants.length);
+    });
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -175,12 +187,13 @@ export default {
       console.log("Participant name received:", participantData.name);
     });
 
+    //används ej
     // Listen for server events to update the question and submitted answers
-    socket.on("questionUpdate", (q) => {
+    /*socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
-
+*/
     socket.on("participantNextQuestion", () => this.particpantNext());
 
     //LISTENER FOR GAME END
@@ -234,7 +247,7 @@ export default {
       this.maxVotes = maxVotes;
       this.topAvatar = topAvatar;
 
-      console.log("avataren är", topAvatar);
+      //console.log("avataren är", topAvatar);
 
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {
@@ -245,7 +258,6 @@ export default {
             this.adminNext();
           }
         }
-
         socket.off("updateNumberOfVotes");
       });
     });
@@ -267,7 +279,7 @@ export default {
 
       socket.emit("runQuestionResults", this.pollId);
       this.hasVoted = true;
-      socket.emit("playerVoted", this.userId);
+      socket.emit("playerVoted", this.pollId);
       //flyttat socket.on top answer update till created delen
     },
 
@@ -365,16 +377,15 @@ export default {
       audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
 
       if (this.isMusicPlaying) {
-    audio.pause();
-    this.isMusicPlaying = false; // Sätt musiken till av
-  } else {
-    // Återställ ljudets position till början om det är pausat
-    audio.currentTime = 0;
-    audio.play();
-    this.isMusicPlaying = true; // Sätt musiken till på
+        audio.pause();
+        this.isMusicPlaying = false; // Sätt musiken till av
+      } else {
+        // Återställ ljudets position till början om det är pausat
+        audio.currentTime = 0;
+        audio.play();
+        this.isMusicPlaying = true; // Sätt musiken till på
       }
     },
-
 
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
@@ -436,36 +447,34 @@ button:disabled {
   /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
 }
 
-
 #poll-id-headline {
   color: rgb(252, 181, 212);
 }
 
+
 .global-music-control {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  left: 4rem;
   z-index: 1000;
 }
 
 .global-music-control button {
-  padding: 3px;
+  padding: 1px;
   background-color: pink;
   color: white;
   border: none;
   border-radius: 50%; /* Gör ikonen rund */
   cursor: pointer;
   display: flex; /* Använd flexbox för att centrera ikonen */
-
 }
 
 .music-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
 }
-
 
 .global-music-control button:hover {
   background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
