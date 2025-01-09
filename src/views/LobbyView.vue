@@ -220,6 +220,7 @@ export default {
       stream: null, // The video stream to access the camera
       isPictureTaken: false, //Tracks that camera is closed and picture taken
       cameraState: false, // Tracks whether the camera is active
+      disableSwitcher: false, //connected to choose premade avatar button
 
       //music
       isMusicPlaying: false,
@@ -251,7 +252,7 @@ export default {
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", { pollId: this.pollId });
+    socket.emit("joinPoll", this.pollId);
   },
 
   methods: {
@@ -527,7 +528,6 @@ export default {
 .name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
-  max-width: 400px; /* Optional: Limit the container width */
   margin: auto; /* Center the container horizontally */
   padding: 20px; /* Optional: Add padding */
   box-sizing: border-box; /* Include padding in width/height calculations */

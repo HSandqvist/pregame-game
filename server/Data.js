@@ -294,7 +294,6 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
       const selectedRandomAnswers = this.loadRandomAnswers(pollId); // Load random answers
 
       questions.push({ q: randomQuestion, a: selectedRandomAnswers });
-      //questions.push({ q: randomQuestion, a: selectedRandomAnswers });
     }
 
     poll.questions = questions; // Assign the questions to the poll
