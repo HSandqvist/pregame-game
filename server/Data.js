@@ -34,14 +34,12 @@ Data.prototype.createPoll = function (
   lang = "en",
   adminId,
   questionCount,
-  timerCount
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
       lang: lang, // Poll language
 
       questionCount: questionCount, // The number of questions for the poll
-      timerCount: timerCount, // Time allocated per question
 
       questions: [], // Empty array for questions
       answers: [], // Empty array for answers

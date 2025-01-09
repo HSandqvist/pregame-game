@@ -8,7 +8,11 @@
 
     <!-- Step 1: Select amount of questions -->
     <div v-if="step === 1" class="amount-questions-section">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NOQUESTIONS" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="NOQUESTIONS"
+      />
       <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
       <div class="amount-questions-buttons">
         <button
@@ -27,25 +31,12 @@
       </div>
     </div>
 
-    <!-- Step 2: Select time per question -->
-    <!-- div v-else-if="step === 2" class="time-per-question-section">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LANGUAGECHOICE" />
-      <h2>
-        {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
-      </h2>
-      <div class="time-per-question-buttons">
-        <button
-          v-for="time in [10, 20, 30]"
-          :key="time"
-          v-on:click="tempTimePerQuestion = time"
-          :class="{ selected: tempTimePerQuestion === time }"
-        >
-          {{ time }}
-        </button>
-      </div-->
-
     <div v-else-if="step === 2" class="language-for-questions-section">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LANGUAGECHOICE" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="LANGUAGECHOICE"  
+      />
       <h2>
         {{
           this.uiLabels.languageForQuestions ||
@@ -122,12 +113,10 @@ export default {
 
       // Temporary values for selections
       tempQuestionsCount: null,
-      tempTimePerQuestion: null,
       tempLangQuestions: null,
 
       // Finalized values for the poll
       selectedQuestionCount: null,
-      selectedTime: null,
       selectedLang: null,
 
       adminId: null,
@@ -170,11 +159,6 @@ export default {
 
     finalizeLang: function () {
       this.selectedLang = this.tempLangQuestions;
-      /*socket.emit("setTimePerQuestion", {
-        pollId: this.pollId,
-        time: this.selectedTime,
-      });*/
-
       // Send file with questions to server
       this.loadQuestionsFromFile(); // read json file questions and send to server
 
@@ -199,7 +183,6 @@ export default {
         lang: this.lang,
         adminId: this.adminId,
         questionCount: this.selectedQuestionCount,
-        timerCount: this.selectedTime,
       });
 
       socket.emit("joinPoll", this.pollId);
@@ -280,7 +263,7 @@ button:disabled {
   margin-top: 20px;
   background: none; /* If body or parent has background */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .action-buttons {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;

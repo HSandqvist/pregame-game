@@ -26,7 +26,11 @@
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="CAMERAVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="CAMERAVIEW"
+      />
       <h1 v-if="!choseCustomAvatar">
         {{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:
       </h1>
@@ -105,7 +109,11 @@
 
     <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="AVATARVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="AVATARVIEW"
+      />
       <h1>{{ this.uiLabels.yourAvatar || "Your avatar" }}: {{ userName }}</h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
@@ -125,8 +133,18 @@
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="isAdmin" viewKey="ADMINLOBBYVIEW" />
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="!isAdmin" viewKey="LOBBYVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="isAdmin"
+        viewKey="ADMINLOBBYVIEW"
+      />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="!isAdmin"
+        viewKey="LOBBYVIEW"
+      />
 
       <h1>
         {{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}
@@ -170,8 +188,7 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="showModal = true" :disabled="!joined || isAdmin"
-        >
+        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
         <ConfirmLeaveModal
@@ -606,7 +623,7 @@ button:hover {
   flex-direction: column; /* Keep buttons stacked vertically */
   gap: 10px; /* Space between buttons */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;
