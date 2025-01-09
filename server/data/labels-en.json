@@ -5,6 +5,10 @@
 	"back": "Back",
 	"result": "Result",
 	"music": "Your browser does not support the audio element.",
+	"yes": "Yes", 
+	"no": "No",
+	"sureLeaveGame": "Are you sure you want to leave game?",
+
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
@@ -17,6 +21,9 @@
 	
 	"numberOfQuestions": "Number of questions",
 	"secondsPerQuestion": "Seconds per question ",
+	"languageForQuestions": "Chose language for questions",
+	"swedish": "Swedish",
+	"english": "English",
 
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Enter your name",

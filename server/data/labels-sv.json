@@ -4,6 +4,9 @@
 	"back": "Tillbaka",
 	"result": "Resultat",
 	"music": "Din webbläsare stödjer inte ljud.",
+	"yes": "Ja", 
+	"no": "Nej",
+	"sureLeaveGame": "Är du säker på att du vill lämna spelet?",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
@@ -17,6 +20,9 @@
 
 	"participateInGame": "Delta i spelet",
 	"numberOfQuestions": "Antal frågor",
+	"languageForQuestions": "Välj språk på frågor",
+	"swedish": "Svenska",
+	"english": "Engelska",
 
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Skriv in ditt namn",

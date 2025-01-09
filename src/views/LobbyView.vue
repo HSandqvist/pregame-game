@@ -26,7 +26,11 @@
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="CAMERAVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="CAMERAVIEW"
+      />
       <h1 v-if="!choseCustomAvatar">
         {{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:
       </h1>
@@ -105,12 +109,18 @@
 
     <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="AVATARVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="AVATARVIEW"
+      />
       <h1>{{ this.uiLabels.yourAvatar || "Your avatar" }}: {{ userName }}</h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
-        <button v-on:click="backStep"> {{ this.uiLabels.back || "Back" }}</button>
+        <button v-on:click="backStep">
+          {{ this.uiLabels.back || "Back" }}
+        </button>
         <button
           v-on:click="participateInPoll"
           id="submitNameButton"
@@ -123,8 +133,18 @@
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="isAdmin" viewKey="ADMINLOBBYVIEW" />
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="!isAdmin" viewKey="LOBBYVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="isAdmin"
+        viewKey="ADMINLOBBYVIEW"
+      />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="!isAdmin"
+        viewKey="LOBBYVIEW"
+      />
 
       <h1>
         {{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}
@@ -168,16 +188,25 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
+        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
+        <ConfirmLeaveModal
+          :show="showModal"
+          :uiLabels="uiLabels"
+          :lang="lang"
+          @confirm="leavePoll"
+          @cancel="showModal = false"
+        />
       </div>
     </div>
   </div>
 
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
-    {{this.uiLabels.music || "Your browser does not support the audio element." }}
+    {{
+      this.uiLabels.music || "Your browser does not support the audio element."
+    }}
   </audio>
 </template>
 
@@ -186,10 +215,10 @@ import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
 
 import musicIconOn from "@/assets/img/musicIcon.png";
 import musicIconOff from "@/assets/img/musicIconOff.png";
-
 
 const socket = io("localhost:3000");
 
@@ -201,6 +230,7 @@ export default {
   components: {
     LanguageSwitcher,
     InstructionButton,
+    ConfirmLeaveModal,
   },
   data: function () {
     return {
@@ -232,6 +262,9 @@ export default {
       musicIconOn, // Importera den ljusa ikonen
       musicIconOff,
       lobbyviewMusic,
+
+      //leave poll lobby
+      showModal: false,
     };
   },
   created: function () {
@@ -268,6 +301,8 @@ export default {
     },
 
     leavePoll() {
+      this.showModal = false;
+
       // Emit an event to the server to remove the participant
       socket.emit("leavePoll", {
         pollId: this.pollId,
@@ -588,7 +623,7 @@ button:hover {
   flex-direction: column; /* Keep buttons stacked vertically */
   gap: 10px; /* Space between buttons */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;
