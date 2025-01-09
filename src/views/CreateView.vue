@@ -1,6 +1,5 @@
 <template>
   <div class="create-game">
-    <InstructionButton viewKey="CREATEVIEW" />
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
     <h1 id="create-game-headline">
@@ -9,6 +8,7 @@
 
     <!-- Step 1: Select amount of questions -->
     <div v-if="step === 1" class="amount-questions-section">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NOQUESTIONS" />
       <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
       <div class="amount-questions-buttons">
         <button
@@ -29,6 +29,7 @@
 
     <!-- Step 2: Select time per question -->
     <!-- div v-else-if="step === 2" class="time-per-question-section">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LANGUAGECHOICE" />
       <h2>
         {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
       </h2>
@@ -44,6 +45,7 @@
       </div-->
 
     <div v-else-if="step === 2" class="language-for-questions-section">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LANGUAGECHOICE" />
       <h2>
         {{
           this.uiLabels.languageForQuestions ||

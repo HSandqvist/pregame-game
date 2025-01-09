@@ -59,11 +59,17 @@
 "RESULTVIEW": "",
 	"showEndResults": "Visa slutresultat",
 
-	"INSTRUCTIONS": {
-	  "STARTVIEW": "Välkommen till startsidan! Här kan du skapa eller gå med i ett spel.",
-	  "CREATEVIEW": "På denna sida kan du skapa ett nytt spel genom att ange detaljer.",
-	  "LOBBYVIEW": "Detta är lobbyn. Vänta tills alla deltagare är redo innan du startar spelet.",
-	  "POLLVIEW": "På denna sida kan du rösta på dina medspelare genom att dra och släppa deras avatarer.",
-	  "RESULTVIEW": "Här kan du se resultaten av spelet."
+"INSTRUCTIONS": {
+	"STARTVIEW": "Välkommen till startsidan!<br>Här kan du välja om du vill skapa ett nytt spel eller gå med i ett existerande spel.",
+	"PINVIEW":"Här anger du det Lobby-ID som visas på skärmen hos den som skapade spelet.",
+	"NOQUESTIONS": "På denna sida kan välja hur många frågor som ska finnas i ditt spel.",
+	"LANGUAGECHOICE": "På denna sida kan du välja vilket språk som deltagarna ska se frågorna på.",
+	"NAMEVIEW": "Här får du välja vilket namn som du ska använda i spelet.",
+	"CAMERAVIEW": "Här välder du din avatar till spelet.<br>Du kan välja att ta en bild genom att starta kameran, eller välja en av de tillgängliga avatarerna.",
+	"AVATARVIEW": "Här kan du se din färdiga avatar. När du är redo kan du gå vidare till lobbyn genom att trycka på 'Delta i spelet'.",
+	"ADMINLOBBYVIEW": "Detta är lobbyn där du kan se alla deltagare.<br>Vänta tills alla deltagare är redo innan du startar spelet.",
+	"LOBBYVIEW": "Detta är lobbyn där du kan se alla deltagare.<br>När alla deltagare är redo kommer admin att starta spelet.",
+	"POLLVIEW": "På denna sida kan du rösta på dina medspelare<br>genom att dra och släppa deras avatarer.",
+	"RESULTVIEW": "Bra jobbat! <br> Här kan du se resultaten av spelet. Vill du spela en gång till så kan du trycka på 'Starta nytt spel'."
 	}
 }

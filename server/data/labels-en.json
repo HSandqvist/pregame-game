@@ -60,12 +60,18 @@
 	"showEndResults": "Show results",
 
 	"INSTRUCTIONS": {
-		"STARTVIEW": "Welcome to the start page! Here you can create or join a game.",
-		"CREATEVIEW": "On this page, you can create a new game by entering the details.",
-		"LOBBYVIEW": "This is the lobby. Wait until all participants are ready before starting the game.",
-		"POLLVIEW": "On this page, you can vote for your teammates by dragging and dropping their avatars.",
-		"RESULTVIEW": "View the results of the game here."
-	  }
+	"STARTVIEW": "Welcome to the start page!<br>Here, you can choose whether to create a new game or join an existing game.",
+	"PINVIEW": "Here, you enter the Lobby ID displayed on the screen of the person who created the game.",
+	"NOQUESTIONS": "On this page, you can choose how many questions should be included in your game.",
+	"LANGUAGECHOICE": "On this page, you can select the language in which participants will see the questions.",
+	"NAMEVIEW": "Here, you choose the name you will use in the game.",
+	"CAMERAVIEW": "Here, you select your avatar for the game.<br>You can either take a picture by starting the camera or choose one of the available avatars.",
+	"AVATARVIEW": "Here, you can see your finished avatar. When you're ready, you can proceed to the lobby by clicking 'Join the game'.",
+	"ADMINLOBBYVIEW": "This is the lobby where you can see all the participants.<br>Wait until all participants are ready before starting the game.",
+	"LOBBYVIEW": "This is the lobby where you can see all the participants.<br>When all participants are ready, the admin will start the game.",
+	"POLLVIEW": "On this page, you can vote for your fellow players<br>by dragging and dropping their avatars.",
+	"RESULTVIEW": "Well done!<br>Here, you can see the results of the game. If you want to play again, you can click 'Start a new game'."
+}
 	}
 
 
