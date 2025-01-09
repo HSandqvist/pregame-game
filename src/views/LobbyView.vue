@@ -165,12 +165,14 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="showModal = true" :disabled="!joined || isAdmin" :lang="this.lang"
+        <button v-on:click="showModal = true" :disabled="!joined || isAdmin"
         >
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
         <ConfirmLeaveModal
           :show="showModal"
+          :uiLabels="uiLabels"
+          :lang="lang"
           @confirm="leavePoll"
           @cancel="showModal = false"
         />

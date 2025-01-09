@@ -161,16 +161,6 @@ export default {
 
     console.log("Adding participantsUpdate listener");
 
-    //DENNA SOCKET KÖRS EJ AV OKLART ANLEDNING???
-    /*
-    socket.on("participantsUpdate", (participantData) => {
-      console.log("Participants updated:", participantData);
-      this.participants = participantData; // Ensure the array is directly assigned here.
-      console.log("längde particpant update", this.participants.length);
-    });
-    //Listen for admin to press next
-*/
-
     socket.emit("getAllParticipantsForGame", this.pollId);
 
     socket.on("allParticpantsForGame", (participantData) => {

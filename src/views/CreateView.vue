@@ -1,5 +1,4 @@
 <template>
-
   <div class="create-game">
     <InstructionButton viewKey="CREATEVIEW" />
     <!-- Language switcher component -->
@@ -20,7 +19,6 @@
         >
           {{ count }}
         </button>
-        
       </div>
       <div class="action-buttons">
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
@@ -45,16 +43,27 @@
         </button>
       </div-->
 
-
-      <div v-else-if="step === 2" class="language-for-questions-section">
-        <h2>
-        {{ this.uiLabels.languageForQuestions || "Choose language for questions " }}:
+    <div v-else-if="step === 2" class="language-for-questions-section">
+      <h2>
+        {{
+          this.uiLabels.languageForQuestions ||
+          "Choose language for questions "
+        }}:
       </h2>
       <div class="language-for-questions-buttons">
-
-        <button v-on:click="tempLangQuestions = 'sv'" :class="{ selected: tempLangQuestions === 'sv' }"> {{ this.uiLabels.swedish || "Swedish" }} </button>
-        <button v-on:click="tempLangQuestions = 'en'" :class="{ selected: tempLangQuestions === 'en' }"> {{ this.uiLabels.english || "English" }} </button>
-        </div>
+        <button
+          v-on:click="tempLangQuestions = 'sv'"
+          :class="{ selected: tempLangQuestions === 'sv' }"
+        >
+          {{ this.uiLabels.swedish || "Swedish" }}
+        </button>
+        <button
+          v-on:click="tempLangQuestions = 'en'"
+          :class="{ selected: tempLangQuestions === 'en' }"
+        >
+          {{ this.uiLabels.english || "English" }}
+        </button>
+      </div>
 
       <div class="action-buttons">
         <button v-on:click="backStep">
@@ -78,7 +87,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -118,7 +126,7 @@ export default {
       // Finalized values for the poll
       selectedQuestionCount: null,
       selectedTime: null,
-      selectedLang: null, 
+      selectedLang: null,
 
       adminId: null,
     };

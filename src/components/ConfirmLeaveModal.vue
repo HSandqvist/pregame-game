@@ -14,27 +14,19 @@
 </template>
 
 <script>
-import io from "socket.io-client";
-const socket = io("localhost:3000");
-
 export default {
   props: {
     show: Boolean,
-    lang: Object,
+    lang: {type: String, default: "en"},
+    uiLabels: { type: Object, default: () => ({})},
   },
   data: function () {
     return {
-      //lang: {}, // Language preference
-      uiLabels: {}, // UI labels for different languages}
+        labels: {}, // placeholder for labels for different languages}
     };
   },
   created: function () {
-    // Listen for server events
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
-    if (this.lang) {
-    socket.emit("getUILabels", this.lang);
-  }
-
+    this.loadLabels();
   },
   methods: {
     confirm() {
@@ -42,6 +34,37 @@ export default {
     },
     cancel() {
       this.$emit("cancel");
+    },
+
+    async loadLabels() {
+      let response;
+
+      if (this.lang == "en") {
+        response = await fetch("/server/data/labels-en.json");
+      } else {
+        response = await fetch("/server/data/labels-sv.json");
+      }
+
+      if (!response.ok) {
+        console.error("Failed to load language file:", response.status);
+        return;
+      }
+
+      this.labels = await response.json();
+    },
+
+    updateLanguage(newLang) {
+      this.lang = newLang;
+      this.loadLabels();
+    },
+  },
+
+  watch: {
+    // Kolla om språket ändras i localStorage och ladda om labels
+    lang(newLang, oldLang) {
+      if (newLang !== oldLang) {
+        this.loadLabels();
+      }
     },
   },
 };
