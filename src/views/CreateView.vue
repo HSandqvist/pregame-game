@@ -30,7 +30,7 @@
     </div>
 
     <!-- Step 2: Select time per question -->
-    <div v-else-if="step === 2" class="time-per-question-section">
+    <!-- div v-else-if="step === 2" class="time-per-question-section">
       <h2>
         {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
       </h2>
@@ -43,7 +43,18 @@
         >
           {{ time }}
         </button>
-      </div>
+      </div-->
+
+
+      <div v-else-if="step === 2" class="language-for-questions-section">
+        <h2>
+        {{ this.uiLabels.languageForQuestions || "Choose language for questions " }}:
+      </h2>
+      <div class="language-for-questions-buttons">
+
+        <button v-on:click="tempLangQuestions = 'sv'" :class="{ selected: tempLangQuestions === 'sv' }"> {{ this.uiLabels.swedish || "Swedish" }} </button>
+        <button v-on:click="tempLangQuestions = 'en'" :class="{ selected: tempLangQuestions === 'en' }"> {{ this.uiLabels.english || "English" }} </button>
+        </div>
 
       <div class="action-buttons">
         <button v-on:click="backStep">
@@ -51,8 +62,8 @@
         </button>
         <button
           id="create-game-button"
-          v-on:click="finalizeTime"
-          :disabled="!tempTimePerQuestion"
+          v-on:click="finalizeLang"
+          :disabled="!tempLangQuestions"
         >
           {{ this.uiLabels.createGame || "Create Game" }}
         </button>
@@ -77,7 +88,7 @@ import InstructionButton from "@/components/InstructionButton.vue";
 
 import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import { toHandlers } from "vue";
+//import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
@@ -102,10 +113,12 @@ export default {
       // Temporary values for selections
       tempQuestionsCount: null,
       tempTimePerQuestion: null,
+      tempLangQuestions: null,
 
       // Finalized values for the poll
       selectedQuestionCount: null,
       selectedTime: null,
+      selectedLang: null, 
 
       adminId: null,
     };
@@ -145,12 +158,16 @@ export default {
       this.nextStep();
     },
 
-    finalizeTime: function () {
-      this.selectedTime = this.tempTimePerQuestion;
-      socket.emit("setTimePerQuestion", {
+    finalizeLang: function () {
+      this.selectedLang = this.tempLangQuestions;
+      /*socket.emit("setTimePerQuestion", {
         pollId: this.pollId,
         time: this.selectedTime,
-      });
+      });*/
+
+      // Send file with questions to server
+      this.loadQuestionsFromFile(); // read json file questions and send to server
+
       this.createPoll();
     },
 
@@ -166,9 +183,6 @@ export default {
       this.generateAdminID();
 
       this.generatePollID();
-
-      // Send file with questions to server
-      this.loadQuestionsFromFile(); // read json file questions and send to server
 
       socket.emit("createPoll", {
         pollId: this.pollId,
@@ -190,9 +204,9 @@ export default {
 
     // Method to load the questions from the file, send to server
     loadQuestionsFromFile: function () {
-      // Choose the appropriate JSON data based on the selected language
+      // Choose the appropriate JSON data based on the selected language in question
       const allQuestionsFromFile =
-        this.lang === "en" ? questionsEn : questionsSv;
+        this.selectedLang === "en" ? questionsEn : questionsSv;
 
       // Emit the JSON data to the server
       try {
@@ -249,7 +263,7 @@ button:disabled {
 
 /* Button groups */
 .amount-questions-buttons,
-.time-per-question-buttons {
+.language-for-questions-buttons {
   display: flex;
   justify-content: center;
   gap: 30px;
