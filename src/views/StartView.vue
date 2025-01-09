@@ -1,7 +1,8 @@
 <template>
   <div class="frontpage">
+<div>
+    <InstructionButton   ref="instructionButton" :uiLabels="uiLabels" :lang="lang" viewKey="STARTVIEW" />
 
-    <InstructionButton viewKey="STARTVIEW" />
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
 
@@ -9,9 +10,10 @@
     <h1 class="game-title" v-motion="motionGrowBiggerAndGlow">
       Pre(game) <sup>2</sup>
     </h1>
-
+</div>
     <!-- Input field for Lobby ID and Join Game button -->
     <div v-if="joinGameClicked" class="join-game-container">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" :showInstructions=false viewKey="PINVIEW" />
       <div class="pin-input-container">
         <input
           v-for="(value, index) in pin"
@@ -96,10 +98,14 @@ export default {
   localStorage.setItem("lang", lang); // Använd "lang" istället
   socket.emit("getUILabels", this.lang);
 },
+hideInstructions() {
+this.$refs.instructionButton.hideInstructions()  
+},
 
     // Show Join Game input
     showPinEntry() {
       this.joinGameClicked = true;
+      this.$refs.instructionButton.hideInstructions()  
     },
 
     // Handle input to allow only numbers and move to the next box
