@@ -608,10 +608,11 @@ button:hover {
 }
 
 .camera-view {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 320px;
-  height: 240px;
+  border: 0.1rem solid #f01984;
+  border-radius: 50%;
+  background-color: #f01984;
+  width: 15rem;
+  height: 14rem;
   display: flex;
   align-items: center;
   justify-content: center;
