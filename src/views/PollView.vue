@@ -9,10 +9,12 @@
       />
     </button>
   </div>
+
   <div class="screen-container">
     <!-- top screen content -->
     <div class="top-box">
       <h1 id="poll-id-headline">Poll ID: {{ pollId }}</h1>
+
     </div>
     <!-- middle screen content -->
     <div class="middle-box">
@@ -158,6 +160,16 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
+    socket.emit("pollInfoUpdatePersonal", {pollId: this.pollId});
+
+    socket.on("pollInfoUpdate", (data) => {
+      console.log("pollInfoUpdate", data);
+      this.view= data.currentView;
+      console.log("view", data.currentView); 
+      this.currentQuestionIndex = data.currentQuestion;
+      console.log("currentQuestionIndex", data.currentQuestion);
+    }
+    );
 
     console.log("Adding participantsUpdate listener");
 
@@ -168,6 +180,7 @@ export default {
       this.participants = participantData; // Ensure the array is directly assigned here.
       console.log("längden av participants", this.participants.length);
     });
+
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -271,20 +284,6 @@ export default {
       //flyttat socket.on top answer update till created delen
     },
 
-    switchView() {
-      //const answers = poll.answers[currentQuestion];
-
-      // If it's the last question, transition to final view
-      if (this.currentQuestionIndex === this.questions.length - 1) {
-        console.log("Last question answered. Switching to final view.");
-        this.view = "final_view";
-      } else {
-        // Switch view to show the result after answer submission
-        this.view = "results_view";
-        console.log("Changed to result view.");
-      }
-    },
-
     checkAdminStatus(callback) {
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
@@ -319,42 +318,30 @@ export default {
 
     nextQuestion: function () {
       // Check if the current question is NOT the last question
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.currentQuestionIndex += 1; // Increment the index
-        this.updateCurrentQuestion(this.currentQuestionIndex); // Update the question
-        console.log("Current question index:", this.currentQuestionIndex);
-
-        // Switch back to 'question' view
-        this.view = "question_view";
-      }
-      // If it's the last question, switch to the final view
-      else if (this.currentQuestionIndex === this.questions.length - 1) {
-        console.log("No more questions. Switching to final view."); //printas aldrig
-
-        this.view = "final_view";
-      }
       this.hasVoted = false;
       this.numberOfVotes = 0;
     },
 
     adminNext: function () {
       socket.emit("nextQuestion", this.pollId, this.userId);
+      socket.emit("updatePollInfo", {pollId: this.pollId, currentView: this.view})
       console.log("In admin next");
     },
 
     particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
-
-        this.switchView();
-      } else if (this.view === "results_view" || this.view === "final_view") {
-        console.log("participant next question");
-        if (this.isAdmin) {
+        if(this.isAdmin)  {
           socket.emit("votingReset", this.pollId);
         }
+
+     
+      } else if (this.view === "results_view" || this.view === "final_view") {
+        console.log("participant next question");
         this.nextQuestion();
-      }
-    },
+      
+    }
+  },
     toggleMusic: function () {
       const audio = this.$refs.backgroundMusic;
       if (!audio) {

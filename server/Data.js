@@ -41,10 +41,14 @@ Data.prototype.createPoll = function (
 
       questionCount: questionCount, // The number of questions for the poll
 
+      //For updating all clients on the current view and question
+      currentView: "question_view", // Start with the question view
+      currentQuestion: 0, // Start with the first question
+
       questions: [], // Empty array for questions
       answers: [], // Empty array for answers
       participants: [], // Empty array for participants
-      currentQuestion: 0, // Start with the first question
+      
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
@@ -63,7 +67,6 @@ Data.prototype.getPoll = function (pollId) {
   }
   return {}; // Return an empty object if the poll doesn't exist
 };
-
 // Add a participant to a poll
 Data.prototype.participateInPoll = function (
   pollId,
@@ -151,6 +154,25 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
     );
   }
 };
+Data.prototype.updateView = function (pollId, view) {
+
+  const poll = this.polls[pollId];
+    if (view === "question_view") {
+     
+      poll.currentView = "results_view";
+    }
+    else if (poll.questionCount -1 === poll.currentQuestion ) {
+      console.log("Last question answered. Switching to final view.");
+      poll.currentView = "final_view";
+
+    } else {
+      // Switch view to show the result after answer submission
+      poll.currentView = "question_view";
+
+      console.log("Changed to question view.");
+    }
+  };
+
 
 Data.prototype.votingReset = function (pollId) {
   if (this.pollExists(pollId)) {
@@ -166,10 +188,12 @@ Data.prototype.votingReset = function (pollId) {
 
     // Move to the next question
     poll.currentQuestion += 1; // Increment to the next question
+   
+
     poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
     console.log(
       "data votingreset har uppdaterat currentquestion till:",
-      currentQuestion
+      poll.currentQuestion
     );
   }
 };
