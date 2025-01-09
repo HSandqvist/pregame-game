@@ -371,7 +371,6 @@ export default {
         console.error("Audio element not found!");
         return;
       }
-
       audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
 
       if (this.isMusicPlaying) {
@@ -397,7 +396,7 @@ export default {
 
     adminToResults: function () {
       socket.emit("toResults", this.pollId, this.userId);
-      console.log("In Admin FINAL");
+      console.log("In admin final");
     },
 
     toResults: function () {
@@ -440,7 +439,6 @@ export default {
   justify-content: center;
   align-items: center;
   position: sticky;
-
 }
 
 /* Bottom box styles */
@@ -451,12 +449,11 @@ export default {
   justify-content: center;
   align-items: center;
   position: sticky;
-
 }
 
 .admin-functions-in-poll {
-  position: fixed;
-  top: 10px; /* Space from the top of the middle box */
+  position: absolute; /* i förhållande till bottom box, alt sätta som relative */
+  top: 10px; /* Space from the top of the bottom box */
   right: 10px; /* Space from the right */
   z-index: 3; /* Make sure it stays above other content */
   display: flex;
@@ -467,7 +464,6 @@ export default {
 .admin-functions-in-poll button {
   margin-top: 10px; /* Adds spacing between buttons and other admin elements */
 }
-
 
 #poll-id-headline {
   color: rgb(252, 181, 212);
