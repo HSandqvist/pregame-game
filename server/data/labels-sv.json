@@ -7,6 +7,7 @@
 	"yes": "Ja", 
 	"no": "Nej",
 	"sureLeaveGame": "Är du säker på att du vill lämna spelet?",
+	"gameID": "Spel ID",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
@@ -23,6 +24,8 @@
 	"languageForQuestions": "Välj språk på frågor",
 	"swedish": "Svenska",
 	"english": "Engelska",
+	"backToStart": "Tillbaka till Start",
+
 
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Skriv in ditt namn",
@@ -32,7 +35,6 @@
 	"takePicture": "Ta bild",
 	"yourAvatar": "Din avatar",
 	"participateInPoll": "Delta i spelet",
-	"lobbyForPoll": "Lobby för spelet",
 	"numberOfPlayers": "Antal spelare",
 	"players": "Spelare",
 	"leaveLobby": "Lämna lobby",

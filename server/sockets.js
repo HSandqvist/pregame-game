@@ -10,7 +10,7 @@ function sockets(io, socket, data) {
   // Event: Create a new poll
   socket.on("createPoll", function (d) {
     // Create a poll with the given ID and language
-    data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount, d.timerCount);
+    data.createPoll(d.pollId, d.lang, d.adminId, d.questionCount);
 
     // Emit the poll data back to the client
     socket.emit("pollData", data.getPoll(d.pollId));
@@ -59,27 +59,28 @@ function sockets(io, socket, data) {
     }
   });
 
-
   socket.on("updatePollInfo", function (d) {
+    console.log("updateView körs från socket", d.pollId);
+    data.updateView(d.pollId, d.currentView);
+    const poll = data.getPoll(d.pollId, d.currentView);
+    console.log("updateView ändrar från socket", poll.currentView);
 
-  console.log("updateView körs från socket", d.pollId);
+    io.emit("pollInfoUpdate", {
+      pollId: poll.pollId,
+      currentView: poll.currentView,
+      currentQuestion: poll.currentQuestion,
+    });
+  });
 
-  data.updateView(d.pollId, d.currentView);
+  socket.on("pollInfoUpdatePersonal", function (d) {
+    const poll = data.getPoll(d.pollId);
 
-  const poll= data.getPoll(d.pollId, d.currentView);
-
-  console.log("updateView ändrar från socket", poll.currentView);
-  
-  io.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion})}
-
-);  
-socket.on("pollInfoUpdatePersonal", function (d) {
-
-  const poll= data.getPoll(d.pollId);
-
-  socket.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion} )
-}
-);
+    socket.emit("pollInfoUpdate", {
+      pollId: poll.pollId,
+      currentView: poll.currentView,
+      currentQuestion: poll.currentQuestion,
+    });
+  });
 
   // Event: Join a poll
   socket.on("joinPoll", function (pollId) {
@@ -119,7 +120,7 @@ socket.on("pollInfoUpdatePersonal", function (d) {
     io.to(pollId).emit("startGame");
   });
 
-  socket.on("nextQuestion", function (pollId ) {
+  socket.on("nextQuestion", function (pollId) {
     // Notify all clients in the poll room that the poll has started
     console.log("In socket Admin next");
     io.to(pollId).emit("participantNextQuestion", pollId);

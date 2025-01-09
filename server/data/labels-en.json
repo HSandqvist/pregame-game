@@ -8,6 +8,7 @@
 	"yes": "Yes", 
 	"no": "No",
 	"sureLeaveGame": "Are you sure you want to leave game?",
+	"gameID": "Game ID",
 
 
 "STARTVIEW": "",
@@ -24,6 +25,7 @@
 	"languageForQuestions": "Chose language for questions",
 	"swedish": "Swedish",
 	"english": "English",
+	"backToStart": "Back to Start",
 
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Enter your name",
@@ -33,7 +35,6 @@
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
 	"participateInPoll": "Participate in game",
-	"lobbyForPoll": "Lobby for poll",
 	"numberOfPlayers": "Number of players",
 	"players": "Players",
 	"leaveLobby": "Leave Lobby",
