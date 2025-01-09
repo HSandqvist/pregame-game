@@ -195,7 +195,7 @@ Data.prototype.votingReset = function (pollId) {
     poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
     console.log(
       "data votingreset har uppdaterat currentquestion till:",
-      currentQuestion
+      poll.currentQuestion
     );
   }
 };

@@ -58,6 +58,8 @@ function sockets(io, socket, data) {
       io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
     }
   });
+
+
   socket.on("updatePollInfo", function (d) {
 
   console.log("updateView körs från socket", d.pollId);
@@ -68,14 +70,14 @@ function sockets(io, socket, data) {
 
   console.log("updateView ändrar från socket", poll.currentView);
   
-  io.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.view, currentQuestion: poll.currentQuestion})}
+  io.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion})}
 
 );  
 socket.on("pollInfoUpdatePersonal", function (d) {
 
   const poll= data.getPoll(d.pollId);
 
-  socket.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.view, currentQuestion: poll.currentQuestion} )
+  socket.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion} )
 }
 );
 
@@ -117,10 +119,10 @@ socket.on("pollInfoUpdatePersonal", function (d) {
     io.to(pollId).emit("startGame");
   });
 
-  socket.on("nextQuestion", function (pollId, userId) {
+  socket.on("nextQuestion", function (pollId ) {
     // Notify all clients in the poll room that the poll has started
     console.log("In socket Admin next");
-    io.to(pollId).emit("participantNextQuestion", pollId, userId);
+    io.to(pollId).emit("participantNextQuestion", pollId);
   });
 
   socket.on("toResults", function (pollId, userId) {

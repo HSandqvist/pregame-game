@@ -34,8 +34,10 @@
 
         <!-- Amount of votes only visible by admin -->
         <p v-if="isAdmin">
-          {{ this.numberOfVotes }} {{ this.uiLabels.outOf || "out of" }}
-          {{ this.participants.length }}
+          {{ this.numberOfVotes }} 
+          
+         <!--  {{ this.uiLabels.outOf || "out of" }}
+          {{ this.participants.length }}-->
           {{ this.uiLabels.hasVoted || "has voted" }}
         </p>
       </div>
@@ -165,14 +167,13 @@ export default {
     socket.on("pollInfoUpdate", (data) => {
       console.log("pollInfoUpdate", data);
       this.view= data.currentView;
+      console.log("view", data.currentView); 
       this.currentQuestionIndex = data.currentQuestion;
-      
-    });
-
-
-    socket.emit("participantsUpdate");
-
+      console.log("currentQuestionIndex", data.currentQuestion);
+    }
+    );
     socket.on("participantsUpdate", (p) => (this.participants = p));
+
     console.log(
       "participant update säger",
       this.participants,
@@ -329,6 +330,9 @@ export default {
     particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
+        if(this.isAdmin)  {
+          socket.emit("votingReset", this.pollId);
+        }
 
      
       } else if (this.view === "results_view" || this.view === "final_view") {
