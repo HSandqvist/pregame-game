@@ -190,4 +190,33 @@ input,
 select {
   font-family: "Truculenta", sans-serif;
 }
+
+/* Buttons general styling */
+button {
+  padding: 0.75rem 1.5rem;
+  background-color: rgb(252, 160, 198);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: rgb(255, 131, 203);
+  cursor: pointer;
+}
+
+button.selected {
+  background-color: rgb(255, 131, 203);
+  border: 2px solid white;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>

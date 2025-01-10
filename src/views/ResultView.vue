@@ -1,52 +1,39 @@
 <template>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
+  
+  <header>
+    <h1 v-if ="showPopup" v-motion="motionGrowBiggerAndGlow"> TOP...</h1>
+    <h1 v-if = "resultsShown && !showPopup" v-motion="motionGrowBiggerAndGlow"> ALL RESULTS </h1>
+  </header>
 
   <div class="result-view">
-    <!-- Display the selected language and current question -->
-    <!-- lang: {{ lang }} -->
 
     <!-- Button to fetch and display results -->
     <button
       v-if="!resultsShown"
       @click="fetchCategoriesWithAnswers"
-      class="center-button"
-    >
+      class="center-button">
       Show Results
     </button>
 
-    <!-- Render the categories only when data is available -->
-    <!-- TESTAR detta var innan
-    <div v-if="Object.keys(categoriesAnswers).length > 0">
-      <div
-        v-for="(topVoted, category) in topVotedCategories"
-        :key="category"
-        class="category"
-      >
-        <h2>{{ category }}</h2>
-        <p>Top voted: {{ topVoted }}</p>
-      </div>
-    </div> -->
-
     <!-- Popup for individual category winners -->
-    <div v-if="showPopup" class="popup">
-      <h2>TOP... {{ currentPopupCategory }}</h2>
-      <h1>{{ currentPopupWinner }}</h1>
-    </div>
+      <div v-if="showPopup" class="popup">
+        <h2> {{ currentPopupCategory }}</h2>
+        <h1 v-motion="motionGrowBiggerAndGlow" >{{ currentPopupWinner }}</h1>
+      </div>
 
     <!-- Render the full results after popups -->
     <div v-if="resultsShown && !showPopup" class="results">
-      <h1>All Results:</h1>
-      <br />
       <div
         v-for="(topVoted, category) in topVotedCategories"
         :key="category"
         class="category"
       >
-        <h2>TOP... {{ category }}</h2>
-        <h1>{{ topVoted }}!</h1>
+        <h2>THE MOST {{ category }}</h2>
+        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
       </div>
     </div>
-    <div v-if="resultsShown">
+    <div v-if="resultsShown && !showPopup">
       <button v-on:click="returnToStart" class="center-button">
         Start new game!
       </button>
@@ -56,14 +43,14 @@
   <!-- ANVÄNDS EJ NU -->
   <!-- Render the BarsComponent to visualize answers -->
   <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers" />
-  <!-- Display the raw data of submitted answers -->
-  <!-- <span>{{ submittedAnswers }}</span> -->
+  
 </template>
 
 <script>
 // @ is an alias to /src
 import BarsComponent from "@/components/BarsComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
 
@@ -79,22 +66,21 @@ export default {
     BarsComponent, // Register the BarsComponent
     InstructionButton,
   },
+
   data: function () {
     return {
-      lang: localStorage.getItem("lang") || "en", // Language preference
+      lang: localStorage.getItem("lang") || "en", 
       uiLabels: {},
       pollId: "",
       question: "",
       submittedAnswers: {},
-      resultsShown: false, // Track whether the results have been shown
-
+      resultsShown: false, 
       categoriesAnswers: {},
-
-      //TESTAR med nedan
       showPopup: false, // Track if a popup is being displayed
       popupQueue: [], // Queue to hold the category winners for the popup
       currentPopupCategory: "", // Current category being displayed in the popup
       currentPopupWinner: "", // Current winner being displayed in the popup
+      motionGrowBiggerAndGlow, // Motion settings
     };
   },
 
@@ -108,8 +94,6 @@ export default {
       "submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
     ); // Update submitted answers
-    //används ej
-    //socket.on("questionUpdate", (update) => (this.question = update)); // Update the current question
 
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
@@ -143,10 +127,6 @@ export default {
     fetchCategoriesWithAnswers() {
       this.resultsShown = true; // Mark the results as shown after button is clicked
       socket.emit("getCategoriesWithAnswers", this.pollId);
-
-      //TESTAR
-      // Process results once the answers arrive
-      // behövs detta?
       socket.on("categoriesWithAnswers", (categories) => {
         console.log("är i socket on categorieswith answers");
         this.categoriesAnswers = categories;
@@ -154,10 +134,8 @@ export default {
       });
     },
 
-    //TESTAR
     handleResults() {
       const categories = Object.keys(this.topVotedCategories);
-
       if (categories.length <= 5) {
         // Prepare popups for categories
         this.popupQueue = categories.map((category) => ({
@@ -168,7 +146,6 @@ export default {
       }
     },
 
-    //TESTAR
     displayNextPopup() {
       if (this.popupQueue.length > 0) {
         const nextPopup = this.popupQueue.shift();
@@ -176,13 +153,11 @@ export default {
         this.currentPopupWinner = nextPopup.winner;
         this.showPopup = true;
 
-        // Display the next popup after 3 seconds
         setTimeout(() => {
           this.showPopup = false;
           this.displayNextPopup();
         }, 2000);
       } else {
-        // End popups and show the full results
         this.showPopup = false;
       }
     },
@@ -202,14 +177,25 @@ export default {
   align-items: center;
   flex-direction: column;
   position: absolute; /* Make it position absolute */
-  top: 50%; /* Move it 50% from the top of the screen */
+  top: 0; /* Move it 50% from the top of the screen */
   left: 50%; /* Move it 50% from the left of the screen */
-  transform: translate(
-    -50%,
-    -50%
-  ); /* Offset by 50% of its own size to center it exactly */
-  width: 100%; /* Make sure it spans full width */
-  height: 100vh; /* Full viewport height */
+  transform: translate(-50%,0); /* Offset by 50% of its own size to center it exactly */
+
+  margin-top: 100px; /* Set to the height of the header (100px) */
+  width: 100%;
+  height: calc(100vh - 100px); /* Subtract header height from full viewport height */
+  box-sizing: border-box; /* Include padding and borders in the height calculation */
+}
+
+header {
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  width: 100%; /* Full width */
+  height: 100px; /* Adjust height as needed */
+  position: fixed; /* Fix it at the top of the page */
+  top: 0; /* Stick to the top */
+  z-index: 2000; /* Ensure it stays above other content */
 }
 
 .center-button {
@@ -240,19 +226,73 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background-color: rgb(252, 160, 198);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));/* Gradient pink background */
+  border: 4px solid white;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
   text-align: center;
   z-index: 1000;
+  animation: popupIn 0.6s ease-out; 
+}
+
+@keyframes popupIn {
+  0% {
+    transform: scale(0.5) translate(-50%, -50%);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translate(-50%, -50%);
+    opacity: 1;
+  }
 }
 
 .results {
   padding: 2rem;
   text-align: center;
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));/* Gradient pink background */
+  border-radius: 8px;
+  border: 4px solid white;
+  font-size: 1.2rem;
+  animation: bounce 1.5s infinite; /* Bouncy animation */
+  max-width: 90%; /* Ensures it doesn’t exceed 90% of the screen width */
+  max-height: 70vh; /* Limits the height to 70% of the viewport */
+  overflow-y: auto; /* Adds a scroll bar if the content overflows vertically */
+  overflow-x: hidden; /* Hides horizontal overflow if needed */
+  box-sizing: border-box; /* Ensures padding is included in the total size */
 }
 
 .category {
   margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: #ff006e; /* Vibrant pink color */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow to make it pop */
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px #f8b4d9, 0 0 20px #ff80b5;
+  }
+  50% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 30px #ff99c8, 0 0 60px #ff80b5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+
+  header {
+    display: flex;                /* Aktivera Flexbox på headern */
+    justify-content: center;      /* Centrera horisontellt */
+    align-items: center;          /* Centrera vertikalt */
+    width: 100%;
+    height: 200px;                /* Sätt höjd på headern */
+    position: relative;           /* För Flexbox och andra positioneringar */
+    opacity: 0.7;
+}
 }
 </style>

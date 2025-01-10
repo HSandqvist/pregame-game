@@ -26,7 +26,11 @@
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="CAMERAVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="CAMERAVIEW"
+      />
       <h1 v-if="!choseCustomAvatar">
         {{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:
       </h1>
@@ -105,12 +109,19 @@
 
     <!-- Step 3: Display captured avatar and go to wait area -->
     <div v-else-if="step === 3" class="avatar-container">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="AVATARVIEW" />
-      <h1>{{ this.uiLabels.yourAvatar || "Your avatar" }}: {{ userName }}</h1>
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="AVATARVIEW"
+      />
+      <h2> {{ this.uiLabels.yourAvatar || "Your avatar" }} </h2>
+        <h1> {{ userName }} </h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
-        <button v-on:click="backStep"> {{ this.uiLabels.back || "Back" }}</button>
+        <button v-on:click="backStep">
+          {{ this.uiLabels.back || "Back" }}
+        </button>
         <button
           v-on:click="participateInPoll"
           id="submitNameButton"
@@ -123,11 +134,21 @@
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="isAdmin" viewKey="ADMINLOBBYVIEW" />
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" v-if="!isAdmin" viewKey="LOBBYVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="isAdmin"
+        viewKey="ADMINLOBBYVIEW"
+      />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        v-if="!isAdmin"
+        viewKey="LOBBYVIEW"
+      />
 
-      <h1>
-        {{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}
+      <h1 id="game-id-headline">
+        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
       </h1>
       <h2>
         {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
@@ -168,16 +189,25 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
+        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
+        <ConfirmLeaveModal
+          :show="showModal"
+          :uiLabels="uiLabels"
+          :lang="lang"
+          @confirm="leavePoll"
+          @cancel="showModal = false"
+        />
       </div>
     </div>
   </div>
 
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
-    {{this.uiLabels.music || "Your browser does not support the audio element." }}
+    {{
+      this.uiLabels.music || "Your browser does not support the audio element."
+    }}
   </audio>
 </template>
 
@@ -186,10 +216,10 @@ import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
 
 import musicIconOn from "@/assets/img/musicIcon.png";
 import musicIconOff from "@/assets/img/musicIconOff.png";
-
 
 const socket = io("localhost:3000");
 
@@ -201,6 +231,7 @@ export default {
   components: {
     LanguageSwitcher,
     InstructionButton,
+    ConfirmLeaveModal,
   },
   data: function () {
     return {
@@ -232,6 +263,9 @@ export default {
       musicIconOn, // Importera den ljusa ikonen
       musicIconOff,
       lobbyviewMusic,
+
+      //leave poll lobby
+      showModal: false,
     };
   },
   created: function () {
@@ -268,6 +302,8 @@ export default {
     },
 
     leavePoll() {
+      this.showModal = false;
+
       // Emit an event to the server to remove the participant
       socket.emit("leavePoll", {
         pollId: this.pollId,
@@ -524,7 +560,6 @@ export default {
   min-height: 100vh; /* Ensures it takes up the full viewport height */
   text-align: center;
   position: relative;
-  color: white;
 }
 
 /* Adjust other containers to ensure consistent styling */
@@ -573,10 +608,11 @@ button:hover {
 }
 
 .camera-view {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 320px;
-  height: 240px;
+  border: 0.1rem solid #f01984;
+  border-radius: 50%;
+  background-color: #f01984;
+  width: 15rem;
+  height: 14rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -588,7 +624,7 @@ button:hover {
   flex-direction: column; /* Keep buttons stacked vertically */
   gap: 10px; /* Space between buttons */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;
@@ -781,5 +817,16 @@ input[type="text"] {
 
 .music-icon:hover {
   transform: scale(1.1); /* Liten zoom vid hover */
+}
+
+#game-id-headline {
+  color: rgb(252, 181, 212);
+
+  position: fixed; 
+  top: 1rem;
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for centering */
+  z-index: 2; /* Ensures it stays above other content */
+  text-align: center;
 }
 </style>

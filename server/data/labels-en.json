@@ -5,6 +5,11 @@
 	"back": "Back",
 	"result": "Result",
 	"music": "Your browser does not support the audio element.",
+	"yes": "Yes", 
+	"no": "No",
+	"sureLeaveGame": "Are you sure you want to leave game?",
+	"gameID": "Game ID",
+
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
@@ -17,6 +22,10 @@
 	
 	"numberOfQuestions": "Number of questions",
 	"secondsPerQuestion": "Seconds per question ",
+	"languageForQuestions": "Chose language for questions",
+	"swedish": "Swedish",
+	"english": "English",
+	"backToStart": "Back to Start",
 
 "LOBBYVIEW": "",
 	"pleaseEnterYourName": "Enter your name",
@@ -26,7 +35,6 @@
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
 	"participateInPoll": "Participate in game",
-	"lobbyForPoll": "Lobby for poll",
 	"numberOfPlayers": "Number of players",
 	"players": "Players",
 	"leaveLobby": "Leave Lobby",
@@ -40,7 +48,7 @@
 		"whichPlayer": "Which player?",
 		"dropAnswerHere": "Drop answer here",
 		"outOf": "out of",
-		"hasVoted": "has Voted",
+		"hasVoted": "players has Voted",
 
 	"RESULT QUESTION COMPONENT":"",
 			"topAnswer": "got most votes!",
