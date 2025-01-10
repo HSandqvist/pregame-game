@@ -63,16 +63,28 @@
         </div>
         <div class="camera-buttons">
           <button v-on:click="choseOptionOne">
-            {{ this.uiLabels.gorankan || "Gorankan" }}
+            {{ this.uiLabels.avatar1 || "Avatar1" }}
           </button>
           <button v-on:click="choseOptionTwo">
-            {{ this.uiLabels.liankan || "Liankan" }}
+            {{ this.uiLabels.avatar2 || "Avatar2" }}
           </button>
           <button v-on:click="choseOptionThree">
-            {{ this.uiLabels.plankan || "Plankan" }}
+            {{ this.uiLabels.avatar3 || "Avatar3" }}
           </button>
           <button v-on:click="choseOptionFour">
-            {{ this.uiLabels.bankan || "Bankan" }}
+            {{ this.uiLabels.avatar4 || "Avatar4" }}
+          </button>
+          <button v-on:click="choseOptionFive">
+            {{ this.uiLabels.avatar1 || "Avatar5" }}
+          </button>
+          <button v-on:click="choseOptionSix">
+            {{ this.uiLabels.avatar2 || "Avatar6" }}
+          </button>
+          <button v-on:click="choseOptionSeven">
+            {{ this.uiLabels.avatar3 || "Avatar7" }}
+          </button>
+          <button v-on:click="choseOptionEight">
+            {{ this.uiLabels.avatar4 || "Avatar8" }}
           </button>
         </div>
       </div>
@@ -445,17 +457,29 @@ export default {
     },
 
     choseOptionOne() {
-      this.avatar = "/src/assets/img/Gorankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar1.png";
     },
 
     choseOptionTwo() {
-      this.avatar = "/src/assets/img/Liankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar2.png";
     },
     choseOptionThree() {
-      this.avatar = "/src/assets/img/Plankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar3.png";
     },
     choseOptionFour() {
-      this.avatar = "/src/assets/img/Bankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar4.png";
+    },
+    choseOptionFive() {
+      this.avatar = "/src/assets/img/Avatars/Avatar5.png";
+    },
+    choseOptionSix() {
+      this.avatar = "/src/assets/img/Avatars/Avatar6.png";
+    },
+    choseOptionSeven() {
+      this.avatar = "/src/assets/img/Avatars/Avatar7.png";
+    },
+    choseOptionEight() {
+      this.avatar = "/src/assets/img/Avatars/Avatar8.png";
     },
 
     returnToPictureMode() {
