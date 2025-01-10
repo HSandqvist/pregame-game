@@ -31,6 +31,13 @@ const router = createRouter({
       component: () => import('../views/LobbyView.vue')
     },
     {
+      // Dynamic route for accessing a lobby, with an `id` parameter
+      path: '/waiting/:id/:userId',
+      name: 'WaitingView',
+      // Lazy-load the LobbyView component
+      component: () => import('../views/WaitingView.vue')
+    },
+    {
       // Route for creating a new poll or quiz
       path: '/create/',
       name: 'CreateView',
