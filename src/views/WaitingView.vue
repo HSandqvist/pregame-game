@@ -35,7 +35,7 @@
             :class="{ host: participant.isAdmin }"
           />
 
-          <p>{{ participant.name}} is [{{ participant.userId }}]</p>
+          <p>{{ participant.name}} </p>
         </div>
       </div>
 

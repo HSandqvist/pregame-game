@@ -4,6 +4,7 @@
       <MusicPlayer :viewKey="'POLLVIEW'"/>
     </div>
 
+
   <div class="screen-container">
     <!-- top screen content -->
     <div class="top-box">
