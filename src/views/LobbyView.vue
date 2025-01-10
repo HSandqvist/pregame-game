@@ -383,95 +383,6 @@ button:disabled {
   background-color: rgb(219, 34, 142);
 }
 
-/* Avatar styles */
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-}
-
-.participants-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box; /* Inkludera padding i bredden */
-}
-
-.participant-item.current-user img.avatar {
-  border-color: rgb(255, 139, 230);
-  /* Lila kant runt aktuell användare */
-  border-style: solid;
-  /* Fylld kant */
-  animation: borderHighlight 1s infinite alternate;
-  /* Animerar kantfärgen */
-}
-
-@keyframes borderHighlight {
-  from {
-    border-color: rgb(255, 139, 230);
-    /* Startfärg */
-  }
-
-  to {
-    border-color: rgb(244, 34, 255);
-    /* Slutfärg */
-  }
-}
-
-.participant-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-img.avatar {
-  width: 100%;
-  /* Gör bilderna flexibla */
-  height: auto;
-  /* Behåll proportionerna */
-  aspect-ratio: 1 / 1;
-  /* Fyrkantiga bilder */
-  border-radius: 50%;
-  /* Runda bilder */
-  object-fit: cover;
-  /* Beskär inte bilder */
-  max-width: 150px;
-  /* Maximal bildstorlek */
-  border: 4px solid transparent;
-  /* Standardkant */
-  border-color: white;
-  /* Default-kantfärg */
-  transition: border-color 0.3s ease;
-  /* Mjuk övergång för kantfärg */
-}
-
-img.avatar.host {
-  border-color: rgb(15, 177, 69);
-  /* Grön kant för admin */
-}
-
-.participant-item p {
-  margin-top: 10px;
-  /* Avstånd mellan bild och namn */
-  font-size: 14px;
-  /* Mindre textstorlek */
-}
-
-@media (max-width: 768px) {
-  .participants-grid {
-    grid-template-columns: repeat(2, 1fr);
-    /* Två bilder per rad på små skärmar */
-  }
-}
-
-
-
 /* Style for the name input box */
 input[type="text"] {
   width: 100%;
@@ -490,15 +401,12 @@ input[type="text"] {
   text-align: center;
 }
 
-
-#game-id-headline {
-  color: rgb(252, 181, 212);
-
-  position: fixed;
-  top: 1rem;
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%); /* Adjust for centering */
-  z-index: 2; /* Ensures it stays above other content */
-  text-align: center;
+/* Avatar styles */
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
 }
 </style>

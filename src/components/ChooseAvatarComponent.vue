@@ -33,11 +33,15 @@
 </template>
 
 <script>
-import defaultAvatar from '@/assets/img/Gorankan.png';
-import avatar1 from "/src/assets/img/Gorankan.png";
-import avatar2 from "/src/assets/img/Liankan.png";
-import avatar3 from "/src/assets/img/Plankan.png";
-import avatar4 from "/src/assets/img/Bankan.png";
+import defaultAvatar from '@/assets/img/avatarsImg/Avatar1.png';
+import avatar1 from '@/assets/img/avatarsImg/avatar1.png';
+import avatar2 from '@/assets/img/avatarsImg/avatar2.png';
+import avatar3 from '@/assets/img/avatarsImg/avatar3.png';
+import avatar4 from '@/assets/img/avatarsImg/avatar4.png';
+import avatar5 from '@/assets/img/avatarsImg/avatar5.png';
+import avatar6 from '@/assets/img/avatarsImg/avatar6.png';
+import avatar7 from '@/assets/img/avatarsImg/avatar7.png';
+import avatar8 from '@/assets/img/avatarsImg/avatar8.png';
 
 export default {
   props: {
@@ -51,7 +55,7 @@ export default {
     return {
       chosenAvatar: defaultAvatar, 
       defaultAvatar,
-      avatarOptions: [ avatar1, avatar2, avatar3, avatar4 ],
+      avatarOptions: [ avatar1, avatar2, avatar3, avatar4, avatar5, avatar6, avatar7, avatar8 ],
     };
   },
   methods: {
