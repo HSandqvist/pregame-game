@@ -76,7 +76,7 @@
         <div v-if="view === 'final_view'">
           <div v-if="isAdmin === true">
             <button @click="adminToResults">
-              {{ this.uiLabels.endgame || "Engame" }}
+              {{ this.uiLabels.endgame || "End game" }}
             </button>
           </div>
         </div>
@@ -160,6 +160,7 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
+
     socket.emit("pollInfoUpdatePersonal", {pollId: this.pollId});
 
     socket.on("pollInfoUpdate", (data) => {
@@ -168,10 +169,7 @@ export default {
       console.log("view", data.currentView); 
       this.currentQuestionIndex = data.currentQuestion;
       console.log("currentQuestionIndex", data.currentQuestion);
-    }
-    );
-
-    console.log("Adding participantsUpdate listener");
+    });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
 
@@ -180,7 +178,6 @@ export default {
       this.participants = participantData; // Ensure the array is directly assigned here.
       console.log("längden av participants", this.participants.length);
     });
-
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {

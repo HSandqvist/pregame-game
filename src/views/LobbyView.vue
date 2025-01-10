@@ -127,7 +127,7 @@
           id="submitNameButton"
           :disabled="joined"
         >
-          {{ this.uiLabels.participateInPoll || "Participate in poll" }}
+          {{ this.uiLabels.participateInPoll || "READY!" }}
         </button>
       </div>
     </div>

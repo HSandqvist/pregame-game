@@ -1,43 +1,55 @@
 <template>
   <div>
     <div v-if="!voting">
-    <h3>{{ this.uiLabels.whichPlayer || "Which player?" }}</h3>
+      <h1>{{ this.uiLabels.whichPlayer || "Which player?" }}</h1>
 
-    <h2 >{{ question.q }}</h2>
+      <h2>{{ question.q }}</h2>
 
-    <!-- Draggable answer options -->
-    <div  class="answer-options">
-      <div
-        v-for="(participant, index) in participants"
-        :key="index"
-        class="draggable"
-        draggable="true"
-        @dragstart="onDragStart(participant)"
-      >
-      <img
-          :src="participant.avatar"
-          alt="Participant Avatar"
-          class="participant-avatar"
-        />
+      <!-- Draggable answer options -->
+      <div class="answer-options">
+        <div
+          v-for="(participant, index) in participants"
+          :key="index"
+          class="draggable"
+          draggable="true"
+          @dragstart="onDragStart(participant)"
+        >
+          <div class="participant-container">
+            <!-- p>{{ participant.name }}</p-->
+            <div class="curved-text">
+              <span
+                v-for="(char, i) in participant.name.split('')"
+                :key="i"
+                :style="getCurvedStyle(i, participant.name.length)"
+              >
+                {{ char }}
+              </span>
+            </div>
+            <img
+              :src="participant.avatar"
+              alt="Participant Avatar"
+              class="participant-avatar"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" @dragover.prevent @drop="onDrop">
+        {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
       </div>
     </div>
 
-    <!-- Drop zone -->
-    <div  class="drop-zone" @dragover.prevent @drop="onDrop">
-      {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
-    </div>
-  </div>
-
-  <h2 v-if="voting">
-    <span 
-      v-for="(char, index) in textArray" 
-      :key="index" 
-      class="bouncing-char"
-      :style="{ animationDelay: getDelay(index) + 's' }"
-    >
-      {{ char }}
-    </span>
-  </h2>
+    <h2 v-if="voting">
+      <span
+        v-for="(char, index) in textArray"
+        :key="index"
+        class="bouncing-char"
+        :style="{ animationDelay: getDelay(index) + 's' }"
+      >
+        {{ char }}
+      </span>
+    </h2>
 
     <!-- h2 v-if="voting" v-motion="jumpingCharacter"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </h2 -->
   </div>
@@ -70,30 +82,31 @@ export default {
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
     //console.log("Participants data:", this.participants);
-
   },
 
   computed: {
     textArray() {
       // Split the text into an array of individual characters
-      return (this.uiLabels.waitingForAnswers || "Waiting for answers..").split('');
+      return (this.uiLabels.waitingForAnswers || "Waiting for answers..").split(
+        ""
+      );
     },
   },
 
   methods: {
     getDelay(index) {
       // Apply a wave effect delay to each character, making it look like a wave
-      const waveDelay = Math.sin(index * 0.5) * 0.5; // Using sine for smooth wave pattern
+      const waveDelay = Math.sin(index * 0.5) * 1.2; // Using sine for smooth wave pattern
       return waveDelay;
     },
 
     // When dragging starts, store the dragged participant
-    onDragStart: function(participant) {
+    onDragStart: function (participant) {
       this.draggedParticipant = participant;
     },
 
     // When an item is dropped in the drop zone
-    onDrop: function() {
+    onDrop: function () {
       if (this.draggedParticipant) {
         // Emit the dragged participant as the selected answer
         this.$emit("answer", this.draggedParticipant);
@@ -110,6 +123,15 @@ export default {
       this.$emit("answer", participant);
     },
     */
+    getCurvedStyle(index, length) {
+    const angleStep = 12; // Adjust for curvature intensity
+    const midpoint = length / 2;
+    const rotationAngle = (index - midpoint) * angleStep;
+
+    return {
+      transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
+    };
+  }
   },
 };
 </script>
@@ -119,11 +141,11 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
 
 .participant-avatar {
-  width: 100px;
-  height: 100px;
+  width: 7rem;
+  height: 7rem;
   border-radius: 50%; /* Makes the avatars round */
   object-fit: cover; /* Ensures the image fills the container without distortion */
-  border: 2px solid #ccc;
+  border: 0.02rem solid rgb(252, 160, 198);
   cursor: grab;
   transition: transform 0.2s ease;
   -webkit-user-drag: none;
@@ -174,7 +196,27 @@ export default {
   transform: scale(1.05);
 }
 
+.participant-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center name and avatar horizontally */
+}
 
+.curved-text {
+  display: flex;
+  justify-content: center;
+  transform: translateY(-0.05rem); /* Moves text above the avatar */
+  position: relative;
+}
+
+.curved-text span {
+  display: inline-block;
+  transform-origin: bottom center;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgb(252, 160, 198);
+  letter-spacing: 0.05rem; /* Adjusts spacing between letters */
+}
 
 
 @keyframes bounce {
