@@ -1,4 +1,7 @@
 <template>
+  <div>
+      <MusicPlayer :viewKey="'RESULTVIEW'"/>
+    </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   
   <header>
@@ -50,6 +53,7 @@
 // @ is an alias to /src
 import BarsComponent from "@/components/BarsComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import MusicPlayer from "@/components/MusicPlayer.vue";
 import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
@@ -65,6 +69,7 @@ export default {
   components: {
     BarsComponent, // Register the BarsComponent
     InstructionButton,
+    MusicPlayer,
   },
 
   data: function () {

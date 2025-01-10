@@ -1,13 +1,8 @@
 <template>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
-  <div class="global-music-control" v-if="isAdmin">
-    <button @click="toggleMusic">
-      <img
-        :src="isMusicPlaying ? musicIconOn : musicIconOff"
-        alt="Music Icon"
-        class="music-icon"
-      />
-    </button>
+  <div v-if="isAdmin">
+      <MusicPlayer :viewKey="'POLLVIEW'"/>
+    </div>
   </div>
 
   <div class="screen-container">
@@ -83,10 +78,6 @@
       </div>
     </div>
   </div>
-  <audio ref="backgroundMusic" loop>
-    <source :src="backgroundMusic" type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
 </template>
 
 <script>
@@ -94,9 +85,8 @@
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
-import backgroundMusic from "@/assets/lobbyviewMusic/pollviewMusic.mp3";
-import musicIconOn from "@/assets/img/musicIcon.png";
-import musicIconOff from "@/assets/img/musicIconOff.png";
+import MusicPlayer from "@/components/MusicPlayer.vue";
+
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -111,6 +101,7 @@ export default {
     QuestionComponent, // Register the QuestionComponent
     ResultQuestionComponent, //Register the ResultQuestionComponent
     InstructionButton,
+    MusicPlayer,
   },
   data: function () {
     return {
@@ -139,11 +130,6 @@ export default {
 
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
-
-      isMusicPlaying: false,
-      musicIconOn, // Importera den ljusa ikonen
-      musicIconOff,
-      backgroundMusic,
     };
   },
 
@@ -342,25 +328,6 @@ export default {
       
     }
   },
-    toggleMusic: function () {
-      const audio = this.$refs.pollviewMusic;
-      if (!audio) {
-        console.error("Audio element not found!");
-        return;
-      }
-      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
-
-      if (this.isMusicPlaying) {
-        audio.pause();
-        this.isMusicPlaying = false; // Sätt musiken till av
-      } else {
-        // Återställ ljudets position till början om det är pausat
-        audio.currentTime = 0;
-        audio.play();
-        this.isMusicPlaying = true; // Sätt musiken till på
-      }
-    },
-
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
@@ -474,36 +441,5 @@ button:hover {
 button:disabled {
   background-color: #cccccc; /* Grey out disabled buttons */
   cursor: not-allowed;
-}
-
-.global-music-control {
-  position: fixed;
-  top: 1rem;
-  left: 4rem;
-  z-index: 1000;
-}
-
-.global-music-control button {
-  padding: 1px;
-  background-color: rgb(252, 160, 198);  color: white;
-  border: none;
-  border-radius: 50%; /* Gör ikonen rund */
-  cursor: pointer;
-  display: flex; /* Använd flexbox för att centrera ikonen */
-}
-
-.music-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
-}
-
-.global-music-control button:hover {
-  background-color: rgb(255, 131, 203);
-}
-
-.music-icon:hover {
-  transform: scale(1.1); /* Liten zoom vid hover */
 }
 </style>
