@@ -1,13 +1,7 @@
 <template>
-  <div class="global-music-control" v-if="isAdmin">
-    <button @click="toggleMusic">
-      <img
-        :src="isMusicPlaying ? musicIconOn : musicIconOff"
-        alt="Music Icon"
-        class="music-icon"
-      />
-    </button>
-  </div>
+    <div v-if="isAdmin">
+      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
+    </div>
   <div class="center-container">
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
@@ -127,28 +121,19 @@
           id="submitNameButton"
           :disabled="joined"
         >
-          {{ this.uiLabels.participateInPoll || "Participate in poll" }}
+          {{ this.uiLabels.participateInPoll || "READY!" }}
         </button>
       </div>
     </div>
   </div>
-  <audio ref="backgroundMusic" loop>
-    <source :src="lobbyviewMusic" type="audio/mpeg" />
-    {{
-      this.uiLabels.music || "Your browser does not support the audio element."
-    }}
-  </audio>
 </template>
 
 <script>
 import io from "socket.io-client";
-import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
+import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
-
-import musicIconOn from "@/assets/img/musicIcon.png";
-import musicIconOff from "@/assets/img/musicIconOff.png";
 
 const socket = io("localhost:3000");
 
@@ -161,6 +146,7 @@ export default {
     LanguageSwitcher,
     InstructionButton,
     ConfirmLeaveModal,
+    MusicPlayer,
   },
   data: function () {
     return {
@@ -186,12 +172,6 @@ export default {
       isPictureTaken: false, //Tracks that camera is closed and picture taken
       cameraState: false, // Tracks whether the camera is active
       disableSwitcher: false, //connected to choose premade avatar button
-
-      //music
-      isMusicPlaying: false,
-      musicIconOn, // Importera den ljusa ikonen
-      musicIconOff,
-      lobbyviewMusic,
 
       //leave poll lobby
       showModal: false,
@@ -387,26 +367,6 @@ export default {
       this.choseCustomAvatar = false;
       this.isPictureTaken = false;
       this.avatar = null;
-    },
-
-    toggleMusic: function () {
-      const audio = this.$refs.backgroundMusic;
-      if (!audio) {
-        console.error("Audio element not found!");
-        return;
-      }
-
-      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
-
-      if (this.isMusicPlaying) {
-        audio.pause();
-        this.isMusicPlaying = false; // Sätt musiken till av
-      } else {
-        // Återställ ljudets position till början om det är pausat
-        audio.currentTime = 0;
-        audio.play();
-        this.isMusicPlaying = true; // Sätt musiken till på
-      }
     },
 
     // Handle manual avatar upload
@@ -664,12 +624,7 @@ img.avatar.host {
   }
 }
 
-@media (max-width: 480px) {
-  .participants-grid {
-    grid-template-columns: repeat(1, 1fr);
-    /* En bild per rad på mycket små skärmar */
-  }
-}
+
 
 /* Style for the name input box */
 input[type="text"] {
@@ -689,38 +644,6 @@ input[type="text"] {
   text-align: center;
 }
 
-.global-music-control {
-  position: fixed;
-  top: 1rem;
-  left: 4rem;
-  z-index: 1000;
-}
-
-.global-music-control button {
-  padding: 1px;
-  background-color: pink;
-  color: white;
-  border: none;
-  border-radius: 50%; /* Gör ikonen rund */
-  cursor: pointer;
-  display: flex; /* Använd flexbox för att centrera ikonen */
-  background-color: rgb(252, 160, 198);
-}
-
-.music-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
-}
-
-.global-music-control button:hover {
-  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
-}
-
-.music-icon:hover {
-  transform: scale(1.1); /* Liten zoom vid hover */
-}
 
 #game-id-headline {
   color: rgb(252, 181, 212);

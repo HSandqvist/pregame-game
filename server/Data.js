@@ -33,7 +33,7 @@ Data.prototype.createPoll = function (
   pollId,
   lang = "en",
   adminId,
-  questionCount,
+  questionCount
 ) {
   if (!this.pollExists(pollId)) {
     let poll = {
@@ -48,7 +48,7 @@ Data.prototype.createPoll = function (
       questions: [], // Empty array for questions
       answers: [], // Empty array for answers
       participants: [], // Empty array for participants
-      
+
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
@@ -137,10 +137,10 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
 
     // Initialize answer count and voters if not already present
     if (!answers[answer.name]) {
-      answers[answer.name] = { count: 0, voters: [], avatar: answer.avatar};
+      answers[answer.name] = { count: 0, voters: [], avatar: answer.avatar };
       console.log("");
     }
-    console.log("answers answer är", answer)
+    console.log("answers answer är", answer);
 
     // Increment the count for this answer
     answers[answer.name].count += 1;
@@ -155,24 +155,21 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
   }
 };
 Data.prototype.updateView = function (pollId, view) {
-
   const poll = this.polls[pollId];
-    if (view === "question_view") {
-     
-      poll.currentView = "results_view";
-    }
-    else if (poll.questionCount -1 === poll.currentQuestion ) {
-      console.log("Last question answered. Switching to final view.");
+  if (view === "question_view") {
+    if (poll.questionCount - 1 === poll.currentQuestion) {
       poll.currentView = "final_view";
-
+      console.log("Changed to final results view.");
     } else {
-      // Switch view to show the result after answer submission
-      poll.currentView = "question_view";
-
-      console.log("Changed to question view.");
+      poll.currentView = "results_view";
+      console.log("Changed to results view.");
     }
-  };
-
+  } else {
+    // Switch view to show the result after answer submission
+    poll.currentView = "question_view";
+    console.log("Changed to question view.");
+  }
+};
 
 Data.prototype.votingReset = function (pollId) {
   if (this.pollExists(pollId)) {
@@ -188,7 +185,6 @@ Data.prototype.votingReset = function (pollId) {
 
     // Move to the next question
     poll.currentQuestion += 1; // Increment to the next question
-   
 
     poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
     console.log(
@@ -208,7 +204,7 @@ Data.prototype.runQuestion = function (pollId) {
     const answers = poll.answers[currentQuestion];
     let maxVotes = 0;
     let topAnswer = {};
-    let topAvatar = ""
+    let topAvatar = "";
 
     for (const [answer, answerdata] of Object.entries(answers)) {
       const { count, voters, avatar } = answerdata; //kanske vill spara voters sen för specifik funktionalitet
@@ -216,7 +212,7 @@ Data.prototype.runQuestion = function (pollId) {
       if (count > maxVotes) {
         maxVotes = count;
         topAnswer = answer;
-        topAvatar = avatar
+        topAvatar = avatar;
         //topAnswer = {answer, avatar};
         this.globalTopAnswer = topAnswer;
       }
