@@ -1,6 +1,16 @@
 <template>
+  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
+  <div class="global-music-control" v-if="isAdmin">
+    <button @click="toggleMusic">
+      <img
+        :src="isMusicPlaying ? musicIconOn : musicIconOff"
+        alt="Music Icon"
+        class="music-icon"
+      />
+    </button>
+  </div>
   <div>
-    <h1>Poll id: {{ pollId }} </h1>
+    <h1 id="poll-id-headline">Poll ID: {{ pollId }}</h1>
     <!-- h3 v-if="isAdmin">You are the host</h3 -->
     <!-- Render the QuestionComponent and pass the current question as a prop -->
     <br />
@@ -14,6 +24,8 @@
         :voting="hasVoted"
       />
 
+      <br />
+
       <!-- Special admin functions -->
       <div class="admin-functions-in-poll">
         <button v-if="isAdmin" v-on:click="adminNext()">
@@ -22,46 +34,71 @@
 
         <!-- Amount of votes only visible by admin -->
         <p v-if="isAdmin">
-          {{ this.numberOfVotes }} out of {{ this.participants.length }} has
-          voted
+          {{ this.numberOfVotes }} 
+          
+         <!--  {{ this.uiLabels.outOf || "out of" }}
+          {{ this.participants.length }}-->
+          {{ this.uiLabels.hasVoted || "has voted" }}
         </p>
       </div>
     </div>
 
     <div v-if="view === 'results_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+      <ResultQuestionComponent
+        :topAnswer="topAnswer"
+        :maxVotes="maxVotes"
+        :topAvatar="topAvatar"
+      />
+      <br />
 
       <!-- so only admin can use buttons -->
-      <div v-if="isAdmin === true">
-        <button
-          @click="adminNext"
-          :disabled="currentQuestionIndex === questions.length - 1"
-        >
-          {{ this.uiLabels.nextQuestion || "Next question" }}
-        </button>
+      <div class="admin-functions-in-poll">
+        <div v-if="isAdmin === true">
+          <button
+            @click="adminNext"
+            :disabled="currentQuestionIndex === questions.length - 1"
+          >
+            {{ this.uiLabels.nextQuestion || "Next question" }}
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- testar!! för finalview-->
     <div v-if="view === 'final_view'">
       <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent :topAnswer="topAnswer" :maxVotes="maxVotes" />
+      <ResultQuestionComponent
+        :topAnswer="topAnswer"
+        :maxVotes="maxVotes"
+        :topAvatar="topAvatar"
+      />
+      <br />
 
       <!-- so only admin can use buttons -->
-      <div v-if="isAdmin === true">
-        <button @click="adminToResults">
-          {{ this.uiLabels.endgame || "Engame" }}
-        </button>
+      <div class="admin-functions-in-poll">
+        <div v-if="isAdmin === true">
+          <button @click="adminToResults">
+            {{ this.uiLabels.endgame || "Engame" }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
+  <audio ref="backgroundMusic" loop>
+    <source :src="backgroundMusic" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
 </template>
 
 <script>
 // @ is an alias to /src
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import backgroundMusic from "@/assets/lobbyviewMusic/backgroundMusic.mp3";
+import musicIconOn from "@/assets/img/musicIcon.png";
+import musicIconOff from "@/assets/img/musicIconOff.png";
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -75,6 +112,7 @@ export default {
   components: {
     QuestionComponent, // Register the QuestionComponent
     ResultQuestionComponent, //Register the ResultQuestionComponent
+    InstructionButton,
   },
   data: function () {
     return {
@@ -93,12 +131,21 @@ export default {
       questions: [], // Array of all questions
       currentQuestionIndex: 0, // Tracks the index of the current question
       currentQuestion: { q: "", a: [] }, // Represents the current question and its answers
+
       topAnswer: "", // Initialize with an empty string
       maxVotes: 0, // Initialize with 0
+      topAvatar: "", //Will store picture of the top voted person
+
       hasVoted: false,
       view: "question_view", // 'question_view' or 'results_view'
 
       uiLabels: {}, // UI labels for different languages
+      lang: localStorage.getItem("lang") || "en", // Language preference
+
+      isMusicPlaying: false,
+      musicIconOn, // Importera den ljusa ikonen
+      musicIconOff,
+      backgroundMusic,
     };
   },
 
@@ -115,9 +162,18 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
-    socket.emit("participantsUpdate");
-    
+    socket.emit("pollInfoUpdatePersonal", {pollId: this.pollId});
+
+    socket.on("pollInfoUpdate", (data) => {
+      console.log("pollInfoUpdate", data);
+      this.view= data.currentView;
+      console.log("view", data.currentView); 
+      this.currentQuestionIndex = data.currentQuestion;
+      console.log("currentQuestionIndex", data.currentQuestion);
+    }
+    );
     socket.on("participantsUpdate", (p) => (this.participants = p));
+
     console.log(
       "participant update säger",
       this.participants,
@@ -131,12 +187,13 @@ export default {
       console.log("Participant name received:", participantData.name);
     });
 
+    //används ej
     // Listen for server events to update the question and submitted answers
-    socket.on("questionUpdate", (q) => {
+    /*socket.on("questionUpdate", (q) => {
       this.currentQuestion = q;
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
-
+*/
     socket.on("participantNextQuestion", () => this.particpantNext());
 
     //LISTENER FOR GAME END
@@ -147,7 +204,11 @@ export default {
       (answers) => (this.submittedAnswers = answers)
     ); // Update the submitted answers
 
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.on("uiLabels", (labels) => {
+      console.log("Received labels:", labels); // Debugging
+      this.uiLabels = labels;
+    });
+
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
 
@@ -180,10 +241,13 @@ export default {
 
     socket.on("topAnswerUpdate", (data) => {
       //console.log("Received data:", data); // Log the received data
-      const { topAnswer, maxVotes } = data;
+      const { topAnswer, maxVotes, topAvatar } = data;
       console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
+      this.topAvatar = topAvatar;
+
+      //console.log("avataren är", topAvatar);
 
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {
@@ -194,7 +258,6 @@ export default {
             this.adminNext();
           }
         }
-
         socket.off("updateNumberOfVotes");
       });
     });
@@ -216,23 +279,8 @@ export default {
 
       socket.emit("runQuestionResults", this.pollId);
       this.hasVoted = true;
-      socket.emit("playerVoted", this.userId);
+      socket.emit("playerVoted", this.pollId);
       //flyttat socket.on top answer update till created delen
-
-    },
-
-    switchView() {
-      //const answers = poll.answers[currentQuestion];
-
-      // If it's the last question, transition to final view
-      if (this.currentQuestionIndex === this.questions.length - 1) {
-        console.log("Last question answered. Switching to final view.");
-        this.view = "final_view";
-      } else {
-        // Switch view to show the result after answer submission
-        this.view = "results_view";
-        console.log("Changed to result view.");
-      }
     },
 
     checkAdminStatus(callback) {
@@ -269,40 +317,47 @@ export default {
 
     nextQuestion: function () {
       // Check if the current question is NOT the last question
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.currentQuestionIndex += 1; // Increment the index
-        this.updateCurrentQuestion(this.currentQuestionIndex); // Update the question
-        console.log("Current question index:", this.currentQuestionIndex);
-
-        // Switch back to 'question' view
-        this.view = "question_view";
-      }
-      // If it's the last question, switch to the final view
-      else if (this.currentQuestionIndex === this.questions.length - 1) {
-        console.log("No more questions. Switching to final view."); //printas aldrig
-
-        this.view = "final_view";
-      }
       this.hasVoted = false;
       this.numberOfVotes = 0;
     },
 
     adminNext: function () {
       socket.emit("nextQuestion", this.pollId, this.userId);
+      socket.emit("updatePollInfo", {pollId: this.pollId, currentView: this.view})
       console.log("In admin next");
     },
 
     particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
-
-        this.switchView();
-      } else if (this.view === "results_view" || this.view === "final_view") {
-        console.log("participant next question");
-        if (this.isAdmin) {
+        if(this.isAdmin)  {
           socket.emit("votingReset", this.pollId);
         }
+
+     
+      } else if (this.view === "results_view" || this.view === "final_view") {
+        console.log("participant next question");
         this.nextQuestion();
+      
+    }
+  },
+    toggleMusic: function () {
+      const audio = this.$refs.backgroundMusic;
+      if (!audio) {
+        console.error("Audio element not found!");
+        return;
+      }
+
+      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
+
+      if (this.isMusicPlaying) {
+        audio.pause();
+        this.isMusicPlaying = false; // Sätt musiken till av
+      } else {
+        // Återställ ljudets position till början om det är pausat
+        audio.currentTime = 0;
+        audio.play();
+        this.isMusicPlaying = true; // Sätt musiken till på
       }
     },
 
@@ -329,7 +384,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* General Button Styling */
 button {
   padding: 15px 25px;
@@ -361,8 +416,45 @@ button:disabled {
 
 /* Admin functions container styling */
 .admin-functions-in-poll {
-  margin-top: 50px; /* Adds spacing above the admin functions */
+  margin-top: 100px; /* Adds spacing above the admin functions */
   padding: 10px; /* Optional padding within the container */
   /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
+}
+
+#poll-id-headline {
+  color: rgb(252, 181, 212);
+}
+
+
+.global-music-control {
+  position: fixed;
+  top: 1rem;
+  left: 4rem;
+  z-index: 1000;
+}
+
+.global-music-control button {
+  padding: 1px;
+  background-color: pink;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Gör ikonen rund */
+  cursor: pointer;
+  display: flex; /* Använd flexbox för att centrera ikonen */
+}
+
+.music-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
+}
+
+.global-music-control button:hover {
+  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
+}
+
+.music-icon:hover {
+  transform: scale(1.1); /* Liten zoom vid hover */
 }
 </style>

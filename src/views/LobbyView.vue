@@ -1,19 +1,20 @@
 <template>
-  <div class="global-music-control">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
+  <div class="global-music-control" v-if="isAdmin">
     <button @click="toggleMusic">
-      {{ isMusicPlaying ? "Turn Music Off" : "Turn Music On" }}
+      <img
+        :src="isMusicPlaying ? musicIconOn : musicIconOff"
+        alt="Music Icon"
+        class="music-icon"
+      />
     </button>
   </div>
   <div class="center-container">
-    <div class="language-switcher-container">
-      <!-- Language switcher component -->
-      <LanguageSwitcher @language-changed="updateLanguage" />
-    </div>
+    <!-- Language switcher component -->
+    <LanguageSwitcher @language-changed="updateLanguage" />
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
-      <h1>
-        {{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:
-      </h1>
+      <h1>{{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:</h1>
       <input type="text" v-model="userName" />
 
       <div class="action-buttons">
@@ -25,8 +26,12 @@
 
     <!-- Step 2: Capture avatar from the camera -->
     <div v-else-if="step === 2" class="camera-container">
-      <h1 v-if="!choseCustomAvatar">{{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:</h1>
-      <h1 v-if="choseCustomAvatar">{{ this.uiLabels.chooseYourAvatar || "Choose your avatar" }}:</h1>
+      <h1 v-if="!choseCustomAvatar">
+        {{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:
+      </h1>
+      <h1 v-if="choseCustomAvatar">
+        {{ this.uiLabels.chooseYourAvatar || "Choose your avatar" }}:
+      </h1>
 
       <div class="camera-picture-container" v-if="!choseCustomAvatar">
         <!-- Camera view -->
@@ -50,16 +55,14 @@
             {{ this.uiLabels.takePicture || "Take picture" }}
           </button>
         </div>
-
       </div>
       <div class="camera-picture-container" v-if="choseCustomAvatar">
-        
-      <div class="camera-view" >
-          <p >
+        <div class="camera-view">
+          <p>
             <img :src="avatar" alt="User Avatar" width="320" height="240" />
           </p>
-          </div>
-          <div class="camera-buttons">
+        </div>
+        <div class="camera-buttons">
           <button v-on:click="choseOptionOne">
             {{ this.uiLabels.gorankan || "Gorankan" }}
           </button>
@@ -68,26 +71,26 @@
           </button>
           <button v-on:click="choseOptionThree">
             {{ this.uiLabels.plankan || "Plankan" }}
-            </button>
+          </button>
           <button v-on:click="choseOptionFour">
             {{ this.uiLabels.bankan || "Bankan" }}
-            </button>
+          </button>
         </div>
-
-        </div>
-
+      </div>
 
       <!-- Action buttons-->
       <div class="action-buttons">
-    
         <button v-on:click="backStep" :disabled="disableSwitcher">
           {{ this.uiLabels.back || "Back" }}
         </button>
 
-        <button v-on:click="chooseAvatar" v-if="!choseCustomAvatar" :disabled="disableSwitcher">
+        <button
+          v-on:click="chooseAvatar"
+          v-if="!choseCustomAvatar"
+          :disabled="disableSwitcher"
+        >
           {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
         </button>
-
 
         <button v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
           {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
@@ -105,7 +108,7 @@
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
-        <button v-on:click="backStep">Back</button>
+        <button v-on:click="backStep"> {{ this.uiLabels.back || "Back" }}</button>
         <button
           v-on:click="participateInPoll"
           id="submitNameButton"
@@ -118,8 +121,13 @@
 
     <!-- Step 4: Show waiting area with other participants -->
     <div v-else-if="step === 4" class="waiting-area">
-      <h1>{{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}</h1>
-      <h2>{{ this.uiLabels.numberOfPlayers || "Number of players" }}: {{ participants.length }}</h2>
+      <h1>
+        {{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}
+      </h1>
+      <h2>
+        {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
+        {{ participants.length }}
+      </h2>
       <h3>{{ this.uiLabels.players || "Players" }}:</h3>
 
       <!-- Participants grid -->
@@ -158,21 +166,25 @@
         <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
-        
       </div>
     </div>
   </div>
 
   <audio ref="backgroundMusic" loop>
     <source :src="lobbyviewMusic" type="audio/mpeg" />
-    Your browser does not support the audio element.
+    {{this.uiLabels.music || "Your browser does not support the audio element." }}
   </audio>
 </template>
 
 <script>
 import io from "socket.io-client";
 import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+
+import musicIconOn from "@/assets/img/musicIcon.png";
+import musicIconOff from "@/assets/img/musicIconOff.png";
+
 
 const socket = io("localhost:3000");
 
@@ -183,6 +195,7 @@ export default {
   name: "LobbyView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
   },
   data: function () {
     return {
@@ -207,9 +220,13 @@ export default {
       stream: null, // The video stream to access the camera
       isPictureTaken: false, //Tracks that camera is closed and picture taken
       cameraState: false, // Tracks whether the camera is active
+      disableSwitcher: false, //connected to choose premade avatar button
 
       //music
       isMusicPlaying: false,
+      musicIconOn, // Importera den ljusa ikonen
+      musicIconOff,
+      lobbyviewMusic,
     };
   },
   created: function () {
@@ -236,7 +253,7 @@ export default {
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", { pollId: this.pollId });
+    socket.emit("joinPoll", this.pollId);
   },
 
   methods: {
@@ -329,7 +346,7 @@ export default {
     startCamera: function () {
       this.isPictureTaken = false;
       this.cameraState = true;
-      this.disableSwitcher=true;
+      this.disableSwitcher = true;
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -348,7 +365,6 @@ export default {
           this.stream = stream;
           this.$refs.video.srcObject = stream;
           console.log("Camera stream is active:", stream);
-          
         })
         .catch((error) => {
           console.error("Error accessing camera:", error);
@@ -369,7 +385,7 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
-      this.disableSwitcher=false;
+      this.disableSwitcher = false;
     },
 
     // Capture the image from the video stream
@@ -403,33 +419,32 @@ export default {
         console.error("Video stream is not available.");
       }
     },
-    chooseAvatar(){
+    chooseAvatar() {
       this.stopCamera();
-      this.choseCustomAvatar= true;
+      this.choseCustomAvatar = true;
       this.isPictureTaken = true;
     },
 
-    choseOptionOne(){
-      this.avatar = "/src/assets/img/Gorankan.png"
+    choseOptionOne() {
+      this.avatar = "/src/assets/img/Gorankan.png";
     },
 
-    choseOptionTwo(){
-      this.avatar = "/src/assets/img/Liankan.png" 
+    choseOptionTwo() {
+      this.avatar = "/src/assets/img/Liankan.png";
     },
-    choseOptionThree(){
-      this.avatar = "/src/assets/img/Plankan.png"
+    choseOptionThree() {
+      this.avatar = "/src/assets/img/Plankan.png";
     },
-    choseOptionFour(){
-      this.avatar = "/src/assets/img/Bankan.png"
+    choseOptionFour() {
+      this.avatar = "/src/assets/img/Bankan.png";
     },
-    
-    returnToPictureMode(){
-      
-      this.choseCustomAvatar= false;
+
+    returnToPictureMode() {
+      this.choseCustomAvatar = false;
       this.isPictureTaken = false;
       this.avatar = null;
     },
-    
+
     toggleMusic: function () {
       const audio = this.$refs.backgroundMusic;
       if (!audio) {
@@ -441,10 +456,13 @@ export default {
 
       if (this.isMusicPlaying) {
         audio.pause();
+        this.isMusicPlaying = false; // Sätt musiken till av
       } else {
+        // Återställ ljudets position till början om det är pausat
+        audio.currentTime = 0;
         audio.play();
+        this.isMusicPlaying = true; // Sätt musiken till på
       }
-      this.isMusicPlaying = !this.isMusicPlaying;
     },
 
     // Handle manual avatar upload
@@ -514,7 +532,6 @@ export default {
 .name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
-  max-width: 400px; /* Optional: Limit the container width */
   margin: auto; /* Center the container horizontally */
   padding: 20px; /* Optional: Add padding */
   box-sizing: border-box; /* Include padding in width/height calculations */
@@ -705,9 +722,6 @@ img.avatar.host {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
-  .global-music-control button {
-    font-size: 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -737,42 +751,33 @@ input[type="text"] {
 
 .global-music-control {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  left: 4rem;
   z-index: 1000;
 }
 
 .global-music-control button {
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 1px;
   background-color: pink;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%; /* Gör ikonen rund */
   cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  transition: all 0.2s ease;
-  text-decoration: none;
+  display: flex; /* Använd flexbox för att centrera ikonen */
+}
+
+.music-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
 }
 
 .global-music-control button:hover {
-  background-color: rgb(255, 131, 203);
+  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
 }
 
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  display: flex;
-  justify-content: flex-end;
-  z-index: 10; /* Ensures it stays above other elements */
+.music-icon:hover {
+  transform: scale(1.1); /* Liten zoom vid hover */
 }
-
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
-}
-
 </style>

@@ -1,4 +1,5 @@
 <template>
+  <div class="language-switcher-container">
   <div class="language-toggle">
     <!-- English Flag Button -->
     <button
@@ -26,6 +27,7 @@
       />
     </button>
   </div>
+</div>
 </template>
 
 <script>
@@ -50,11 +52,14 @@ export default {
 
 <style scoped>
 .language-toggle {
- display: flex;
- gap: 10px;
- align-items: center;
- justify-content: center;
- margin-top: 1rem;
+  position: fixed;
+  top: 1rem;
+  right: 1rem; /* Right side for the language switcher */
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 .flag-button {
@@ -85,4 +90,5 @@ export default {
 .flag-button.active {
  box-shadow: 0 0 0 3px #007bff; /* Highlight the active language */
 }
+
 </style>

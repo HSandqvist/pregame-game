@@ -3,6 +3,8 @@
 "GENERIC":"",
 	"next" : "Next",
 	"back": "Back",
+	"result": "Result",
+	"music": "Your browser does not support the audio element.",
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
@@ -33,13 +35,32 @@
 	
 
 "POLLVIEW": "",
-	"whichPlayer": "Which player?",
-	"dropAnswerHere": "Drop answer here",
+
+	"QUESTION COMPONENT": "",
+		"whichPlayer": "Which player?",
+		"dropAnswerHere": "Drop answer here",
+		"outOf": "out of",
+		"hasVoted": "players has Voted",
+
+	"RESULT QUESTION COMPONENT":"",
+			"topAnswer": "got most votes!",
+			"amountVotes": "Votes:",
+
 	"nextQuestion": "Next question",
 	"waitingForAnswers": "Waiting for answers...",
 	"showResult": "Show result",
 	"endgame": "Endgame",
-	"showEndResults": "Show results"
-}
+	"showEndResults": "Show results",
+
+	"INSTRUCTIONS": {
+		"STARTVIEW": "Welcome to the start page! Here you can create or join a game.",
+		"CREATEVIEW": "On this page, you can create a new game by entering the details.",
+		"LOBBYVIEW": "This is the lobby. Wait until all participants are ready before starting the game.",
+		"POLLVIEW": "On this page, you can vote for your teammates by dragging and dropping their avatars.",
+		"RESULTVIEW": "View the results of the game here."
+	  }
+	}
+
+
 
 

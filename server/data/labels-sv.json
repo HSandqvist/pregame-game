@@ -2,6 +2,8 @@
 "GENERIC":"",
 	"next" : "Nästa",
 	"back": "Tillbaka",
+	"result": "Resultat",
+	"music": "Din webbläsare stödjer inte ljud.",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
@@ -32,14 +34,30 @@
 	"takeAPictureInstead": "Ta en bild istället",
 
 "POLLVIEW": "",
-	"whichPlayer": "Vilken spelare?",
-	"dropAnswerHere": "Dra svar hit",
+
+	"QUESTION COMPONENT": "",
+		"whichPlayer": "Vilken spelare?",
+		"dropAnswerHere": "Dra svar hit",
+		"outOf": "av",
+		"hasVoted": "spelare har röstat",
+
+	"RESULT QUESTION COMPONENT":"",
+		"topAnswer":"fick mest röster!",
+		"amountVotes":"Antal röster:",
+
 	"nextQuestion": "Nästa fråga",
 	"waitingForAnswers": "Väntar på svar...",
 	"showResult": "Visa resultat",
 	"endgame": "Avsluta spel",
 
 "RESULTVIEW": "",
-	"showEndResults": "Visa slutresultat"
+	"showEndResults": "Visa slutresultat",
 
+	"INSTRUCTIONS": {
+	  "STARTVIEW": "Välkommen till startsidan! Här kan du skapa eller gå med i ett spel.",
+	  "CREATEVIEW": "På denna sida kan du skapa ett nytt spel genom att ange detaljer.",
+	  "LOBBYVIEW": "Detta är lobbyn. Vänta tills alla deltagare är redo innan du startar spelet.",
+	  "POLLVIEW": "På denna sida kan du rösta på dina medspelare genom att dra och släppa deras avatarer.",
+	  "RESULTVIEW": "Här kan du se resultaten av spelet."
+	}
 }

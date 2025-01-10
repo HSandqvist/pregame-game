@@ -16,6 +16,7 @@ function sockets(io, socket, data) {
     socket.emit("pollData", data.getPoll(d.pollId));
   });
 
+  //används ej
   /*
   // Event: Add a new question to a poll
   socket.on("addQuestion", function (d) {
@@ -25,6 +26,8 @@ function sockets(io, socket, data) {
     socket.emit("questionUpdate", data.getQuestion(d.pollId));
   });*/
 
+  //används ej
+  /*
   // Event: Add a new question to a poll //KOLLA VAD DENNA GÖR EXAKT!!
   socket.on("addQuestion", function (d) {
     const pollId = d.pollId;
@@ -39,7 +42,7 @@ function sockets(io, socket, data) {
 
     // Optionally, broadcast the updated question to all participants
     io.to(pollId).emit("questionUpdate", questionData);
-  });
+  });*/
 
   socket.on("leavePoll", function (d) {
     const { pollId, userId } = d;
@@ -56,19 +59,47 @@ function sockets(io, socket, data) {
     }
   });
 
+
+  socket.on("updatePollInfo", function (d) {
+
+  console.log("updateView körs från socket", d.pollId);
+
+  data.updateView(d.pollId, d.currentView);
+
+  const poll= data.getPoll(d.pollId, d.currentView);
+
+  console.log("updateView ändrar från socket", poll.currentView);
+  
+  io.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion})}
+
+);  
+socket.on("pollInfoUpdatePersonal", function (d) {
+
+  const poll= data.getPoll(d.pollId);
+
+  socket.emit("pollInfoUpdate", {pollId: poll.pollId, currentView: poll.currentView, currentQuestion: poll.currentQuestion} )
+}
+);
+
   // Event: Join a poll
-  socket.on("joinPoll", function (d) {
+  socket.on("joinPoll", function (pollId) {
     // Add the client to the specified poll room
-    socket.join(d.pollId);
+    socket.join(pollId);
     // Emit the current question data to the client
-    socket.emit("questionUpdate", data.getQuestion(d.pollId));
+    //socket.emit("questionUpdate", data.getQuestion(pollId));
     // Emit the submitted answers for the current question to the client
-    socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(d.pollId));
+    socket.emit("submittedAnswersUpdate", data.getSubmittedAnswers(pollId));
+    console.log(pollId, "från socket.js i joinPoll");
 
     //ev lägga till
     // Send the adminId to the client after joining
-    const poll = data.getPoll(d.pollId);
+    const poll = data.getPoll(pollId);
     socket.emit("adminId", poll.adminId);
+  });
+
+  socket.on("getAllParticipantsForGame", function (pollId) {
+    console.log("getting participants in socket from data");
+    io.to(pollId).emit("allParticpantsForGame", data.getParticipants(pollId));
   });
 
   // Event: Participate in a poll
@@ -79,7 +110,7 @@ function sockets(io, socket, data) {
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit("participantsUpdate", data.getParticipants(d.pollId));
-    //console.log("participants update körs från socket", data.getParticipants(d.pollId))
+    //console.log("participants update körs från socket", data.getParticipants(d.pollId));
   });
 
   socket.on("getParticipants", function (pollId) {
@@ -100,17 +131,16 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("startGame");
   });
 
-  socket.on("nextQuestion", function (pollId, userId ) {
+  socket.on("nextQuestion", function (pollId ) {
     // Notify all clients in the poll room that the poll has started
-    console.log("In socket Admin next")
-    io.emit("participantNextQuestion", pollId, userId);
+    console.log("In socket Admin next");
+    io.to(pollId).emit("participantNextQuestion", pollId);
   });
 
-  socket.on("toResults", function (pollId, userId ){
+  socket.on("toResults", function (pollId, userId) {
     console.log("in to Results socket");
-    io.emit("finishGame");
+    io.to(pollId).emit("finishGame");
   });
-
 
   /*// Event: Run a specific question in a poll
   socket.on("runQuestion", function (d) {
@@ -138,7 +168,7 @@ function sockets(io, socket, data) {
       if (participantData) {
         // Emit the participant data back to the client
         socket.emit("currentParticipant", participantData);
-        io.emit("participantsUpdate", poll.participants);
+        io.to(pollId).emit("participantsUpdate", poll.participants);
       } else {
         // Emit an error if no participant with the given userId was found
         socket.emit("currentParticipant", { error: "Participant not found" });
@@ -149,16 +179,15 @@ function sockets(io, socket, data) {
     }
   });
 
-  socket.on("votingReset", function(pollId){
+  socket.on("votingReset", function (pollId) {
     data.votingReset(pollId);
-    console.log("är i socket on votingReset")
+    console.log("är i socket on votingReset");
   });
 
   // Event: använda för handling när resultatet per fråga ska visas?
   socket.on("runQuestionResults", function (pollId) {
-    //NEDAN BORDE TYP GÖRAS NÄR TIDEN TAGIT SLUT FÖR EN FRÅGA?
     // Run the question logic (determine the top answer)
-    const { topAnswer, maxVotes } = data.runQuestion(pollId); // Now we get the result directly
+    const { topAnswer, maxVotes, topAvatar } = data.runQuestion(pollId); // Now we get the result directly   //NAMN RUNQUESTION BRA NAMN FÖR DETTA?
 
     console.log(
       `Socket runQuestionResults: Top answer for question: ${topAnswer} with ${maxVotes} votes.`
@@ -166,15 +195,15 @@ function sockets(io, socket, data) {
 
     console.log(`Emitting topAnswerUpdate: ${topAnswer}, ${maxVotes}`); // Log data before emitting
     // Emit the most voted answer to all clients in the poll room
-    //io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes }); //uppdatera för alla som är inne i pollen
-    io.emit("topAnswerUpdate", { topAnswer, maxVotes });
+    io.to(pollId).emit("topAnswerUpdate", { topAnswer, maxVotes, topAvatar });
 
     // Emit the updated question to the clients
     const question = data.getQuestion(pollId);
-    io.to(pollId).emit("questionUpdate", question);
+    io.to(pollId).emit("questionUpdate", question); //ANVÄNDS DENNA VERKLIGEN?
 
     // Emit the submitted answers //NÖDVÄNDIGT?
     io.to(pollId).emit(
+      //ANVÄNDS DENNA VERKLIGEN?
       "submittedAnswersUpdate",
       data.getSubmittedAnswers(pollId)
     );
@@ -190,13 +219,12 @@ function sockets(io, socket, data) {
     // Submit the answer via the data function
     data.submitAnswer(pollId, answer, voter);
 
-    console.log(`Answer received: ${answer} for poll ${pollId}`);
+    console.log(`Answer received: ${answer.name} for poll ${pollId}`);
   });
 
   //Player voted function //behövs thePlayer här? används ej
-  socket.on("playerVoted", function (thePlayer){
-
-    io.emit("updateNumberOfVotes")
+  socket.on("playerVoted", function (pollId) {
+    io.to(pollId).emit("updateNumberOfVotes");
   });
 
   // Event: Check if user is the admin
@@ -263,11 +291,10 @@ function sockets(io, socket, data) {
     //io.to(pollId).emit("questionsForGame", poll.questions);//denna rad funkar inte...? varför?
   });
 
-  socket.on("getCategoriesWithAnswers", function(pollId) {   
+  socket.on("getCategoriesWithAnswers", function (pollId) {
     const categoriesWithAnswers = data.polls[pollId].categoryWinners;
-    socket.emit("categoriesWithAnswers", categoriesWithAnswers)
+    socket.emit("categoriesWithAnswers", categoriesWithAnswers);
   });
- 
 }
 
 // Export the sockets function for use in other modules
