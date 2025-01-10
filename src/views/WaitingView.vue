@@ -35,7 +35,7 @@
             :class="{ host: participant.isAdmin }"
           />
 
-          <p>{{ participant.name }}</p>
+          <p>{{ participant.name}} is [{{ participant.userId }}]</p>
         </div>
       </div>
 
@@ -44,7 +44,7 @@
         <button
           v-if="isAdmin"
           v-on:click="adminStartGame"
-          :disabled="!joined || atLeastThree <3"
+          :disabled="!joined || participants.length <3"
         >
           {{ this.uiLabels.startGame || "Start Game" }}
         </button>
@@ -109,7 +109,7 @@ export default {
     this.pollId = this.$route.params.id; //set poll id
     this.userId = this.$route.params.userId; //set user id
   
-  
+    socket.emit("joinPoll", this.pollId );
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
      // Update UI labels
@@ -129,8 +129,6 @@ export default {
         console.log("this joined är", this.joined);
       }
     });
-
-
     socket.emit("getPolls", this.pollId);
     socket.emit("getParticipants", this.pollId);
 
@@ -150,6 +148,15 @@ export default {
         if (typeof callback === "function") callback();
       });
 
+      socket.on("waitingParticipantsUpdate", (p) => {
+      console.log("waitingParticipantsUpdate event received:");
+      this.participants = p;
+     // Ensure the check runs after the participants array is updated
+      console.log("participants är", this.participants);
+
+    });
+
+
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
     
     //socket.on("participantsUpdate", (p) => {
@@ -164,13 +171,13 @@ export default {
    
 
     //Listen for start game from server
-    socket.on("startGame", () => this.participantStartGame());
+    socket.on("adminStartGame", () => this.participantStartGame());
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", { pollId: this.pollId });
+   
     this.joined= true;
     
   },
@@ -184,6 +191,7 @@ export default {
   
 
     leavePoll() {
+      this.showModal = false;
       // Emit an event to the server to remove the participant
       socket.emit("leavePoll", {
         pollId: this.pollId,
@@ -192,13 +200,14 @@ export default {
       });
       // Reset local state   
       // Optionally, navigate back to the start view
-      if (!this.isAdmin) {
+      
         this.$router.push("/");
-      }
+      
     },
     // Move to the next step
   
     adminStartGame: function () {
+      console.log("adminStartGame event emitted");
       socket.emit("startGame", this.pollId);
     },
 

@@ -47,15 +47,14 @@ function sockets(io, socket, data) {
   socket.on("leavePoll", function (d) {
     const { pollId, userId } = d;
     const poll = data.getPoll(pollId);
+    console.log("leavePoll körs av ", userId);
 
     if (poll) {
       // Remove the participant from the poll
-      poll.participants = poll.participants.filter(
-        (participant) => participant.userId !== userId
-      );
-
+      console.log("leavePoll körs från socket", pollId);
+      poll.participants = poll.participants.filter((participant) => participant.userId !== userId);
       // Notify all clients in the poll room about the updated participant list
-      io.to(pollId).emit("participantsUpdate", data.getParticipants(pollId));
+      io.to(pollId).emit("waitingParticipantsUpdate", poll.participants);
     }
   });
 
@@ -65,7 +64,7 @@ function sockets(io, socket, data) {
     const poll = data.getPoll(d.pollId, d.currentView);
     console.log("updateView ändrar från socket", poll.currentView);
 
-    io.emit("pollInfoUpdate", {
+    io.to(d.pollId).emit("pollInfoUpdate", {
       pollId: poll.pollId,
       currentView: poll.currentView,
       currentQuestion: poll.currentQuestion,
@@ -120,7 +119,7 @@ function sockets(io, socket, data) {
   });
   socket.on("getPolls", function (pollId) {
 
-    io.emit("pollsUpdate", data.getPoll(pollId));
+    io.to(pollId).emit("pollsUpdate", data.getPoll(pollId));
   }
 );
   
@@ -129,7 +128,8 @@ function sockets(io, socket, data) {
   // Event: Start a poll
   socket.on("startGame", function (pollId) {
     // Notify all clients in the poll room that the poll has started
-    io.to(pollId).emit("startGame");
+    console.log("In socket Admin start");
+    io.to(pollId).emit("adminStartGame");
   });
 
   socket.on("nextQuestion", function (pollId) {
