@@ -1,13 +1,13 @@
 <template>
-  <div class="global-music-control">
-    <button @click="toggleMusic">
-      {{ isMusicPlaying ? "Turn Music Off" : "Turn Music On" }}
-    </button>
-  </div>
+   <div v-if="isAdmin">
+      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
+    </div>
+  
   <div class="center-container">
     <div class="language-switcher-container">
       <!-- Language switcher component -->
       <LanguageSwitcher @language-changed="updateLanguage" />
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
     </div>
     
 
@@ -57,17 +57,13 @@
       </div>
     </div>
   </div>
-
-  <audio ref="backgroundMusic" loop>
-    <source :src="lobbyviewMusic" type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
 </template>
 
 <script>
 import io from "socket.io-client";
-import lobbyviewMusic from "@/assets/lobbyviewMusic/lobbyviewMusic.mp3";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
+import MusicPlayer from "@/components/MusicPlayer.vue";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 
 const socket = io("localhost:3000");
 
@@ -78,6 +74,8 @@ export default {
   name: "WaitingView",
   components: {
     LanguageSwitcher,
+    InstructionButton,
+    MusicPlayer,
   },
   data: function () {
     return {
@@ -99,9 +97,6 @@ export default {
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
       atLeastThree: false,
-
-      //music
-      isMusicPlaying: false,
     };
   },
   created: function () {
@@ -213,26 +208,6 @@ export default {
 
     participantStartGame: function () {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
-    },
-
-    // Function to check if the user is an admin
-    // Move to the previous step
-  
-    toggleMusic: function () {
-      const audio = this.$refs.backgroundMusic;
-      if (!audio) {
-        console.error("Audio element not found!");
-        return;
-      }
-
-      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
-
-      if (this.isMusicPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
-      }
-      this.isMusicPlaying = !this.isMusicPlaying;
     },
 
     // Handle manual avatar upload
@@ -514,39 +489,6 @@ input[type="text"] {
   box-sizing: border-box;
   /* text placed in center */
   text-align: center;
-}
-
-.global-music-control {
-  position: fixed;
-  top: 1rem;
-  left: 4rem;
-  z-index: 1000;
-}
-
-.global-music-control button {
-  padding: 1px;
-  background-color: pink;
-  color: white;
-  border: none;
-  border-radius: 50%; /* Gör ikonen rund */
-  cursor: pointer;
-  display: flex; /* Använd flexbox för att centrera ikonen */
-  background-color: rgb(252, 160, 198);
-}
-
-.music-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
-}
-
-.global-music-control button:hover {
-  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
-}
-
-.music-icon:hover {
-  transform: scale(1.1); /* Liten zoom vid hover */
 }
 
 #game-id-headline {
