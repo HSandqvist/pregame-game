@@ -89,7 +89,8 @@ export default {
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 1000;
+  z-index: 9999;
+
 }
 
 .instruction-button {
@@ -113,7 +114,7 @@ export default {
 }
 
 .instruction-text:hover {
-  transform: scale(1.3); /* Liten zoom vid hover */
+  transform: scale(1.2); /* Liten zoom vid hover */
 }
 .instructions-popup {
   position: absolute;
@@ -141,7 +142,11 @@ export default {
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 2px 13px;
+  font-size: 12pt;
   cursor: pointer;
+}
+.instructions-popup button:hover {
+    transform: scale(1.1); /* Liten zoom vid hover */
 }
 </style>

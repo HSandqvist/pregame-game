@@ -2,12 +2,15 @@
   <div v-if="show" class="modal-overlay">
     <div class="modal-content">
       <p>
+        <!-- Display the message, with a fallback if no label is provided -->
         {{
           this.uiLabels.sureLeaveGame ||
           "Are you sure you want to leave the poll?"
         }}
       </p>
+      <!-- Button for confirming the action -->
       <button @click="confirm">{{ this.uiLabels.yes || "Yes" }}</button>
+      <!-- Button for canceling the action -->
       <button @click="cancel">{{ this.uiLabels.no || "No" }}</button>
     </div>
   </div>
@@ -17,12 +20,12 @@
 export default {
   props: {
     show: Boolean,
-    lang: {type: String, default: "en"},
-    uiLabels: { type: Object, default: () => ({})},
+    lang: {type: String, default: "en"},     // Language setting, default is English
+    uiLabels: { type: Object, default: () => ({})},     // Labels for UI texts, fallback is an empty object
   },
   data: function () {
     return {
-        labels: {}, // placeholder for labels for different languages}
+        labels: {}, // placeholder for labels for different languages
     };
   },
   created: function () {

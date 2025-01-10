@@ -94,7 +94,7 @@
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
-import backgroundMusic from "@/assets/lobbyviewMusic/backgroundMusic.mp3";
+import backgroundMusic from "@/assets/lobbyviewMusic/pollviewMusic.mp3";
 import musicIconOn from "@/assets/img/musicIcon.png";
 import musicIconOff from "@/assets/img/musicIconOff.png";
 
@@ -343,7 +343,7 @@ export default {
     }
   },
     toggleMusic: function () {
-      const audio = this.$refs.backgroundMusic;
+      const audio = this.$refs.pollviewMusic;
       if (!audio) {
         console.error("Audio element not found!");
         return;
@@ -485,8 +485,7 @@ button:disabled {
 
 .global-music-control button {
   padding: 1px;
-  background-color: pink;
-  color: white;
+  background-color: rgb(252, 160, 198);  color: white;
   border: none;
   border-radius: 50%; /* Gör ikonen rund */
   cursor: pointer;
@@ -501,7 +500,7 @@ button:disabled {
 }
 
 .global-music-control button:hover {
-  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
+  background-color: rgb(255, 131, 203);
 }
 
 .music-icon:hover {
