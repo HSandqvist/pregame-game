@@ -7,7 +7,12 @@
     <div class="language-switcher-container">
       <!-- Language switcher component -->
       <LanguageSwitcher @language-changed="updateLanguage" />
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
+     <div v-if="isAdmin">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="ADMINLOBBYVIEW" />
+     </div>
+     <div v-if="!isAdmin">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
+     </div>
     </div>
     
 
