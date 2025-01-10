@@ -281,8 +281,9 @@ export default {
 
     socket.on("participantsUpdate", (p) => {
       this.participants = p;
-      this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
+     // Ensure the check runs after the participants array is updated
       //console.log("participants är", this.participants);
+
       this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
     });
     //Listen for start game from server
@@ -542,13 +543,6 @@ export default {
 
       if(this.isAdmin){
       localStorage.setItem("userId", this.userId);
-      }
-      
-    },
-
-    checkAtLeastThree: function () {
-      if (this.participants.length >= 3) {
-        this.atLeastThree = true;
       }
       
     },

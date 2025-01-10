@@ -119,10 +119,15 @@ export default {
       console.log("pollData event received:");
       this.pollData = data;
       this.participants= data.participants;
-
+      
       console.log("pollData är", this.pollData);
       console.log("participants är", this.participants);
-      
+
+      if (this.participants.length >= 3) {
+        this.atLeastThree = true;
+        console.log("atLeastThree är", this.participants.length);
+        console.log("this joined är", this.joined);
+      }
     });
 
 
@@ -176,6 +181,7 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
+  
 
     leavePoll() {
       // Emit an event to the server to remove the participant
@@ -184,15 +190,7 @@ export default {
         userId: this.userId,
         
       });
-
-      // Reset local state
-      this.joined = false;
-      this.userName = "";
-      this.avatar = null;
-      this.step = 1; // Go back to the first step
-      socket.emit("getParticipants", this.pollId);
-
-
+      // Reset local state   
       // Optionally, navigate back to the start view
       if (!this.isAdmin) {
         this.$router.push("/");
@@ -283,7 +281,6 @@ export default {
   min-height: 100vh; /* Ensures it takes up the full viewport height */
   text-align: center;
   position: relative;
-  color: white;
 }
 
 /* Adjust other containers to ensure consistent styling */
@@ -292,7 +289,6 @@ export default {
 .name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
-  max-width: 400px; /* Optional: Limit the container width */
   margin: auto; /* Center the container horizontally */
   padding: 20px; /* Optional: Add padding */
   box-sizing: border-box; /* Include padding in width/height calculations */
@@ -333,10 +329,11 @@ button:hover {
 }
 
 .camera-view {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 320px;
-  height: 240px;
+  border: 0.1rem solid #f01984;
+  border-radius: 50%;
+  background-color: #f01984;
+  width: 15rem;
+  height: 14rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,7 +345,7 @@ button:hover {
   flex-direction: column; /* Keep buttons stacked vertically */
   gap: 10px; /* Space between buttons */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;
@@ -483,9 +480,6 @@ img.avatar.host {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
-  .global-music-control button {
-    font-size: 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -515,42 +509,45 @@ input[type="text"] {
 
 .global-music-control {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  left: 4rem;
   z-index: 1000;
 }
 
 .global-music-control button {
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 1px;
   background-color: pink;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%; /* Gör ikonen rund */
   cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  transition: all 0.2s ease;
-  text-decoration: none;
+  display: flex; /* Använd flexbox för att centrera ikonen */
+  background-color: rgb(252, 160, 198);
+}
+
+.music-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
 }
 
 .global-music-control button:hover {
-  background-color: rgb(255, 131, 203);
+  background-color: rgb(255, 131, 203); /* Lättare hover-effekt för ringen */
 }
 
-/* Wrapper for LanguageSwitcher */
-.language-switcher-container {
-  position: absolute;
-  top: 1rem; /* Distance from the top */
-  right: 1rem; /* Distance from the right */
-  display: flex;
-  justify-content: flex-end;
-  z-index: 10; /* Ensures it stays above other elements */
+.music-icon:hover {
+  transform: scale(1.1); /* Liten zoom vid hover */
 }
 
-.language-toggle {
-  justify-content: flex-end; /* Override center alignment in LanguageSwitcher */
-}
+#game-id-headline {
+  color: rgb(252, 181, 212);
 
+  position: fixed; 
+  top: 1rem;
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for centering */
+  z-index: 2; /* Ensures it stays above other content */
+  text-align: center;
+}
 </style>

@@ -120,7 +120,7 @@ function sockets(io, socket, data) {
   });
   socket.on("getPolls", function (pollId) {
 
-    socket.emit("pollsUpdate", data.getPoll(pollId));
+    io.emit("pollsUpdate", data.getPoll(pollId));
   }
 );
   
