@@ -106,9 +106,8 @@ export default {
   },
   created: function () {
     // Set the poll ID from the route parameter
-    this.pollId = this.$route.params.id;
-
-    //set user id
+    this.pollId = this.$route.params.id; //set poll id
+    this.userId = this.$route.params.userId; //set user id
   
   
     // Listen for server events
@@ -119,23 +118,44 @@ export default {
     socket.on("pollsUpdate", (data) => {
       console.log("pollData event received:");
       this.pollData = data;
-      console.log(data);
+      this.participants= data.participants;
+
+      console.log("pollData är", this.pollData);
+      console.log("participants är", this.participants);
+      
     });
+
 
     socket.emit("getPolls", this.pollId);
     socket.emit("getParticipants", this.pollId);
+
+    socket.on("adminCheckResult", (data) => {
+        if (data.isAdmin) {
+          console.log("You are the admin for this poll.");
+          this.isAdmin = true; // Set admin flag
+        } else if (data.error) {
+          console.error(data.error); // Handle errors (e.g., poll does not exist)
+          alert(data.error);
+          return; // Stop further execution
+        } else {
+          console.log("You are not the admin for this poll.");
+          this.isAdmin = false; // Set participant flag
+        }
+        // Execute the callback after admin check
+        if (typeof callback === "function") callback();
+      });
+
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
     
-    
-    
-    socket.on("participantsUpdate", (p) => {
-      console.log("participantsUpdate event received:");
-      this.participants = p;
-      this.checkAtLeastThree(); 
-      this.tempUserID= localStorage.getItem("userId")  
+    //socket.on("participantsUpdate", (p) => {
+     // console.log("participantsUpdate event received:");
+     // this.participants = p;
+     // this.checkAtLeastThree(); 
+     // this.tempUserID= localStorage.getItem("userId")  
   
       // Ensure the check runs after the participants array is updated
       //console.log("participants är", this.participants);
-    });
+    //});
    
 
     //Listen for start game from server
@@ -146,8 +166,8 @@ export default {
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", { pollId: this.pollId });
-
-    saveInfo();
+    this.joined= true;
+    
   },
 
   methods: {
@@ -156,20 +176,13 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
-    saveInfo(){
-      this.userId = this.tempUserID;
-    console.log("userId är", this.userId);
-    if( this.userId === this.pollData.adminId) {
-        this.isAdmin = true;
-        console.log("Admin status granted to userId:", this.userId);
-      };
-    },
 
     leavePoll() {
       // Emit an event to the server to remove the participant
       socket.emit("leavePoll", {
         pollId: this.pollId,
         userId: this.userId,
+        
       });
 
       // Reset local state

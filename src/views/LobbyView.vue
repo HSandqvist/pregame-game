@@ -283,7 +283,7 @@ export default {
       this.participants = p;
       this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
       //console.log("participants är", this.participants);
-      this.$router.push(`/waiting/${this.pollId}`);
+      this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
     });
     //Listen for start game from server
     socket.on("startGame", () => this.participantStartGame());
@@ -539,7 +539,10 @@ export default {
       }
 
       this.nextStep(); //hoppa till nästa steg
+
+      if(this.isAdmin){
       localStorage.setItem("userId", this.userId);
+      }
       
     },
 
