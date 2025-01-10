@@ -13,14 +13,10 @@
   </template>
   
   <script>
-  import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 
 
   export default {
     name: "InstructionButton",
-    components:{
-        LanguageSwitcher,
-    },
     props: {
   lang: { type: String, default: "en" },
   viewKey: { type: String, required: true },
