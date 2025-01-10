@@ -61,9 +61,11 @@
 
 
 "RESULTVIEW": "",
-	"showEndResults": "Show results",
+	"showEndResults": "Show results!",
 	"allResults": "ALL RESULTS",
 	"theMost": "THE MOST",
+	"startNewGame": "Start new game!",
+	"skip": "Skip",
 
 
 	"INSTRUCTIONS": {

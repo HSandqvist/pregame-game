@@ -3,7 +3,6 @@
   <div v-if="isAdmin">
       <MusicPlayer :viewKey="'POLLVIEW'"/>
     </div>
-  </div>
 
   <div class="screen-container">
     <!-- top screen content -->
