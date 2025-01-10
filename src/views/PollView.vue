@@ -46,7 +46,7 @@
     <div class="bottom-box">
       <div class="admin-functions-in-poll">
         <div v-if="view === 'question_view'">
-          <button v-if="isAdmin" v-on:click="adminNext()">
+          <button v-if="isAdmin" v-on:click="adminNext()" :disabled= "numberOfVotes == 0">
             {{ this.uiLabels.showResult || "Show result" }}
           </button>
           <!-- Amount of votes only visible by admin -->
@@ -61,7 +61,7 @@
           <div v-if="isAdmin === true">
             <button
               @click="adminNext"
-              :disabled="currentQuestionIndex === questions.length - 1"
+              :disabled="currentQuestionIndex === questions.length -1 "
             >
               {{ this.uiLabels.nextQuestion || "Next question" }}
             </button>
