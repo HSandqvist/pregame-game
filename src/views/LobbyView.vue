@@ -1,7 +1,4 @@
 <template>
-    <div v-if="isAdmin">
-      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
-    </div>
   <div class="center-container">
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
@@ -63,16 +60,28 @@
         </div>
         <div class="camera-buttons">
           <button v-on:click="choseOptionOne">
-            {{ this.uiLabels.gorankan || "Gorankan" }}
+            {{ this.uiLabels.avatar1 || "Avatar1" }}
           </button>
           <button v-on:click="choseOptionTwo">
-            {{ this.uiLabels.liankan || "Liankan" }}
+            {{ this.uiLabels.avatar2 || "Avatar2" }}
           </button>
           <button v-on:click="choseOptionThree">
-            {{ this.uiLabels.plankan || "Plankan" }}
+            {{ this.uiLabels.avatar3 || "Avatar3" }}
           </button>
           <button v-on:click="choseOptionFour">
-            {{ this.uiLabels.bankan || "Bankan" }}
+            {{ this.uiLabels.avatar4 || "Avatar4" }}
+          </button>
+          <button v-on:click="choseOptionFive">
+            {{ this.uiLabels.avatar1 || "Avatar5" }}
+          </button>
+          <button v-on:click="choseOptionSix">
+            {{ this.uiLabels.avatar2 || "Avatar6" }}
+          </button>
+          <button v-on:click="choseOptionSeven">
+            {{ this.uiLabels.avatar3 || "Avatar7" }}
+          </button>
+          <button v-on:click="choseOptionEight">
+            {{ this.uiLabels.avatar4 || "Avatar8" }}
           </button>
         </div>
       </div>
@@ -125,82 +134,11 @@
         </button>
       </div>
     </div>
-
-    <!-- Step 4: Show waiting area with other participants -->
-    <div v-else-if="step === 4" class="waiting-area">
-      <InstructionButton
-        :uiLabels="uiLabels"
-        :lang="lang"
-        v-if="isAdmin"
-        viewKey="ADMINLOBBYVIEW"
-      />
-      <InstructionButton
-        :uiLabels="uiLabels"
-        :lang="lang"
-        v-if="!isAdmin"
-        viewKey="LOBBYVIEW"
-      />
-
-      <h1 id="game-id-headline">
-        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
-      </h1>
-      <h2>
-        {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
-        {{ participants.length }}
-      </h2>
-      <h3>{{ this.uiLabels.players || "Players" }}:</h3>
-
-      <!-- Participants grid -->
-      <div class="participants-grid">
-        <div
-          v-for="(participant, index) in participants"
-          :key="index"
-          :class="[
-            'participant-item',
-            { 'current-user': participant.userId === userId },
-          ]"
-        >
-          <!-- Participant avatar -->
-          <img
-            :src="participant.avatar"
-            alt="User Avatar"
-            class="avatar"
-            :class="{ host: participant.isAdmin }"
-          />
-
-          <p>{{ participant.name }}</p>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="submit-section">
-        <button
-          v-if="isAdmin"
-          v-on:click="adminStartGame"
-          :disabled="!joined || !atLeastThree"
-        >
-          {{ this.uiLabels.startGame || "Start Game" }}
-        </button>
-
-        <!-- Leave Poll Button -->
-        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
-          {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
-        </button>
-        <ConfirmLeaveModal
-          :show="showModal"
-          :uiLabels="uiLabels"
-          :lang="lang"
-          @confirm="leavePoll"
-          @cancel="showModal = false"
-        />
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import io from "socket.io-client";
-import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
@@ -216,7 +154,6 @@ export default {
     LanguageSwitcher,
     InstructionButton,
     ConfirmLeaveModal,
-    MusicPlayer,
   },
   data: function () {
     return {
@@ -260,11 +197,15 @@ export default {
 
     socket.on("participantsUpdate", (p) => {
       this.participants = p;
-      this.checkAtLeastThree(); // Ensure the check runs after the participants array is updated
+     // Ensure the check runs after the participants array is updated
       //console.log("participants är", this.participants);
+
+      this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
+
+      socket.off("participantsUpdate")
     });
     //Listen for start game from server
-    socket.on("startGame", () => this.participantStartGame());
+  
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
@@ -279,27 +220,6 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
-
-    leavePoll() {
-      this.showModal = false;
-
-      // Emit an event to the server to remove the participant
-      socket.emit("leavePoll", {
-        pollId: this.pollId,
-        userId: this.userId,
-      });
-
-      // Reset local state
-      this.joined = false;
-      this.userName = "";
-      this.avatar = null;
-      this.step = 1; // Go back to the first step
-
-      // Optionally, navigate back to the start view
-      if (!this.isAdmin) {
-        this.$router.push("/");
-      }
-    },
     // Move to the next step
     nextStep() {
       if (this.step == 3) {
@@ -311,14 +231,6 @@ export default {
         this.step++;
       }
       console.log(this.step);
-    },
-
-    adminStartGame: function () {
-      socket.emit("startGame", this.pollId);
-    },
-
-    participantStartGame: function () {
-      this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
     setUserId: function () {
@@ -445,17 +357,29 @@ export default {
     },
 
     choseOptionOne() {
-      this.avatar = "/src/assets/img/Gorankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar1.png";
     },
 
     choseOptionTwo() {
-      this.avatar = "/src/assets/img/Liankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar2.png";
     },
     choseOptionThree() {
-      this.avatar = "/src/assets/img/Plankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar3.png";
     },
     choseOptionFour() {
-      this.avatar = "/src/assets/img/Bankan.png";
+      this.avatar = "/src/assets/img/Avatars/Avatar4.png";
+    },
+    choseOptionFive() {
+      this.avatar = "/src/assets/img/Avatars/Avatar5.png";
+    },
+    choseOptionSix() {
+      this.avatar = "/src/assets/img/Avatars/Avatar6.png";
+    },
+    choseOptionSeven() {
+      this.avatar = "/src/assets/img/Avatars/Avatar7.png";
+    },
+    choseOptionEight() {
+      this.avatar = "/src/assets/img/Avatars/Avatar8.png";
     },
 
     returnToPictureMode() {
@@ -490,19 +414,18 @@ export default {
         avatar: this.avatar,
         isAdmin: this.isAdmin,
       });
-
+    
       this.joined = true;
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
 
       this.nextStep(); //hoppa till nästa steg
-    },
 
-    checkAtLeastThree: function () {
-      if (this.participants.length >= 3) {
-        this.atLeastThree = true;
+      if(this.isAdmin){
+      localStorage.setItem("userId", this.userId);
       }
+      
     },
   },
 };
