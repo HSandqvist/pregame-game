@@ -1,4 +1,7 @@
 <template>
+  <div>
+      <MusicPlayer :viewKey="'RESULTVIEW'"/>
+    </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   
   <header>
@@ -10,50 +13,47 @@
 
     <!-- Button to fetch and display results -->
     <button
-      v-if="!resultsShown"
-      @click="fetchCategoriesWithAnswers"
-      class="center-button">
-      {{ this.uiLabels.showEndResults|| "Show Results"}}
+      v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button">
+      <h1>{{ this.uiLabels.showEndResults|| "Show Results"}}</h1>
     </button>
 
     <!-- Popup for individual category winners -->
       <div v-if="showPopup" class="popup">
         <h2> {{ currentPopupCategory }}</h2>
-        <h1 v-motion="motionGrowBiggerAndGlow" >{{ currentPopupWinner }}</h1>
+        <h1>{{ currentPopupWinner }}</h1>
+      </div>
+      
+      <div v-if="showPopup">
+      <button @click="skipToResults" class="skip-button">
+      {{this.uiLabels.skip}}
+      </button>
       </div>
 
     <!-- Render the full results after popups -->
     <div v-if="resultsShown && !showPopup" class="results">
       <div
         v-for="(topVoted, category) in topVotedCategories"
-        :key="category"
-        class="category"
-      >
+        :key="category">
         <h2> {{ this.uiLabels.theMost || "THE MOST"}} {{ category }}</h2>
         <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
       </div>
     </div>
+
     <div v-if="resultsShown && !showPopup">
       <button v-on:click="returnToStart" class="center-button">
-        Start new game!
+        {{ this.uiLabels.startNewGame|| "Start new game!"}}
       </button>
     </div>
   </div>
-
-  <!-- ANVÄNDS EJ NU -->
-  <!-- Render the BarsComponent to visualize answers -->
-  <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers" />
   
 </template>
 
 <script>
-// @ is an alias to /src
-import BarsComponent from "@/components/BarsComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import MusicPlayer from "@/components/MusicPlayer.vue";
 import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
-
 import io from "socket.io-client";
 const socket = io("localhost:3000");
 
@@ -63,8 +63,8 @@ const socket = io("localhost:3000");
 export default {
   name: "ResultView",
   components: {
-    BarsComponent, // Register the BarsComponent
     InstructionButton,
+    MusicPlayer,
   },
 
   data: function () {
@@ -90,11 +90,9 @@ export default {
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
-    socket.on(
-      "submittedAnswersUpdate",
+    socket.on("submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
     ); // Update submitted answers
-
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
     socket.emit("joinPoll", this.pollId);
@@ -144,6 +142,12 @@ export default {
         }));
         this.displayNextPopup();
       }
+    },
+
+    skipToResults() {
+        this.showPopup = false; // Hide the popup
+        this.popupQueue = []; // Clear the popup queue
+        this.resultsShown = true; // Show the full results
     },
 
     displayNextPopup() {
@@ -198,6 +202,21 @@ header {
   z-index: 2000; /* Ensure it stays above other content */
 }
 
+.result-button {
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
+  border: 4px solid white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 10; /* Ensure it's above other content */
+}
+
+.result-button:disabled {
+  visibility: hidden;
+}
+
 .center-button {
   padding: 1rem 2rem;
   font-size: 1.5rem;
@@ -214,19 +233,17 @@ header {
   background-color: rgb(255, 131, 203);
 }
 
-/* Ensure the button disappears when clicked */
 .center-button:disabled {
   visibility: hidden;
 }
 
-/* TESTAR MED ALLT NEDAN */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));/* Gradient pink background */
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
   border: 4px solid white;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
@@ -261,13 +278,6 @@ header {
   box-sizing: border-box; /* Ensures padding is included in the total size */
 }
 
-.category {
-  margin-bottom: 1rem;
-  font-size: 1.4rem;
-  color: #ff006e; /* Vibrant pink color */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow to make it pop */
-}
-
 @keyframes pulse {
   0%, 100% {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px #f8b4d9, 0 0 20px #ff80b5;
@@ -284,15 +294,13 @@ header {
   50% {
     transform: translateY(-10px);
   }
-
-  header {
-    display: flex;                /* Aktivera Flexbox på headern */
-    justify-content: center;      /* Centrera horisontellt */
-    align-items: center;          /* Centrera vertikalt */
-    width: 100%;
-    height: 200px;                /* Sätt höjd på headern */
-    position: relative;           /* För Flexbox och andra positioneringar */
-    opacity: 0.7;
 }
+
+.skip-button {
+  position: fixed; /* Fix the button relative to the viewport */
+  bottom: 5%; /* Position it near the bottom of the screen */
+  left: 50%; /* Center it horizontally */
+  transform: translateX(-50%); /* Offset by half its width to align it perfectly */
+  z-index: 999; /* Ensure it's below the popup (popup z-index is 1000) */
 }
 </style>

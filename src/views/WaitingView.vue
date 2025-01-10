@@ -1,97 +1,64 @@
 <template>
+   <div v-if="isAdmin">
+      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
+    </div>
+  
   <div class="center-container">
-    <!-- Language switcher component -->
-    <LanguageSwitcher @language-changed="updateLanguage" />
-
-    <!-- Step 1: Enter your name -->
-    <div v-if="step === 1" class="name-entry-section">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
-      <h1>{{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:</h1>
-      <input type="text" v-model="userName" />
-
-      <div class="action-buttons">
-        <button v-on:click="nextStep" :disabled="!userName">
-          {{ this.uiLabels.next || "Next" }}
-        </button>
-      </div>
+    <div class="language-switcher-container">
+      <!-- Language switcher component -->
+      <LanguageSwitcher @language-changed="updateLanguage" />
+     <div v-if="isAdmin">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="ADMINLOBBYVIEW" />
+     </div>
+     <div v-if="!isAdmin">
+      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
+     </div>
     </div>
+    
 
-    <!-- Step 2: Capture avatar from the  or choose avatar -->
-    <div v-else-if="step === 2" class="camera-container">
-      <InstructionButton
-        :uiLabels="uiLabels"
-        :lang="lang"
-        viewKey="CAMERAVIEW"
-      />
+    <!-- Step 4: Show waiting area with other participants -->
+    <div class="waiting-area">
+      <h1>{{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}</h1>
+      <h2>{{ this.uiLabels.numberOfPlayers || "Number of players" }}: {{ participants.length }}</h2>
+      <h3>{{ this.uiLabels.players || "Players" }}:</h3>
 
-      <!-- Camera/Picture for avatar -->
-      <div class="camera-picture-container">
-        <div v-if="!choseCustomAvatar">
-          <CameraComponent
-            v-model:isPictureTaken="isPictureTaken"
-            :uiLabels="uiLabels"
-            :disableSwitcher="disableSwitcher"
-            @update:avatar="avatar = $event"
-            @update:disableSwitcher="disableSwitcher = $event"
-            @update:isPictureTaken="isPictureTaken = $event"
+      <!-- Participants grid -->
+      <div class="participants-grid">
+        <div
+          v-for="(participant, index) in participants"
+          :key="index"
+          :class="[
+            'participant-item',
+            { 'current-user': participant.userId === userId },
+          ]"
+        >
+          <!-- Participant avatar -->
+          <img
+            :src="participant.avatar"
+            alt="User Avatar"
+            class="avatar"
+            :class="{ host: participant.isAdmin }"
           />
-        </div>
-        <div v-if="choseCustomAvatar">
-          <ChooseAvatarComponent
-            v-model:isPictureTaken="isPictureTaken"
-            :uiLabels="uiLabels"
-            @update:avatar="avatar = $event"
-            @update:isPictureTaken="isPictureTaken = $event"
-          />
+
+          <p>{{ participant.name}} </p>
         </div>
       </div>
 
-      <!-- Action buttons-->
-      <div class="action-buttons">
-        <button v-on:click="backStep" :disabled="disableSwitcher">
-          {{ this.uiLabels.back || "Back" }}
-        </button>
-
+      <!-- Actions -->
+      <div class="submit-section">
         <button
-          v-on:click="chooseAvatar"
-          v-if="!choseCustomAvatar"
-          :disabled="disableSwitcher"
+          v-if="isAdmin"
+          v-on:click="adminStartGame"
+          :disabled="!joined || participants.length <3"
         >
-          {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
+          {{ this.uiLabels.startGame || "Start Game" }}
         </button>
 
-        <button v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
-          {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
+        <!-- Leave Poll Button -->
+        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
+          {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
-
-        <button v-on:click="nextStep" :disabled="!isPictureTaken">
-          {{ this.uiLabels.next || "Next" }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 3: Display captured avatar and go to wait area -->
-    <div v-else-if="step === 3" class="avatar-container">
-      <InstructionButton
-        :uiLabels="uiLabels"
-        :lang="lang"
-        viewKey="AVATARVIEW"
-      />
-      <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}</h2>
-      <h1>{{ userName }}</h1>
-      <img :src="avatar" alt="User Avatar" class="avatar" />
-
-      <div class="action-buttons">
-        <button v-on:click="backStep">
-          {{ this.uiLabels.back || "Back" }}
-        </button>
-        <button
-          v-on:click="participateInPoll"
-          id="submitNameButton"
-          :disabled="joined"
-        >
-          {{ this.uiLabels.participateInPoll || "READY!" }}
-        </button>
+        
       </div>
     </div>
   </div>
@@ -99,15 +66,9 @@
 
 <script>
 import io from "socket.io-client";
-import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
-import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
-
-import CameraComponent from "@/components/CameraComponent.vue";
-import ChooseAvatarComponent from "@/components/ChooseAvatarComponent.vue";
-
-import musicIconOn from "@/assets/img/musicIcon.png";
-import musicIconOff from "@/assets/img/musicIconOff.png";
+import MusicPlayer from "@/components/MusicPlayer.vue";
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 
 const socket = io("localhost:3000");
 
@@ -115,13 +76,11 @@ const socket = io("localhost:3000");
 //const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
 
 export default {
-  name: "LobbyView",
+  name: "WaitingView",
   components: {
     LanguageSwitcher,
     InstructionButton,
-    ConfirmLeaveModal,
-    CameraComponent,
-    ChooseAvatarComponent,
+    MusicPlayer,
   },
   data: function () {
     return {
@@ -130,92 +89,50 @@ export default {
 
       //user
       userId: "", //alla ha egen sida sen hej
+
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data
       isAdmin: false, //flag for admin status, deklarerad här nu men tror det ska göras lite annorlunda
       adminId: null, //placeholder for eventual adminId, if present
       choseCustomAvatar: false,
+      pollData: {}, // Poll data received from the server
 
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
       atLeastThree: false,
-
-      //camera
-      disableSwitcher: false, //connected to choose premade avatar button
-      isPictureTaken: false,
-
-      //leave poll lobby
-      showModal: false,
     };
   },
   created: function () {
     // Set the poll ID from the route parameter
-    this.pollId = this.$route.params.id;
-
-    //set user id
-    this.setUserId();
-
+    this.pollId = this.$route.params.id; //set poll id
+    this.userId = this.$route.params.userId; //set user id
+  
+    socket.emit("joinPoll", this.pollId );
     // Listen for server events
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
+    socket.on("uiLabels", (labels) => (this.uiLabels = labels));
+     // Update UI labels
     socket.emit("getUILabels", this.lang);
 
-    socket.on("participantsUpdate", (p) => {
-      this.participants = p;
-     // Ensure the check runs after the participants array is updated
-      //console.log("participants är", this.participants);
+    socket.on("pollsUpdate", (data) => {
+      console.log("pollData event received:");
+      this.pollData = data;
+      this.participants= data.participants;
+      
+      console.log("pollData är", this.pollData);
+      console.log("participants är", this.participants);
 
-      this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
-
-      socket.off("participantsUpdate")
+      if (this.participants.length >= 3) {
+        this.atLeastThree = true;
+        console.log("atLeastThree är", this.participants.length);
+        console.log("this joined är", this.joined);
+      }
     });
-    //Listen for start game from server
-  
+    socket.emit("getPolls", this.pollId);
+    socket.emit("getParticipants", this.pollId);
 
-    // Navigate to the poll page when the poll starts
-    socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
-
-    // Emit events to join the poll and get UI labels
-    socket.emit("joinPoll", this.pollId);
-  },
-
-  methods: {
-    // Update language when changed in LanguageSwitcher
-    updateLanguage(lang) {
-      this.lang = lang;
-      socket.emit("getUILabels", this.lang);
-    },
-    // Move to the next step
-    nextStep() {
-      if (this.step == 3) {
-        // Check admin status before moving to Step 3
-        this.checkAdminStatus(() => {
-          this.step++; // Move to Step 3 after admin check
-        });
-      } else if (this.step < 5) {
-        this.step++;
-      }
-      console.log(this.step);
-    },
-
-    setUserId: function () {
-      if (localStorage.userId) {
-        this.userId = localStorage.getItem("userId");
-      } else {
-        this.userId = Math.ceil(Math.random() * 100000); // Generate userId if not present
-      }
-    },
-
-    // Function to check if the user is an admin
-    checkAdminStatus: function (callback) {
-      //userid set in created by separate function instead! else problems!!
-
-      // Emit admin check request
-      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
-
-      // Listen for the server's response
-      socket.on("adminCheckResult", (data) => {
+    socket.on("adminCheckResult", (data) => {
         if (data.isAdmin) {
           console.log("You are the admin for this poll.");
           this.isAdmin = true; // Set admin flag
@@ -230,48 +147,93 @@ export default {
         // Execute the callback after admin check
         if (typeof callback === "function") callback();
       });
+
+      socket.on("waitingParticipantsUpdate", (p) => {
+      console.log("waitingParticipantsUpdate event received:");
+      this.participants = p;
+     // Ensure the check runs after the participants array is updated
+      console.log("participants är", this.participants);
+
+    });
+
+
+      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+    
+    //socket.on("participantsUpdate", (p) => {
+     // console.log("participantsUpdate event received:");
+     // this.participants = p;
+     // this.checkAtLeastThree(); 
+     // this.tempUserID= localStorage.getItem("userId")  
+  
+      // Ensure the check runs after the participants array is updated
+      //console.log("participants är", this.participants);
+    //});
+   
+
+    //Listen for start game from server
+    socket.on("adminStartGame", () => this.participantStartGame());
+
+    // Navigate to the poll page when the poll starts
+    socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
+
+    // Emit events to join the poll and get UI labels
+   
+    this.joined= true;
+    
+  },
+
+  methods: {
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+  
+
+    leavePoll() {
+      this.showModal = false;
+      // Emit an event to the server to remove the participant
+      socket.emit("leavePoll", {
+        pollId: this.pollId,
+        userId: this.userId,
+        
+      });
+      // Reset local state   
+      // Optionally, navigate back to the start view
+      
+        this.$router.push("/");
+      
+    },
+    // Move to the next step
+  
+    adminStartGame: function () {
+      console.log("adminStartGame event emitted");
+      socket.emit("startGame", this.pollId);
     },
 
-    // Move to the previous step
-    backStep: function () {
-      if (this.step > 1) {
-        this.step--;
-      }
+    participantStartGame: function () {
+      this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
-    returnToPictureMode() {
-      this.choseCustomAvatar = false;
-      this.isPictureTaken = false;
-      this.avatar = null;
-    },
-
-    chooseAvatar() {
-      this.choseCustomAvatar = true; // Show ChooseAvatarComponent
-      this.avatar = null;
-    },
-
-    toggleMusic: function () {
-      const audio = this.$refs.backgroundMusic;
-      if (!audio) {
-        console.error("Audio element not found!");
-        return;
-      }
-
-      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
-
-      if (this.isMusicPlaying) {
-        audio.pause();
-        this.isMusicPlaying = false; // Sätt musiken till av
-      } else {
-        // Återställ ljudets position till början om det är pausat
-        audio.currentTime = 0;
-        audio.play();
-        this.isMusicPlaying = true; // Sätt musiken till på
+    // Handle manual avatar upload
+    handleAvatarUpload: function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.avatar = reader.result;
+        };
+        reader.readAsDataURL(file); // Convert image to base64
       }
     },
 
     // Participate in the poll
     participateInPoll: function () {
+      //if (!this.avatar) {
+      //alert("Please select or capture an avatar!");
+      //return;
+      //}
+
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -279,18 +241,19 @@ export default {
         avatar: this.avatar,
         isAdmin: this.isAdmin,
       });
-    
+
       this.joined = true;
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
 
       this.nextStep(); //hoppa till nästa steg
+    },
 
-      if(this.isAdmin){
-      localStorage.setItem("userId", this.userId);
+    checkAtLeastThree: function () {
+      if (this.participants.length >= 3) {
+        this.atLeastThree = true;
       }
-      
     },
   },
 };
@@ -310,6 +273,8 @@ export default {
 }
 
 /* Adjust other containers to ensure consistent styling */
+.avatar-container,
+.camera-container,
 .name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
@@ -342,20 +307,33 @@ button:hover {
   display: flex; /* Align buttons horizontally */
   justify-content: center; /* Center the buttons */
   gap: 20px; /* Space between buttons */
-  padding: 5px;
 }
 
 /* Camera and camera buttons styling*/
 .camera-picture-container {
-  flex-grow: 1;
   display: flex; /* Arrange items in a row */
-  flex-direction: column;
   align-items: center; /* Center items vertically */
   justify-content: space-between; /* Add space between camera view and buttons */
   gap: 20px; /* Optional: Space between elements */
-  min-height: 60vh; /* Ensure consistent height */
 }
 
+.camera-view {
+  border: 0.1rem solid #f01984;
+  border-radius: 50%;
+  background-color: #f01984;
+  width: 15rem;
+  height: 14rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.camera-buttons {
+  display: flex; /* Arrange buttons in a column */
+  flex-direction: column; /* Keep buttons stacked vertically */
+  gap: 10px; /* Space between buttons */
+}
 /* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
@@ -363,6 +341,23 @@ button:hover {
   justify-content: center;
   gap: 20px; /* Keeps space between the buttons themselves */
   background: none; /* If body or parent has background */
+}
+
+.camera-buttons button {
+  padding: 12px 20px;
+  background-color: rgb(225, 95, 150); /* Darker pink */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.camera-buttons button:hover {
+  background-color: rgb(205, 85, 140); /* Darker hover effect */
 }
 
 /*  When button is disabled styling */
@@ -390,6 +385,12 @@ button:disabled {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
+}
+
+/* Camera styling */
+video {
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 .participants-grid {
@@ -470,7 +471,12 @@ img.avatar.host {
   }
 }
 
-
+@media (max-width: 480px) {
+  .participants-grid {
+    grid-template-columns: repeat(1, 1fr);
+    /* En bild per rad på mycket små skärmar */
+  }
+}
 
 /* Style for the name input box */
 input[type="text"] {
@@ -490,11 +496,10 @@ input[type="text"] {
   text-align: center;
 }
 
-
 #game-id-headline {
   color: rgb(252, 181, 212);
 
-  position: fixed;
+  position: fixed; 
   top: 1rem;
   left: 50%; /* Center horizontally */
   transform: translate(-50%, -50%); /* Adjust for centering */
