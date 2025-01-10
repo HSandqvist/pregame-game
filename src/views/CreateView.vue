@@ -1,7 +1,5 @@
 <template>
-
   <div class="create-game">
-    <InstructionButton viewKey="CREATEVIEW" />
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
     <h1 id="create-game-headline">
@@ -10,6 +8,11 @@
 
     <!-- Step 1: Select amount of questions -->
     <div v-if="step === 1" class="amount-questions-section">
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="NOQUESTIONS"
+      />
       <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
       <div class="amount-questions-buttons">
         <button
@@ -20,7 +23,6 @@
         >
           {{ count }}
         </button>
-        
       </div>
       <div class="action-buttons">
         <button @click="finalizeQuestions" :disabled="!tempQuestionsCount">
@@ -29,19 +31,31 @@
       </div>
     </div>
 
-    <!-- Step 2: Select time per question -->
-    <div v-else-if="step === 2" class="time-per-question-section">
+    <!-- step 2: select language for questions -->
+    <div v-else-if="step === 2" class="language-for-questions-section">
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        viewKey="LANGUAGECHOICE"  
+      />
       <h2>
-        {{ this.uiLabels.secondsPerQuestion || "Seconds per question " }}:
+        {{
+          this.uiLabels.languageForQuestions ||
+          "Choose language for questions "
+        }}:
       </h2>
-      <div class="time-per-question-buttons">
+      <div class="language-for-questions-buttons">
         <button
-          v-for="time in [10, 20, 30]"
-          :key="time"
-          v-on:click="tempTimePerQuestion = time"
-          :class="{ selected: tempTimePerQuestion === time }"
+          v-on:click="tempLangQuestions = 'sv'"
+          :class="{ selected: tempLangQuestions === 'sv' }"
         >
-          {{ time }}
+          {{ this.uiLabels.swedish || "Swedish" }}
+        </button>
+        <button
+          v-on:click="tempLangQuestions = 'en'"
+          :class="{ selected: tempLangQuestions === 'en' }"
+        >
+          {{ this.uiLabels.english || "English" }}
         </button>
       </div>
 
@@ -51,23 +65,20 @@
         </button>
         <button
           id="create-game-button"
-          v-on:click="finalizeTime"
-          :disabled="!tempTimePerQuestion"
+          v-on:click="finalizeLang"
+          :disabled="!tempLangQuestions"
         >
           {{ this.uiLabels.createGame || "Create Game" }}
         </button>
       </div>
     </div>
 
-    <!-- Step 3: Display poll data -->
-    <div v-else class="poll-container">
-      <div class="poll-data-section">
-        <router-link :to="'/result/' + pollId"> Check result </router-link>
-        Data: {{ pollData }}
-      </div>
+    <div class="back-to-start">
+      <button @click="goToStartPage">
+        {{ this.uiLabels.backToStart || "Back to Start" }}
+      </button>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -77,7 +88,6 @@ import InstructionButton from "@/components/InstructionButton.vue";
 
 import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
@@ -101,11 +111,11 @@ export default {
 
       // Temporary values for selections
       tempQuestionsCount: null,
-      tempTimePerQuestion: null,
+      tempLangQuestions: null,
 
       // Finalized values for the poll
       selectedQuestionCount: null,
-      selectedTime: null,
+      selectedLang: null,
 
       adminId: null,
     };
@@ -145,12 +155,11 @@ export default {
       this.nextStep();
     },
 
-    finalizeTime: function () {
-      this.selectedTime = this.tempTimePerQuestion;
-      socket.emit("setTimePerQuestion", {
-        pollId: this.pollId,
-        time: this.selectedTime,
-      });
+    finalizeLang: function () {
+      this.selectedLang = this.tempLangQuestions;
+      // Send file with questions to server
+      this.loadQuestionsFromFile(); // read json file questions and send to server
+
       this.createPoll();
     },
 
@@ -167,15 +176,11 @@ export default {
 
       this.generatePollID();
 
-      // Send file with questions to server
-      this.loadQuestionsFromFile(); // read json file questions and send to server
-
       socket.emit("createPoll", {
         pollId: this.pollId,
         lang: this.lang,
         adminId: this.adminId,
         questionCount: this.selectedQuestionCount,
-        timerCount: this.selectedTime,
       });
 
       socket.emit("joinPoll", this.pollId);
@@ -190,9 +195,9 @@ export default {
 
     // Method to load the questions from the file, send to server
     loadQuestionsFromFile: function () {
-      // Choose the appropriate JSON data based on the selected language
+      // Choose the appropriate JSON data based on the selected language in question
       const allQuestionsFromFile =
-        this.lang === "en" ? questionsEn : questionsSv;
+        this.selectedLang === "en" ? questionsEn : questionsSv;
 
       // Emit the JSON data to the server
       try {
@@ -201,6 +206,10 @@ export default {
       } catch (error) {
         console.error("Error sending questions to server:", error);
       }
+    },
+
+    goToStartPage: function() {
+      this.$router.push("/");
     },
   },
 };
@@ -249,14 +258,14 @@ button:disabled {
 
 /* Button groups */
 .amount-questions-buttons,
-.time-per-question-buttons {
+.language-for-questions-buttons {
   display: flex;
   justify-content: center;
   gap: 30px;
   margin-top: 20px;
   background: none; /* If body or parent has background */
 }
-/* Add spacing between the time buttons and the action buttons */
+/* Add spacing between the action buttons */
 .action-buttons {
   margin-top: 40px; /* Adjust this value as needed */
   display: flex;
@@ -275,5 +284,12 @@ button:disabled {
 
 #create-game-button:hover {
   background-color: rgb(219, 34, 142);
+}
+
+/* jump to start page button */
+.back-to-start {
+  position: fixed;
+  bottom: 3rem; /* Distance from the bottom of the screen */
+  left: 3rem; /* Distance from the left side of the screen */
 }
 </style>

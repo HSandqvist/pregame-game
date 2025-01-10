@@ -48,10 +48,7 @@ export default {
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
 
-    console.log("avatar i reuslt question", this.topAvatar);
-
-    console.log("MotionPlugin available:", this.$motion); // Should print if MotionPlugin is working
-    console.log("motionGlowText:", this.motionGlowText);
+    console.log("avatar i result question");
   },
 };
 </script>

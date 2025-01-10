@@ -9,78 +9,76 @@
       />
     </button>
   </div>
-  <div>
-    <h1 id="poll-id-headline">Poll ID: {{ pollId }}</h1>
-    <!-- h3 v-if="isAdmin">You are the host</h3 -->
-    <!-- Render the QuestionComponent and pass the current question as a prop -->
-    <br />
 
-    <div v-if="view === 'question_view'">
-      <!-- Render the question component -->
-      <QuestionComponent
-        v-bind:question="currentQuestion"
-        v-bind:participants="currentQuestion.a"
-        v-on:answer="submitAnswer($event)"
-        :voting="hasVoted"
-      />
+  <div class="screen-container">
+    <!-- top screen content -->
+    <div class="top-box">
+      <h1 id="game-id-headline"> {{this.uiLabels.gameID || "Game ID"}}: {{ pollId }}</h1>
 
-      <br />
+    </div>
+    <!-- middle screen content -->
+    <div class="middle-box">
+      <div v-if="view === 'question_view'">
+        <!-- Render the question component -->
+        <QuestionComponent
+          v-bind:question="currentQuestion"
+          v-bind:participants="currentQuestion.a"
+          v-on:answer="submitAnswer($event)"
+          :voting="hasVoted"
+        />
+      </div>
 
-      <!-- Special admin functions -->
-      <div class="admin-functions-in-poll">
-        <button v-if="isAdmin" v-on:click="adminNext()">
-          {{ this.uiLabels.showResult || "Show result" }}
-        </button>
+      <div v-if="view === 'results_view'">
+        <!-- Render ResultQuestionComponent -->
+        <ResultQuestionComponent
+          :topAnswer="topAnswer"
+          :maxVotes="maxVotes"
+          :topAvatar="topAvatar"
+        />
+      </div>
 
-        <!-- Amount of votes only visible by admin -->
-        <p v-if="isAdmin">
-          {{ this.numberOfVotes }} 
-          
-         <!--  {{ this.uiLabels.outOf || "out of" }}
-          {{ this.participants.length }}-->
-          {{ this.uiLabels.hasVoted || "has voted" }}
-        </p>
+      <div v-if="view === 'final_view'">
+        <!-- Render ResultQuestionComponent -->
+        <ResultQuestionComponent
+          :topAnswer="topAnswer"
+          :maxVotes="maxVotes"
+          :topAvatar="topAvatar"
+        />
       </div>
     </div>
 
-    <div v-if="view === 'results_view'">
-      <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent
-        :topAnswer="topAnswer"
-        :maxVotes="maxVotes"
-        :topAvatar="topAvatar"
-      />
-      <br />
-
-      <!-- so only admin can use buttons -->
+    <!-- bottom screen content -->
+    <div class="bottom-box">
       <div class="admin-functions-in-poll">
-        <div v-if="isAdmin === true">
-          <button
-            @click="adminNext"
-            :disabled="currentQuestionIndex === questions.length - 1"
-          >
-            {{ this.uiLabels.nextQuestion || "Next question" }}
+        <div v-if="view === 'question_view'">
+          <button v-if="isAdmin" v-on:click="adminNext()">
+            {{ this.uiLabels.showResult || "Show result" }}
           </button>
+          <!-- Amount of votes only visible by admin -->
+          <p v-if="isAdmin">
+            {{ this.numberOfVotes }} {{ this.uiLabels.outOf || "out of" }}
+            {{ this.participants.length }}
+            {{ this.uiLabels.hasVoted || "has voted" }}
+          </p>
         </div>
-      </div>
-    </div>
-
-    <!-- testar!! för finalview-->
-    <div v-if="view === 'final_view'">
-      <!-- Render ResultQuestionComponent -->
-      <ResultQuestionComponent
-        :topAnswer="topAnswer"
-        :maxVotes="maxVotes"
-        :topAvatar="topAvatar"
-      />
-      <br />
-
-      <!-- so only admin can use buttons -->
-      <div class="admin-functions-in-poll">
-        <div v-if="isAdmin === true">
-          <button @click="adminToResults">
-            {{ this.uiLabels.endgame || "Engame" }}
-          </button>
+        <!-- admin result view button and go next-->
+        <div v-if="view === 'results_view'">
+          <div v-if="isAdmin === true">
+            <button
+              @click="adminNext"
+              :disabled="currentQuestionIndex === questions.length - 1"
+            >
+              {{ this.uiLabels.nextQuestion || "Next question" }}
+            </button>
+          </div>
+        </div>
+        <!-- admin final view button-->
+        <div v-if="view === 'final_view'">
+          <div v-if="isAdmin === true">
+            <button @click="adminToResults">
+              {{ this.uiLabels.endgame || "Engame" }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -172,14 +170,17 @@ export default {
       console.log("currentQuestionIndex", data.currentQuestion);
     }
     );
-    socket.on("participantsUpdate", (p) => (this.participants = p));
 
-    console.log(
-      "participant update säger",
-      this.participants,
-      this.participants.length
-    );
-    //Listen for admin to press next
+    console.log("Adding participantsUpdate listener");
+
+    socket.emit("getAllParticipantsForGame", this.pollId);
+
+    socket.on("allParticpantsForGame", (participantData) => {
+      console.log("Participants uppdaterade:", participantData);
+      this.participants = participantData; // Ensure the array is directly assigned here.
+      console.log("längden av participants", this.participants.length);
+    });
+
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
@@ -347,7 +348,6 @@ export default {
         console.error("Audio element not found!");
         return;
       }
-
       audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
 
       if (this.isMusicPlaying) {
@@ -373,7 +373,7 @@ export default {
 
     adminToResults: function () {
       socket.emit("toResults", this.pollId, this.userId);
-      console.log("In Admin FINAL");
+      console.log("In admin final");
     },
 
     toResults: function () {
@@ -385,6 +385,72 @@ export default {
 </script>
 
 <style scoped>
+/* Parent container to manage the layout */
+.screen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full height of the screen */
+  width: 100vw; /* Fill screen width */
+  gap: 0.2rem; /* Optional: Adds space between boxes */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+/* Top box styles */
+.top-box {
+  min-height: 10vh; /* Fixed height, adjust as needed */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+}
+
+/* Middle box styles */
+.middle-box {
+  flex-grow: 1; /* Take up remaining space */
+  min-height: 60vh; /* Adjust based on available space */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+}
+
+/* Bottom box styles */
+.bottom-box {
+  min-height: 20vh; /* Adjust height as needed */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+}
+
+.admin-functions-in-poll {
+  position: absolute; /* i förhållande till bottom box, alt sätta som relative */
+  top: 10px; /* Space from the top of the bottom box */
+  right: 10px; /* Space from the right */
+  z-index: 3; /* Make sure it stays above other content */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-functions-in-poll button {
+  margin-top: 10px; /* Adds spacing between buttons and other admin elements */
+}
+
+#game-id-headline {
+  color: rgb(252, 181, 212);
+
+  position: sticky; /* Kan bli problem på mobiltelefon */
+  top: 1rem;
+  z-index: 2; /* Ensures it stays above other content */
+}
+
+
+
 /* General Button Styling */
 button {
   padding: 15px 25px;
@@ -409,22 +475,6 @@ button:disabled {
   background-color: #cccccc; /* Grey out disabled buttons */
   cursor: not-allowed;
 }
-
-.admin-functions-in-poll button {
-  margin-top: 10px; /* Adds spacing between buttons and other admin elements */
-}
-
-/* Admin functions container styling */
-.admin-functions-in-poll {
-  margin-top: 100px; /* Adds spacing above the admin functions */
-  padding: 10px; /* Optional padding within the container */
-  /*border-top: 2px dotted #f394be; /* Optional: add a border to separate it visually */
-}
-
-#poll-id-headline {
-  color: rgb(252, 181, 212);
-}
-
 
 .global-music-control {
   position: fixed;
