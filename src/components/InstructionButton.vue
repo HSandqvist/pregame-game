@@ -9,17 +9,13 @@
       <p v-html="instructions"></p>
       <button @click="toggleInstructions">X</button>
     </div>
-  </div>
+</div>
 </template>
 
 <script>
-import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 
 export default {
   name: "InstructionButton",
-  components: {
-    LanguageSwitcher,
-  },
   props: {
     lang: { type: String, default: "en" },
     viewKey: { type: String, required: true },
@@ -99,14 +95,17 @@ export default {
 .instruction-button {
   width: 40px;
   height: 40px;
-  border: none;
+  padding: 0;
   border-radius: 50%;
   background-color: rgb(252, 160, 198);
   color: white;
   font-size: 24px;
   font-weight: bold;
+  display: flex;
   cursor: pointer;
-  text-align: center;
+  justify-content: center; /* Horisontell centrering */
+  align-items: center; /* Vertikal centrering */
+  box-sizing: border-box; /* Säkerställer att padding inte påverkar storleken */
 }
 
 .instruction-button:hover {
@@ -114,7 +113,7 @@ export default {
 }
 
 .instruction-text:hover {
-  transform: scale(1.5); /* Liten zoom vid hover */
+  transform: scale(1.3); /* Liten zoom vid hover */
 }
 .instructions-popup {
   position: absolute;
