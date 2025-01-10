@@ -190,6 +190,8 @@ export default {
       this.userName = "";
       this.avatar = null;
       this.step = 1; // Go back to the first step
+      socket.emit("getParticipants", this.pollId);
+
 
       // Optionally, navigate back to the start view
       if (!this.isAdmin) {
