@@ -40,6 +40,12 @@
       <button class="btn" @click="attemptJoin">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
+
+      <div class="back-to-start">
+        <button @click="goToStartPage">
+          {{ this.uiLabels.backToStart || "Back to Start" }}
+        </button>
+      </div>
     </div>
 
     <!-- Show action buttons if not joining a game -->
@@ -162,6 +168,10 @@ export default {
         }
       });
     },
+
+    goToStartPage: function () {
+      this.$router.go(0);
+    },
   },
 };
 </script>
@@ -173,7 +183,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vw;
-  width:100vw;
+  width: 100vw;
   font-family: Arial, sans-serif;
   text-align: center;
   position: relative;
@@ -252,5 +262,12 @@ export default {
   justify-content: center;
   align-items: center;
   margin-top: 2rem; /* Optional: Add spacing from the title */
+}
+
+/* jump to start page button */
+.back-to-start {
+  position: fixed;
+  bottom: 3rem; /* Distance from the bottom of the screen */
+  left: 3rem; /* Distance from the left side of the screen */
 }
 </style>

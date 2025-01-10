@@ -34,7 +34,7 @@
 	"startCamera": "Starta Kameran",
 	"takePicture": "Ta bild",
 	"yourAvatar": "Din avatar",
-	"participateInPoll": "Delta i spelet",
+	"participateInPoll": "REDO!",
 	"numberOfPlayers": "Antal spelare",
 	"players": "Spelare",
 	"leaveLobby": "Lämna lobby",
@@ -60,6 +60,8 @@
 
 "RESULTVIEW": "",
 	"showEndResults": "Visa slutresultat",
+	"allResults": "ALLA RESULTAT",
+	"theMost": "GRUPPENS",
 
 "INSTRUCTIONS": {
 	"STARTVIEW": "Välkommen till startsidan!<br>Här kan du välja om du vill skapa ett nytt spel eller gå med i ett existerande spel.",

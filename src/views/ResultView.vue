@@ -3,7 +3,7 @@
   
   <header>
     <h1 v-if ="showPopup" v-motion="motionGrowBiggerAndGlow"> TOP...</h1>
-    <h1 v-if = "resultsShown && !showPopup" v-motion="motionGrowBiggerAndGlow"> ALL RESULTS </h1>
+    <h1 v-if = "resultsShown && !showPopup" v-motion="motionGrowBiggerAndGlow"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
   </header>
 
   <div class="result-view">
@@ -13,7 +13,7 @@
       v-if="!resultsShown"
       @click="fetchCategoriesWithAnswers"
       class="center-button">
-      Show Results
+      {{ this.uiLabels.showEndResults|| "Show Results"}}
     </button>
 
     <!-- Popup for individual category winners -->
@@ -29,7 +29,7 @@
         :key="category"
         class="category"
       >
-        <h2>THE MOST {{ category }}</h2>
+        <h2> {{ this.uiLabels.theMost || "THE MOST"}} {{ category }}</h2>
         <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
       </div>
     </div>
