@@ -1,7 +1,4 @@
 <template>
-    <div v-if="isAdmin">
-      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
-    </div>
   <div class="center-container">
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
@@ -142,7 +139,6 @@
 
 <script>
 import io from "socket.io-client";
-import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
@@ -158,7 +154,6 @@ export default {
     LanguageSwitcher,
     InstructionButton,
     ConfirmLeaveModal,
-    MusicPlayer,
   },
   data: function () {
     return {
