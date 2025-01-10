@@ -37,9 +37,16 @@
           @keydown="handleBackspace(index, $event)"
         />
       </div>
+      <ErrorMessage :message="errorMessage" />
       <button class="btn" @click="attemptJoin">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
+
+      <div class="back-to-start">
+        <button @click="goToStartPage">
+          {{ this.uiLabels.backToStart || "Back to Start" }}
+        </button>
+      </div>
     </div>
 
     <!-- Show action buttons if not joining a game -->
@@ -58,6 +65,7 @@
 import io from "socket.io-client"; // Import WebSocket library
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import ErrorMessage from "../components/ErrorMessage.vue";
 
 import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 
@@ -71,6 +79,7 @@ export default {
   components: {
     LanguageSwitcher,
     InstructionButton,
+    ErrorMessage,
   },
   data() {
     return {
@@ -147,7 +156,6 @@ export default {
 
       if (!lobbyId || lobbyId.length < 6) {
         this.errorMessage = "Please enter a valid 6-digit Lobby ID.";
-        alert(this.errorMessage);
         return;
       }
 
@@ -158,9 +166,12 @@ export default {
           this.$router.push(`/lobby/${lobbyId}`);
         } else {
           this.errorMessage = "Lobby does not exist. Please check the ID.";
-          alert(this.errorMessage);
         }
       });
+    },
+
+    goToStartPage: function () {
+      this.$router.go(0);
     },
   },
 };
@@ -173,7 +184,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vw;
-  width:100vw;
+  width: 100vw;
   font-family: Arial, sans-serif;
   text-align: center;
   position: relative;
@@ -252,5 +263,12 @@ export default {
   justify-content: center;
   align-items: center;
   margin-top: 2rem; /* Optional: Add spacing from the title */
+}
+
+/* jump to start page button */
+.back-to-start {
+  position: fixed;
+  bottom: 3rem; /* Distance from the bottom of the screen */
+  left: 3rem; /* Distance from the left side of the screen */
 }
 </style>

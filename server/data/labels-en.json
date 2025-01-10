@@ -34,7 +34,7 @@
 	"startCamera": "Start camera",
 	"takePicture": "Take picture",
 	"yourAvatar": "Your avatar",
-	"participateInPoll": "Participate in game",
+	"participateInPoll": "READY!",
 	"numberOfPlayers": "Number of players",
 	"players": "Players",
 	"leaveLobby": "Leave Lobby",
@@ -57,8 +57,14 @@
 	"nextQuestion": "Next question",
 	"waitingForAnswers": "Waiting for answers...",
 	"showResult": "Show result",
-	"endgame": "Endgame",
+	"endgame": "End game",
+
+
+"RESULTVIEW": "",
 	"showEndResults": "Show results",
+	"allResults": "ALL RESULTS",
+	"theMost": "THE MOST",
+
 
 	"INSTRUCTIONS": {
 	"STARTVIEW": "Welcome to the start page!<br>Here, you can choose whether to create a new game or join an existing game.",
