@@ -4,7 +4,15 @@
     <div class="camera-container">
       <!-- camera view -->
       <div class="camera-view">
-        <p v-if="!isPictureTaken">
+        <p v-if="!cameraState && !isPictureTaken">
+          <img
+            :src="cameraPicIcon"
+            alt="Default Camera Placeholder"
+            width="320"
+            height="240"
+          />
+        </p>
+        <p v-if="cameraState && !isPictureTaken">
           <video ref="video" width="320" height="240" autoplay></video>
         </p>
         <p v-if="isPictureTaken">
@@ -26,6 +34,7 @@
 
 <script>
 //importera bild på kamera att ha som default när ingen bild har tagits
+import cameraPicIcon from "@/assets/img/cameraPicIcon.png";
 
 export default {
   name: "CameraComponent",
@@ -39,6 +48,7 @@ export default {
       avatar: null, // Ensure avatar is defined in the data
       cameraState: false,
       stream: null, // The video stream to access the camera
+      cameraPicIcon,
     };
   },
   methods: {
@@ -155,8 +165,9 @@ export default {
 }
 
 .camera-component-container h1 {
-    margin-bottom: 3rem; /* Remove default margin from h1 */
-    padding: 1rem; /* Remove any padding */}
+  margin-bottom: 3rem; /* Remove default margin from h1 */
+  padding: 1rem; /* Remove any padding */
+}
 
 .camera-container {
   display: flex;
