@@ -86,7 +86,7 @@ export default {
 
       //user
       userId: "", //alla ha egen sida sen hej
-      tempUserID: "",
+
       userName: "", // User's name
       joined: false, // If the user has joined
       avatar: null, // Avatar image data

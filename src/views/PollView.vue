@@ -160,6 +160,7 @@ export default {
       pollId: this.pollId,
       userId: this.userId,
     });
+    
     socket.emit("pollInfoUpdatePersonal", {pollId: this.pollId});
 
     socket.on("pollInfoUpdate", (data) => {

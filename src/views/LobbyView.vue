@@ -215,7 +215,7 @@ export default {
 
       this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
 
-      
+      socket.off("participantsUpdate")
     });
     //Listen for start game from server
   
@@ -244,14 +244,6 @@ export default {
         this.step++;
       }
       console.log(this.step);
-    },
-
-    adminStartGame: function () {
-      socket.emit("startGame", this.pollId);
-    },
-
-    participantStartGame: function () {
-      this.$router.push(`/poll/${this.pollId}/${this.userId}`);
     },
 
     setUserId: function () {
