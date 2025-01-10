@@ -114,7 +114,8 @@
         :lang="lang"
         viewKey="AVATARVIEW"
       />
-      <h1>{{ this.uiLabels.yourAvatar || "Your avatar" }}: {{ userName }}</h1>
+      <h2> {{ this.uiLabels.yourAvatar || "Your avatar" }} </h2>
+        <h1> {{ userName }} </h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
@@ -146,8 +147,8 @@
         viewKey="LOBBYVIEW"
       />
 
-      <h1>
-        {{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}
+      <h1 id="game-id-headline">
+        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
       </h1>
       <h2>
         {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
@@ -559,7 +560,6 @@ export default {
   min-height: 100vh; /* Ensures it takes up the full viewport height */
   text-align: center;
   position: relative;
-  color: white;
 }
 
 /* Adjust other containers to ensure consistent styling */
@@ -608,10 +608,11 @@ button:hover {
 }
 
 .camera-view {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 320px;
-  height: 240px;
+  border: 0.1rem solid #f01984;
+  border-radius: 50%;
+  background-color: #f01984;
+  width: 15rem;
+  height: 14rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -816,5 +817,16 @@ input[type="text"] {
 
 .music-icon:hover {
   transform: scale(1.1); /* Liten zoom vid hover */
+}
+
+#game-id-headline {
+  color: rgb(252, 181, 212);
+
+  position: fixed; 
+  top: 1rem;
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for centering */
+  z-index: 2; /* Ensures it stays above other content */
+  text-align: center;
 }
 </style>

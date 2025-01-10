@@ -31,6 +31,7 @@
       </div>
     </div>
 
+    <!-- step 2: select language for questions -->
     <div v-else-if="step === 2" class="language-for-questions-section">
       <InstructionButton
         :uiLabels="uiLabels"
@@ -72,12 +73,10 @@
       </div>
     </div>
 
-    <!-- Step 3: Display poll data -->
-    <div v-else class="poll-container">
-      <div class="poll-data-section">
-        <router-link :to="'/result/' + pollId"> Check result </router-link>
-        Data: {{ pollData }}
-      </div>
+    <div class="back-to-start">
+      <button @click="goToStartPage">
+        {{ this.uiLabels.backToStart || "Back to Start" }}
+      </button>
     </div>
   </div>
 </template>
@@ -89,7 +88,6 @@ import InstructionButton from "@/components/InstructionButton.vue";
 
 import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-//import { toHandlers } from "vue";
 
 // Initialize the WebSocket connection to the server
 const socket = io("localhost:3000");
@@ -209,6 +207,10 @@ export default {
         console.error("Error sending questions to server:", error);
       }
     },
+
+    goToStartPage: function() {
+      this.$router.push("/");
+    },
   },
 };
 </script>
@@ -282,5 +284,12 @@ button:disabled {
 
 #create-game-button:hover {
   background-color: rgb(219, 34, 142);
+}
+
+/* jump to start page button */
+.back-to-start {
+  position: fixed;
+  bottom: 3rem; /* Distance from the bottom of the screen */
+  left: 3rem; /* Distance from the left side of the screen */
 }
 </style>

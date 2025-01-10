@@ -13,7 +13,7 @@
   <div class="screen-container">
     <!-- top screen content -->
     <div class="top-box">
-      <h1 id="poll-id-headline">Poll ID: {{ pollId }}</h1>
+      <h1 id="game-id-headline"> {{this.uiLabels.gameID || "Game ID"}}: {{ pollId }}</h1>
 
     </div>
     <!-- middle screen content -->
@@ -404,7 +404,6 @@ export default {
   justify-content: center;
   align-items: center;
   position: sticky;
-
 }
 
 /* Middle box styles */
@@ -442,7 +441,7 @@ export default {
   margin-top: 10px; /* Adds spacing between buttons and other admin elements */
 }
 
-#poll-id-headline {
+#game-id-headline {
   color: rgb(252, 181, 212);
 
   position: sticky; /* Kan bli problem på mobiltelefon */

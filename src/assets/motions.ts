@@ -19,10 +19,10 @@ export const motionGrowBiggerAndGlow = {
   },
   enter: {
     "text-shadow": "0 0 10px rgba(255, 107, 174, 1)", // Bright pink glow
-    transform: "scale(1.7)", //larger size
+    transform: "scale(1.5)", //larger size
     transition: {
       delay: 1000, // Delay of 1 seconds
-      duration: 2000, // 2 seconds
+      duration: 2500, // 2 seconds
     },
   },
 };
