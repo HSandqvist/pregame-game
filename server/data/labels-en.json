@@ -21,7 +21,6 @@
 "CREATEVIEW":"", 
 	
 	"numberOfQuestions": "Number of questions",
-	"secondsPerQuestion": "Seconds per question ",
 	"languageForQuestions": "Chose language for questions",
 	"swedish": "Swedish",
 	"english": "English",
