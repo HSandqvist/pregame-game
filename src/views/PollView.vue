@@ -154,6 +154,8 @@ export default {
       console.log("view", data.currentView); 
       this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
       console.log("currentQuestionIndex", data.currentQuestion);
+      this.updateCurrentQuestion(this.currentQuestionIndex);
+
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
@@ -177,7 +179,7 @@ export default {
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
 */
-    socket.on("participantNextQuestion", () => this.particpantNext());
+    socket.on("participantNextQuestion", () => this.particpantNext(), this.updateCurrentQuestion(this.currentQuestionIndex));
 
     //LISTENER FOR GAME END
     socket.on("finishGame", () => this.toResults());
@@ -212,8 +214,9 @@ export default {
     socket.on("questionsForGame", (qs) => {
       if (qs) {
         this.questions = qs;
-        this.updateCurrentQuestion(this.currentQuestionIndex); // Start with the first question
+         // Start with the first question
         //console.log("Questions received from server:", this.questions);
+        this.currentQuestion = this.questions[this.currentQuestionIndex];
       } else {
         console.error("Received empty questions array from server.");
       }
@@ -293,7 +296,7 @@ export default {
       this.hasVoted = false;
       this.numberOfVotes = 0;   
       
-      this.updateCurrentQuestion(this.currentQuestionIndex);
+     
     },
 
     adminNext: function () {
@@ -321,7 +324,7 @@ export default {
         this.currentQuestion = this.questions[index];
         console.log("Current question data:", this.currentQuestion);
       } else {
-        console.error("Invalid question index:", index);
+        //"console.error("Invalid question index:", index);"
       }
     },
 
