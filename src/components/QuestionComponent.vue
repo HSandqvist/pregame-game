@@ -99,7 +99,7 @@ export default {
   methods: {
     getDelay(index) {
       // Apply a wave effect delay to each character, making it look like a wave
-      const waveDelay = Math.sin(index * 0.5) * 1.2; // Using sine for smooth wave pattern
+      const waveDelay = Math.sin(index * 0.5) * 0.3; // Using sine for smooth wave pattern
       return waveDelay;
     },
 
@@ -227,7 +227,7 @@ export default {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5rem); /* Bounce upwards */
+    transform: translateY(-2rem); /* Bounce upwards */
   }
   100% {
     transform: translateY(0);

@@ -5,16 +5,16 @@
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   
   <header>
-    <h1 v-if ="showPopup" v-motion="motionGrowBiggerAndGlow"> TOP...</h1>
-    <h1 v-if = "resultsShown && !showPopup" v-motion="motionGrowBiggerAndGlow"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
+    <h1 v-if ="showPopup" v-motion="popEffect"> TOP...</h1>
+    <h1 v-if = "resultsShown && !showPopup"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
   </header>
 
   <div class="result-view">
 
     <!-- Button to fetch and display results -->
-    <button
-      v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button">
-      <h1>{{ this.uiLabels.showEndResults|| "Show Results"}}</h1>
+    <button 
+      v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button" v-motion="motionGlowNeon">
+      <p >{{ this.uiLabels.showEndResults|| "Show Results"}} </p>
     </button>
 
     <!-- Popup for individual category winners -->
@@ -34,8 +34,10 @@
       <div
         v-for="(topVoted, category) in topVotedCategories"
         :key="category">
-        <h2> {{ this.uiLabels.theMost || "THE MOST"}} {{ category }}</h2>
+        <div class="one-result-each"> 
+        <h2> <span id="the-most"> {{ this.uiLabels.theMost || "THE MOST"}} </span> {{ category }}</h2>
         <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
+      </div>
       </div>
     </div>
 
@@ -51,7 +53,7 @@
 <script>
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import MusicPlayer from "@/components/MusicPlayer.vue";
-import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
+import { motionGrowBiggerAndGlow, motionGlowNeon, popEffect } from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -81,6 +83,8 @@ export default {
       currentPopupCategory: "", // Current category being displayed in the popup
       currentPopupWinner: "", // Current winner being displayed in the popup
       motionGrowBiggerAndGlow, // Motion settings
+      motionGlowNeon,
+      popEffect,
     };
   },
 
@@ -185,9 +189,9 @@ export default {
   left: 50%; /* Move it 50% from the left of the screen */
   transform: translate(-50%,0); /* Offset by 50% of its own size to center it exactly */
 
-  margin-top: 100px; /* Set to the height of the header (100px) */
+  margin-top: 4rem; /* Set to the height of the header (100px) */
   width: 100%;
-  height: calc(100vh - 100px); /* Subtract header height from full viewport height */
+  height: calc(100vh - 4rem); /* Subtract header height from full viewport height */
   box-sizing: border-box; /* Include padding and borders in the height calculation */
 }
 
@@ -203,18 +207,23 @@ header {
 }
 
 .result-button {
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
-  border: 4px solid white;
-  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 2rem;
+  background-color: rgb(187, 143, 206);
+  border: 0.3rem solid white;
+  border-radius: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
   z-index: 10; /* Ensure it's above other content */
 }
 
+.result-button:hover {
+  transform: scale(1.1);
+}
+
 .result-button:disabled {
   visibility: hidden;
+  cursor: pointer;
 }
 
 .center-button {
@@ -244,8 +253,8 @@ header {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
-  border: 4px solid white;
+  background: rgb(255, 179, 205);
+  border: 0.3rem solid white;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
   text-align: center;
@@ -265,18 +274,23 @@ header {
 }
 
 .results {
+  margin: 2rem;
   padding: 1rem;
   text-align: center;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));/* Gradient pink background */
-  border-radius: 8px;
-  border: 0.2rem solid white;
-  font-size: 1.2rem;
+  background: rgb(161, 75, 201);/* Gradient pink background */
+  border-radius: 2rem;
+  border: 0.3rem solid white;
+  font-size: 1rem;
   animation: bounce 1.5s infinite; /* Bouncy animation */
   max-width: 80%; /* Ensures it doesn’t exceed 90% of the screen width */
   max-height: 60vh; /* Limits the height to 70% of the viewport */
   overflow-y: auto; /* Adds a scroll bar if the content overflows vertically */
   overflow-x: hidden; /* Hides horizontal overflow if needed */
   box-sizing: border-box; /* Ensures padding is included in the total size */
+}
+
+#the-most {
+  color: rgb(255, 156, 222 );
 }
 
 @keyframes pulse {
@@ -314,5 +328,13 @@ header {
   .result-view h2 {
     font-size: 1.2em;
   }
+}
+
+.one-result-each {
+  margin-bottom: 2rem;
+}
+
+h1, h2 {
+  margin:2%;
 }
 </style>

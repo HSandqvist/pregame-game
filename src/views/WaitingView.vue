@@ -69,14 +69,7 @@
     <div class="bottom-box">
       <!-- Actions -->
       <div class="submit-section">
-        <button
-          v-if="isAdmin"
-          v-on:click="adminStartGame"
-          :disabled="!joined || participants.length < 3"
-        >
-          {{ this.uiLabels.startGame || "Start Game" }}
-        </button>
-
+    
         <!-- Leave Poll Button -->
         <button
           v-if="!isAdmin"
@@ -92,6 +85,13 @@
           :disabled="!joined"
         >
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
+        </button>
+        <button
+          v-if="isAdmin"
+          v-on:click="adminStartGame"
+          :disabled="!joined || participants.length < 3"
+        >
+          {{ this.uiLabels.startGame || "Start Game" }}
         </button>
 
         <ConfirmLeaveModal
