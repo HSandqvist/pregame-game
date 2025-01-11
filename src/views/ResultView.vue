@@ -198,7 +198,7 @@ header {
   width: 100%; /* Full width */
   height: 100px; /* Adjust height as needed */
   position: fixed; /* Fix it at the top of the page */
-  top: 0; /* Stick to the top */
+  top: 3rem;
   z-index: 2000; /* Ensure it stays above other content */
 }
 
@@ -231,6 +231,7 @@ header {
   cursor: pointer;
   transition: background-color 0.3s ease;
   z-index: 10; /* Ensure it's above other content */
+  margin-top: 2rem;
 }
 
 .center-button:hover {
@@ -268,15 +269,15 @@ header {
 }
 
 .results {
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));/* Gradient pink background */
   border-radius: 8px;
-  border: 4px solid white;
+  border: 0.2rem solid white;
   font-size: 1.2rem;
   animation: bounce 1.5s infinite; /* Bouncy animation */
-  max-width: 90%; /* Ensures it doesn’t exceed 90% of the screen width */
-  max-height: 70vh; /* Limits the height to 70% of the viewport */
+  max-width: 80%; /* Ensures it doesn’t exceed 90% of the screen width */
+  max-height: 60vh; /* Limits the height to 70% of the viewport */
   overflow-y: auto; /* Adds a scroll bar if the content overflows vertically */
   overflow-x: hidden; /* Hides horizontal overflow if needed */
   box-sizing: border-box; /* Ensures padding is included in the total size */
@@ -306,5 +307,16 @@ header {
   left: 50%; /* Center it horizontally */
   transform: translateX(-50%); /* Offset by half its width to align it perfectly */
   z-index: 999; /* Ensure it's below the popup (popup z-index is 1000) */
+}
+
+
+@media (max-width: 430px) {
+  .result-view h1 {
+    font-size: 1.5em;
+  }
+
+  .result-view h2 {
+    font-size: 1.2em;
+  }
 }
 </style>
