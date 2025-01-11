@@ -213,6 +213,10 @@ header {
   z-index: 10; /* Ensure it's above other content */
 }
 
+.result-button:hover {
+  transform: scale(1.1);
+}
+
 .result-button:disabled {
   visibility: hidden;
 }
@@ -243,7 +247,7 @@ header {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
+  background: linear-gradient(rgb(255, 179, 205));
   border: 4px solid white;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
