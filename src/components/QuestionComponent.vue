@@ -60,6 +60,9 @@
 import io from "socket.io-client";
 const socket = io("localhost:3000");
 
+//const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners
+
+
 export default {
   name: "QuestionComponent",
   props: {
@@ -164,9 +167,9 @@ export default {
 }
 
 .drop-zone {
-  width: 140px;
-  height: 140px;
-  border: 6px dotted rgb(252, 160, 198);
+  width: 8.75rem;
+  height: 8.75rem;
+  border: 0.4rem dotted rgb(252, 160, 198);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -212,7 +215,7 @@ export default {
 .curved-text span {
   display: inline-block;
   transform-origin: bottom center;
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: bold;
   color: rgb(252, 160, 198);
   letter-spacing: 0.05rem; /* Adjusts spacing between letters */
@@ -224,7 +227,7 @@ export default {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px); /* Bounce upwards */
+    transform: translateY(-5rem); /* Bounce upwards */
   }
   100% {
     transform: translateY(0);
@@ -238,6 +241,6 @@ export default {
 
 h2 span {
   display: inline-block;
-  margin: 0 2px; /* Small space between characters */
+  margin: 0 0.23rem; /* Small space between characters */
 }
 </style>

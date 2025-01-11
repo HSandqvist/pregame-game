@@ -110,8 +110,8 @@
 }
 
 .music-icon {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: cover;
   transition: filter 0.3s ease, transform 0.2s ease; /* Smidig övergång */
 }

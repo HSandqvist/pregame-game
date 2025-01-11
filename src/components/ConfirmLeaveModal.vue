@@ -88,7 +88,7 @@ export default {
 .modal-content {
   background: rgb(252, 160, 198);
   padding: 1.5rem;
-  border-radius: 5px;
+  border-radius: 0.3rem;
   border: 0.2rem solid rgb(248, 99, 161);
   text-align: center;
 }
@@ -97,7 +97,7 @@ export default {
   background: rgb(248, 99, 161);
   border-radius: 1rem;
   border: 0.01rem solid rgb(243, 68, 141);
-  padding: 10px;
+  padding: 0.6rem;
   font-weight: bold;
   font-size: 1.2em;
   color: white;

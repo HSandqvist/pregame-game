@@ -57,14 +57,14 @@ export default {
   right: 1rem; /* Right side for the language switcher */
   z-index: 1000;
   display: flex;
-  gap: 10px;
+  gap: 0.8rem;
   align-items: center;
   justify-content: center;
 }
 
 .flag-button {
- width: 40px;
- height: 40px;
+ width: 2.5rem;
+ height: 2.5rem;
  border: none;
  border-radius: 50%;
  overflow: hidden;
@@ -78,7 +78,7 @@ export default {
 
 .flag-button:hover {
  transform: scale(1.1);
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+ box-shadow: 0 0.4rem 0.6rem rgba(0, 0, 0, 0.2);
 }
 
 .flag-icon {
