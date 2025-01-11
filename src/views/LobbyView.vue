@@ -2,6 +2,7 @@
   <div class="center-container">
     <!-- Language switcher component -->
     <LanguageSwitcher @language-changed="updateLanguage" />
+
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
       <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
@@ -15,74 +16,33 @@
       </div>
     </div>
 
-    <!-- Step 2: Capture avatar from the camera -->
+    <!-- Step 2: Capture avatar from the  or choose avatar -->
     <div v-else-if="step === 2" class="camera-container">
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
         viewKey="CAMERAVIEW"
       />
-      <h1 v-if="!choseCustomAvatar">
-        {{ this.uiLabels.captureYourAvatar || "Capture your avatar" }}:
-      </h1>
-      <h1 v-if="choseCustomAvatar">
-        {{ this.uiLabels.chooseYourAvatar || "Choose your avatar" }}:
-      </h1>
 
-      <div class="camera-picture-container" v-if="!choseCustomAvatar">
-        <!-- Camera view -->
-        <div class="camera-view">
-          <p v-if="!isPictureTaken">
-            <video ref="video" width="320" height="240" autoplay></video>
-          </p>
-
-          <!-- show the picture before creating final avatar -->
-          <p v-if="isPictureTaken">
-            <img :src="avatar" alt="User Avatar" width="320" height="240" />
-          </p>
-          <!-- Show the custom avatar -->
+      <!-- Camera/Picture for avatar -->
+      <div class="camera-picture-container">
+        <div v-if="!choseCustomAvatar">
+          <CameraComponent
+            v-model:isPictureTaken="isPictureTaken"
+            :uiLabels="uiLabels"
+            :disableSwitcher="disableSwitcher"
+            @update:avatar="avatar = $event"
+            @update:disableSwitcher="disableSwitcher = $event"
+            @update:isPictureTaken="isPictureTaken = $event"
+          />
         </div>
-        <!-- Camera buttons-->
-        <div class="camera-buttons">
-          <button v-on:click="startCamera" :disabled="cameraState">
-            {{ this.uiLabels.startCamera || "Start camera" }}
-          </button>
-          <button v-on:click="captureImage" :disabled="!cameraState">
-            {{ this.uiLabels.takePicture || "Take picture" }}
-          </button>
-        </div>
-      </div>
-      <div class="camera-picture-container" v-if="choseCustomAvatar">
-        <div class="camera-view">
-          <p>
-            <img :src="avatar" alt="User Avatar" width="320" height="240" />
-          </p>
-        </div>
-        <div class="camera-buttons">
-          <button v-on:click="choseOptionOne">
-            {{ this.uiLabels.avatar1 || "Avatar1" }}
-          </button>
-          <button v-on:click="choseOptionTwo">
-            {{ this.uiLabels.avatar2 || "Avatar2" }}
-          </button>
-          <button v-on:click="choseOptionThree">
-            {{ this.uiLabels.avatar3 || "Avatar3" }}
-          </button>
-          <button v-on:click="choseOptionFour">
-            {{ this.uiLabels.avatar4 || "Avatar4" }}
-          </button>
-          <button v-on:click="choseOptionFive">
-            {{ this.uiLabels.avatar1 || "Avatar5" }}
-          </button>
-          <button v-on:click="choseOptionSix">
-            {{ this.uiLabels.avatar2 || "Avatar6" }}
-          </button>
-          <button v-on:click="choseOptionSeven">
-            {{ this.uiLabels.avatar3 || "Avatar7" }}
-          </button>
-          <button v-on:click="choseOptionEight">
-            {{ this.uiLabels.avatar4 || "Avatar8" }}
-          </button>
+        <div v-if="choseCustomAvatar">
+          <ChooseAvatarComponent
+            v-model:isPictureTaken="isPictureTaken"
+            :uiLabels="uiLabels"
+            @update:avatar="avatar = $event"
+            @update:isPictureTaken="isPictureTaken = $event"
+          />
         </div>
       </div>
 
@@ -117,8 +77,8 @@
         :lang="lang"
         viewKey="AVATARVIEW"
       />
-      <h2> {{ this.uiLabels.yourAvatar || "Your avatar" }} </h2>
-        <h1> {{ userName }} </h1>
+      <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}</h2>
+      <h1>{{ userName }}</h1>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
@@ -143,6 +103,12 @@ import InstructionButton from "@/components/InstructionButton.vue"; //Import Ins
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
 
+import CameraComponent from "@/components/CameraComponent.vue";
+import ChooseAvatarComponent from "@/components/ChooseAvatarComponent.vue";
+
+import musicIconOn from "@/assets/img/musicIcon.png";
+import musicIconOff from "@/assets/img/musicIconOff.png";
+
 const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
@@ -154,6 +120,8 @@ export default {
     LanguageSwitcher,
     InstructionButton,
     ConfirmLeaveModal,
+    CameraComponent,
+    ChooseAvatarComponent,
   },
   data: function () {
     return {
@@ -175,10 +143,8 @@ export default {
       atLeastThree: false,
 
       //camera
-      stream: null, // The video stream to access the camera
-      isPictureTaken: false, //Tracks that camera is closed and picture taken
-      cameraState: false, // Tracks whether the camera is active
       disableSwitcher: false, //connected to choose premade avatar button
+      isPictureTaken: false,
 
       //leave poll lobby
       showModal: false,
@@ -273,140 +239,39 @@ export default {
       }
     },
 
-    // Start the camera stream
-    startCamera: function () {
-      this.isPictureTaken = false;
-      this.cameraState = true;
-      this.disableSwitcher = true;
-
-      // Stop any existing camera stream before starting a new one, make sure always turned off
-      if (this.stream) {
-        const tracks = this.stream.getTracks();
-        tracks.forEach((track) => track.stop());
-        this.stream = null;
-      }
-      // Stop the video element from using the old stream
-      if (this.$refs.video) {
-        this.$refs.video.srcObject = null;
-      }
-      //start new camera stream
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          this.stream = stream;
-          this.$refs.video.srcObject = stream;
-          console.log("Camera stream is active:", stream);
-        })
-        .catch((error) => {
-          console.error("Error accessing camera:", error);
-          alert(
-            "Unable to access the camera. Please check your camera settings."
-          );
-        });
-    },
-
-    // Stop the camera stream
-    stopCamera: function () {
-      if (this.stream) {
-        console.log("stopping stream", this.stream);
-        const tracks = this.stream.getTracks();
-        tracks.forEach((track) => track.stop()); //stop all tracks
-        this.stream = null; //added
-      }
-      if (this.$refs.video) {
-        this.$refs.video.srcObject = null; // Clear the video element source
-      }
-      this.disableSwitcher = false;
-    },
-
-    // Capture the image from the video stream
-    captureImage: function () {
-      const video = this.$refs.video;
-
-      this.isPictureTaken = true;
-
-      if (video && video.videoWidth > 0 && video.videoHeight > 0) {
-        // Create a canvas to capture the image
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        // Get the context and draw the video frame to the canvas
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Convert canvas to a base64 image string
-        this.avatar = canvas.toDataURL("image/png");
-
-        // Log to check the base64 image
-        console.log("Avatar captured");
-        //console.log("Captured Avatar: ", this.avatar);
-
-        this.cameraState = false; // Disable camera actions
-
-        // Stop the camera stream after capturing the image
-        this.stopCamera();
-      } else {
-        console.error("Video stream is not available.");
-      }
-    },
-    chooseAvatar() {
-      this.stopCamera();
-      this.choseCustomAvatar = true;
-      this.isPictureTaken = true;
-    },
-
-    choseOptionOne() {
-      this.avatar = "/src/assets/img/Avatars/Avatar1.png";
-    },
-
-    choseOptionTwo() {
-      this.avatar = "/src/assets/img/Avatars/Avatar2.png";
-    },
-    choseOptionThree() {
-      this.avatar = "/src/assets/img/Avatars/Avatar3.png";
-    },
-    choseOptionFour() {
-      this.avatar = "/src/assets/img/Avatars/Avatar4.png";
-    },
-    choseOptionFive() {
-      this.avatar = "/src/assets/img/Avatars/Avatar5.png";
-    },
-    choseOptionSix() {
-      this.avatar = "/src/assets/img/Avatars/Avatar6.png";
-    },
-    choseOptionSeven() {
-      this.avatar = "/src/assets/img/Avatars/Avatar7.png";
-    },
-    choseOptionEight() {
-      this.avatar = "/src/assets/img/Avatars/Avatar8.png";
-    },
-
     returnToPictureMode() {
       this.choseCustomAvatar = false;
       this.isPictureTaken = false;
       this.avatar = null;
     },
 
-    // Handle manual avatar upload
-    handleAvatarUpload: function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.avatar = reader.result;
-        };
-        reader.readAsDataURL(file); // Convert image to base64
+    chooseAvatar() {
+      this.choseCustomAvatar = true; // Show ChooseAvatarComponent
+      this.avatar = null;
+    },
+
+    toggleMusic: function () {
+      const audio = this.$refs.backgroundMusic;
+      if (!audio) {
+        console.error("Audio element not found!");
+        return;
+      }
+
+      audio.volume = 1.0; // Full volym (värde mellan 0.0 och 1.0)
+
+      if (this.isMusicPlaying) {
+        audio.pause();
+        this.isMusicPlaying = false; // Sätt musiken till av
+      } else {
+        // Återställ ljudets position till början om det är pausat
+        audio.currentTime = 0;
+        audio.play();
+        this.isMusicPlaying = true; // Sätt musiken till på
       }
     },
 
     // Participate in the poll
     participateInPoll: function () {
-      //if (!this.avatar) {
-      //alert("Please select or capture an avatar!");
-      //return;
-      //}
-
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -445,8 +310,6 @@ export default {
 }
 
 /* Adjust other containers to ensure consistent styling */
-.avatar-container,
-.camera-container,
 .name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
@@ -479,33 +342,20 @@ button:hover {
   display: flex; /* Align buttons horizontally */
   justify-content: center; /* Center the buttons */
   gap: 20px; /* Space between buttons */
+  padding: 5px;
 }
 
 /* Camera and camera buttons styling*/
 .camera-picture-container {
+  flex-grow: 1;
   display: flex; /* Arrange items in a row */
+  flex-direction: column;
   align-items: center; /* Center items vertically */
   justify-content: space-between; /* Add space between camera view and buttons */
   gap: 20px; /* Optional: Space between elements */
+  min-height: 60vh; /* Ensure consistent height */
 }
 
-.camera-view {
-  border: 0.1rem solid #f01984;
-  border-radius: 50%;
-  background-color: #f01984;
-  width: 15rem;
-  height: 14rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.camera-buttons {
-  display: flex; /* Arrange buttons in a column */
-  flex-direction: column; /* Keep buttons stacked vertically */
-  gap: 10px; /* Space between buttons */
-}
 /* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
@@ -513,23 +363,6 @@ button:hover {
   justify-content: center;
   gap: 20px; /* Keeps space between the buttons themselves */
   background: none; /* If body or parent has background */
-}
-
-.camera-buttons button {
-  padding: 12px 20px;
-  background-color: rgb(225, 95, 150); /* Darker pink */
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
-}
-
-.camera-buttons button:hover {
-  background-color: rgb(205, 85, 140); /* Darker hover effect */
 }
 
 /*  When button is disabled styling */
@@ -550,101 +383,6 @@ button:disabled {
   background-color: rgb(219, 34, 142);
 }
 
-/* Avatar styles */
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-}
-
-/* Camera styling */
-video {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-.participants-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box; /* Inkludera padding i bredden */
-}
-
-.participant-item.current-user img.avatar {
-  border-color: rgb(255, 139, 230);
-  /* Lila kant runt aktuell användare */
-  border-style: solid;
-  /* Fylld kant */
-  animation: borderHighlight 1s infinite alternate;
-  /* Animerar kantfärgen */
-}
-
-@keyframes borderHighlight {
-  from {
-    border-color: rgb(255, 139, 230);
-    /* Startfärg */
-  }
-
-  to {
-    border-color: rgb(244, 34, 255);
-    /* Slutfärg */
-  }
-}
-
-.participant-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-img.avatar {
-  width: 100%;
-  /* Gör bilderna flexibla */
-  height: auto;
-  /* Behåll proportionerna */
-  aspect-ratio: 1 / 1;
-  /* Fyrkantiga bilder */
-  border-radius: 50%;
-  /* Runda bilder */
-  object-fit: cover;
-  /* Beskär inte bilder */
-  max-width: 150px;
-  /* Maximal bildstorlek */
-  border: 4px solid transparent;
-  /* Standardkant */
-  border-color: white;
-  /* Default-kantfärg */
-  transition: border-color 0.3s ease;
-  /* Mjuk övergång för kantfärg */
-}
-
-img.avatar.host {
-  border-color: rgb(15, 177, 69);
-  /* Grön kant för admin */
-}
-
-.participant-item p {
-  margin-top: 10px;
-  /* Avstånd mellan bild och namn */
-  font-size: 14px;
-  /* Mindre textstorlek */
-}
-
-@media (max-width: 768px) {
-  .participants-grid {
-    grid-template-columns: repeat(2, 1fr);
-    /* Två bilder per rad på små skärmar */
-  }
-}
-
-
-
 /* Style for the name input box */
 input[type="text"] {
   width: 100%;
@@ -663,15 +401,12 @@ input[type="text"] {
   text-align: center;
 }
 
-
-#game-id-headline {
-  color: rgb(252, 181, 212);
-
-  position: fixed; 
-  top: 1rem;
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%); /* Adjust for centering */
-  z-index: 2; /* Ensures it stays above other content */
-  text-align: center;
+/* Avatar styles */
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
 }
 </style>
