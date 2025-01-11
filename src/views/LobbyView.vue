@@ -40,9 +40,11 @@
           <ChooseAvatarComponent
             v-model:isPictureTaken="isPictureTaken"
             :uiLabels="uiLabels"
-            @update:avatar="avatar = $event"
+            :takenAvatars="selectedAvatars"
             @update:isPictureTaken="isPictureTaken = $event"
+            @avatar-selected="handleAvatarSelection"
           />
+          <!-- @update:avatar="avatar = $event" -->
         </div>
       </div>
 
@@ -137,6 +139,8 @@ export default {
       adminId: null, //placeholder for eventual adminId, if present
       choseCustomAvatar: false,
 
+      selectedAvatars: [],
+
       uiLabels: {}, // UI labels for different languages
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
@@ -163,18 +167,21 @@ export default {
 
     socket.on("participantsUpdate", (p) => {
       this.participants = p;
-     // Ensure the check runs after the participants array is updated
+      // Ensure the check runs after the participants array is updated
       //console.log("participants är", this.participants);
 
       this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
 
-      socket.off("participantsUpdate")
+      socket.off("participantsUpdate");
     });
     //Listen for start game from server
-  
 
     // Navigate to the poll page when the poll starts
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
+
+    socket.on("updateTakenAvatars", (avatars) => {
+      this.selectedAvatars = avatars;
+    });
 
     // Emit events to join the poll and get UI labels
     socket.emit("joinPoll", this.pollId);
@@ -279,7 +286,7 @@ export default {
         avatar: this.avatar,
         isAdmin: this.isAdmin,
       });
-    
+
       this.joined = true;
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
@@ -287,10 +294,22 @@ export default {
 
       this.nextStep(); //hoppa till nästa steg
 
-      if(this.isAdmin){
-      localStorage.setItem("userId", this.userId);
+      if (this.isAdmin) {
+        localStorage.setItem("userId", this.userId);
       }
-      
+    },
+
+    handleAvatarSelection(avatar) {
+      // Check if the avatar has already been taken
+      if (!this.selectedAvatars.includes(avatar)) {
+        socket.emit("select-avatar", {
+          pollId: this.pollId,
+          userId: this.userId,
+          avatar,
+        }); // Emit avatar selection
+        this.selectedAvatars.push(avatar); // Locally update the selected avatars
+        this.avatar = avatar; // Update the user's avatar
+      }
     },
   },
 };

@@ -333,7 +333,46 @@ Data.prototype.loadRandomAnswers = function (pollId) {
   }
   return []; // Return empty array if poll doesn't exist
 };
-//};
+
+// Store selected avatars for a specific poll
+Data.prototype.storeSelectedAvatar = function (pollId, userId, avatar) {
+  if (this.pollExists(pollId)) {
+    const poll = this.polls[pollId];
+
+    // Initialize takenAvatars array if not present
+    if (!poll.takenAvatars) {
+      poll.takenAvatars = [];
+    }
+
+    // Initialize userAvatars object if not present
+    if (!poll.userAvatars) {
+      poll.userAvatars = {};
+    }
+    // Check if the user has already selected an avatar before
+    const previousAvatar = poll.userAvatars[userId];
+    if (previousAvatar) {
+      // Remove the previously selected avatar from takenAvatars
+      const avatarIndex = poll.takenAvatars.indexOf(previousAvatar);
+      if (avatarIndex !== -1) {
+        poll.takenAvatars.splice(avatarIndex, 1); // Remove the previous avatar
+      }
+    }
+
+    // Add the new avatar to takenAvatars
+    poll.takenAvatars.push(avatar);
+
+    // Update the user's chosen avatar
+    poll.userAvatars[userId] = avatar;
+  }
+};
+
+// Retrieve selected avatars for a specific poll
+Data.prototype.getSelectedAvatars = function (pollId) {
+  if (this.pollExists(pollId)) {
+    return this.polls[pollId].takenAvatars || [];
+  }
+  return [];
+};
 
 // Export the Data class
 export { Data };
