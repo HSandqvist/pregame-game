@@ -94,13 +94,13 @@ export default {
 }
 
 .instruction-button {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   border-radius: 50%;
   background-color: rgb(252, 160, 198);
   color: white;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
   display: flex;
   cursor: pointer;
@@ -118,18 +118,18 @@ export default {
 }
 .instructions-popup {
   position: absolute;
-  top: 50px;
+  top: 3.2rem;
   left: 0;
-  width: 300px;
+  width: 18.8rem;
   background: white;
-  border: 2px solid rgb(252, 160, 198);
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 0.2rem solid rgb(252, 160, 198);
+  border-radius: 0.5rem;
+  padding: 0.7rem;
+  box-shadow: 0 0.3rem 0.4rem rgba(0, 0, 0, 0.1);
 }
 
 .instructions-popup h3 {
-  margin: 0 0 10px;
+  margin: 0 0 0.6rem;
   color: rgb(252, 63, 173);
 }
 .instructions-popup p {
@@ -137,13 +137,13 @@ export default {
 }
 
 .instructions-popup button {
-  margin-top: 10px;
+  margin-top: 0.6rem;
   background-color: rgb(252, 63, 173);
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 2px 13px;
-  font-size: 12pt;
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.8rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 .instructions-popup button:hover {

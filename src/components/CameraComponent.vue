@@ -204,18 +204,18 @@ img {
 .camera-buttons {
   display: flex; /* Arrange buttons vertically */
   flex-direction: column;
-  gap: 10px;
+  gap: 0.6rem;
   align-items: flex-start; /* Align buttons to the left of the container */
 }
 
 .camera-buttons button {
-  padding: 12px 20px;
+  padding: 0.75rem 1.25rem;
   background-color: rgb(225, 95, 150); /* Darker pink */
   color: white;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;

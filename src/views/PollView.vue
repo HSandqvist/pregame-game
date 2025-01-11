@@ -96,7 +96,7 @@ import io from "socket.io-client";
 const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-//const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
+//const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners
 
 export default {
   name: "PollView",
