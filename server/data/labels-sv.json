@@ -40,6 +40,8 @@
 	"leaveLobby": "Lämna lobby",
 	"choosePreMadeAvatar": "Välj en färdig avatar",
 	"takeAPictureInstead": "Ta en bild istället",
+	"selectAnAvatar": "Avatarer:", 
+
 
 "POLLVIEW": "",
 
@@ -59,9 +61,11 @@
 	"endgame": "Avsluta spel",
 
 "RESULTVIEW": "",
-	"showEndResults": "Visa slutresultat",
+	"showEndResults": "Visa resultat!",
 	"allResults": "ALLA RESULTAT",
 	"theMost": "GRUPPENS",
+	"startNewGame": "Starta nytt spel!",
+	"skip": "Skippa",
 
 "INSTRUCTIONS": {
 	"STARTVIEW": "Välkommen till startsidan!<br>Här kan du välja om du vill skapa ett nytt spel eller gå med i ett existerande spel.",

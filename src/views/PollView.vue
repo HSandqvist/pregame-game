@@ -4,7 +4,6 @@
       <MusicPlayer :viewKey="'POLLVIEW'"/>
     </div>
 
-
   <div class="screen-container">
     <!-- top screen content -->
     <div class="top-box">
@@ -153,7 +152,7 @@ export default {
       console.log("pollInfoUpdate", data);
       this.view= data.currentView;
       console.log("view", data.currentView); 
-      this.currentQuestionIndex = data.currentQuestion;
+      this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
       console.log("currentQuestionIndex", data.currentQuestion);
     });
 
@@ -289,20 +288,12 @@ export default {
       });
     },
 
-    // Update the question with server data or a randomly selected question
-    updateQuestion: function (serverQuestion) {
-      if (serverQuestion && serverQuestion.q) {
-        this.currentQuestion.q = serverQuestion.q;
-        this.currentQuestion.a = serverQuestion.a || [];
-
-        console.log("current q:", this.currentQuestion.q);
-      }
-    },
-
     nextQuestion: function () {
       // Check if the current question is NOT the last question
       this.hasVoted = false;
       this.numberOfVotes = 0;
+
+      this.updateCurrentQuestion(this.currentQuestionIndex);      
     },
 
     adminNext: function () {
@@ -314,15 +305,12 @@ export default {
     particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
-        if(this.isAdmin)  {
+        if (this.isAdmin)  {
           socket.emit("votingReset", this.pollId);
         }
-
-     
       } else if (this.view === "results_view" || this.view === "final_view") {
         console.log("participant next question");
         this.nextQuestion();
-      
     }
   },
     updateCurrentQuestion: function (index) {

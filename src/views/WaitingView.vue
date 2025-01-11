@@ -1,26 +1,36 @@
 <template>
-   <div v-if="isAdmin">
-      <MusicPlayer :viewKey="'LOBBYVIEW'"/>
-    </div>
-  
+  <div v-if="isAdmin">
+    <MusicPlayer :viewKey="'LOBBYVIEW'" />
+  </div>
+
   <div class="center-container">
     <div class="language-switcher-container">
       <!-- Language switcher component -->
       <LanguageSwitcher @language-changed="updateLanguage" />
-     <div v-if="isAdmin">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="ADMINLOBBYVIEW" />
-     </div>
-     <div v-if="!isAdmin">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="LOBBYVIEW" />
-     </div>
+      <div v-if="isAdmin">
+        <InstructionButton
+          :uiLabels="uiLabels"
+          :lang="lang"
+          viewKey="ADMINLOBBYVIEW"
+        />
+      </div>
+      <div v-if="!isAdmin">
+        <InstructionButton
+          :uiLabels="uiLabels"
+          :lang="lang"
+          viewKey="LOBBYVIEW"
+        />
+      </div>
     </div>
-    
 
-    <!-- Step 4: Show waiting area with other participants -->
     <div class="waiting-area">
-      <h1>{{ this.uiLabels.lobbyForPoll || "Lobby for poll" }}: {{ pollId }}</h1>
-      <h2>{{ this.uiLabels.numberOfPlayers || "Number of players" }}: {{ participants.length }}</h2>
-      <h3>{{ this.uiLabels.players || "Players" }}:</h3>
+      <h1 id="game-id-headline">
+        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
+      </h1>
+      <h2>
+        {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
+        {{ participants.length }}
+      </h2>
 
       <!-- Participants grid -->
       <div class="participants-grid">
@@ -40,7 +50,7 @@
             :class="{ host: participant.isAdmin }"
           />
 
-          <p>{{ participant.name}} </p>
+          <p>{{ participant.name }}</p>
         </div>
       </div>
 
@@ -49,16 +59,22 @@
         <button
           v-if="isAdmin"
           v-on:click="adminStartGame"
-          :disabled="!joined || participants.length <3"
+          :disabled="!joined || participants.length < 3"
         >
           {{ this.uiLabels.startGame || "Start Game" }}
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="leavePoll" :disabled="!joined || isAdmin">
+        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
-        
+        <ConfirmLeaveModal
+          :show="showModal"
+          :uiLabels="uiLabels"
+          :lang="lang"
+          @confirm="leavePoll"
+          @cancel="showModal = false"
+        />
       </div>
     </div>
   </div>
@@ -69,6 +85,7 @@ import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
 
 const socket = io("localhost:3000");
 
@@ -81,6 +98,7 @@ export default {
     LanguageSwitcher,
     InstructionButton,
     MusicPlayer,
+    ConfirmLeaveModal,
   },
   data: function () {
     return {
@@ -102,24 +120,27 @@ export default {
       lang: localStorage.getItem("lang") || "en", // Language preference
       participants: [],
       atLeastThree: false,
+
+      //leave poll lobby
+      showModal: false,
     };
   },
   created: function () {
     // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id; //set poll id
     this.userId = this.$route.params.userId; //set user id
-  
-    socket.emit("joinPoll", this.pollId );
+
+    socket.emit("joinPoll", this.pollId);
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
-     // Update UI labels
+    // Update UI labels
     socket.emit("getUILabels", this.lang);
 
     socket.on("pollsUpdate", (data) => {
       console.log("pollData event received:");
       this.pollData = data;
-      this.participants= data.participants;
-      
+      this.participants = data.participants;
+
       console.log("pollData är", this.pollData);
       console.log("participants är", this.participants);
 
@@ -133,42 +154,39 @@ export default {
     socket.emit("getParticipants", this.pollId);
 
     socket.on("adminCheckResult", (data) => {
-        if (data.isAdmin) {
-          console.log("You are the admin for this poll.");
-          this.isAdmin = true; // Set admin flag
-        } else if (data.error) {
-          console.error(data.error); // Handle errors (e.g., poll does not exist)
-          alert(data.error);
-          return; // Stop further execution
-        } else {
-          console.log("You are not the admin for this poll.");
-          this.isAdmin = false; // Set participant flag
-        }
-        // Execute the callback after admin check
-        if (typeof callback === "function") callback();
-      });
-
-      socket.on("waitingParticipantsUpdate", (p) => {
-      console.log("waitingParticipantsUpdate event received:");
-      this.participants = p;
-     // Ensure the check runs after the participants array is updated
-      console.log("participants är", this.participants);
-
+      if (data.isAdmin) {
+        console.log("You are the admin for this poll.");
+        this.isAdmin = true; // Set admin flag
+      } else if (data.error) {
+        console.error(data.error); // Handle errors (e.g., poll does not exist)
+        alert(data.error);
+        return; // Stop further execution
+      } else {
+        console.log("You are not the admin for this poll.");
+        this.isAdmin = false; // Set participant flag
+      }
+      // Execute the callback after admin check
+      if (typeof callback === "function") callback();
     });
 
-
-      socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
-    
-    //socket.on("participantsUpdate", (p) => {
-     // console.log("participantsUpdate event received:");
-     // this.participants = p;
-     // this.checkAtLeastThree(); 
-     // this.tempUserID= localStorage.getItem("userId")  
-  
+    socket.on("waitingParticipantsUpdate", (p) => {
+      console.log("waitingParticipantsUpdate event received:");
+      this.participants = p;
       // Ensure the check runs after the participants array is updated
-      //console.log("participants är", this.participants);
+      console.log("participants är", this.participants);
+    });
+
+    socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
+
+    //socket.on("participantsUpdate", (p) => {
+    // console.log("participantsUpdate event received:");
+    // this.participants = p;
+    // this.checkAtLeastThree();
+    // this.tempUserID= localStorage.getItem("userId")
+
+    // Ensure the check runs after the participants array is updated
+    //console.log("participants är", this.participants);
     //});
-   
 
     //Listen for start game from server
     socket.on("adminStartGame", () => this.participantStartGame());
@@ -177,9 +195,8 @@ export default {
     socket.on("startPoll", () => this.$router.push("/poll/" + this.pollId));
 
     // Emit events to join the poll and get UI labels
-   
-    this.joined= true;
-    
+
+    this.joined = true;
   },
 
   methods: {
@@ -188,7 +205,6 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
-  
 
     leavePoll() {
       this.showModal = false;
@@ -196,16 +212,14 @@ export default {
       socket.emit("leavePoll", {
         pollId: this.pollId,
         userId: this.userId,
-        
       });
-      // Reset local state   
+      // Reset local state
       // Optionally, navigate back to the start view
-      
-        this.$router.push("/");
-      
+
+      this.$router.push("/");
     },
     // Move to the next step
-  
+
     adminStartGame: function () {
       console.log("adminStartGame event emitted");
       socket.emit("startGame", this.pollId);
@@ -273,9 +287,6 @@ export default {
 }
 
 /* Adjust other containers to ensure consistent styling */
-.avatar-container,
-.camera-container,
-.name-entry-section,
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
   margin: auto; /* Center the container horizontally */
@@ -309,31 +320,6 @@ button:hover {
   gap: 20px; /* Space between buttons */
 }
 
-/* Camera and camera buttons styling*/
-.camera-picture-container {
-  display: flex; /* Arrange items in a row */
-  align-items: center; /* Center items vertically */
-  justify-content: space-between; /* Add space between camera view and buttons */
-  gap: 20px; /* Optional: Space between elements */
-}
-
-.camera-view {
-  border: 0.1rem solid #f01984;
-  border-radius: 50%;
-  background-color: #f01984;
-  width: 15rem;
-  height: 14rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.camera-buttons {
-  display: flex; /* Arrange buttons in a column */
-  flex-direction: column; /* Keep buttons stacked vertically */
-  gap: 10px; /* Space between buttons */
-}
 /* Add spacing between the action buttons */
 .submit-section {
   margin-top: 40px; /* Adjust this value as needed */
@@ -341,23 +327,6 @@ button:hover {
   justify-content: center;
   gap: 20px; /* Keeps space between the buttons themselves */
   background: none; /* If body or parent has background */
-}
-
-.camera-buttons button {
-  padding: 12px 20px;
-  background-color: rgb(225, 95, 150); /* Darker pink */
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
-}
-
-.camera-buttons button:hover {
-  background-color: rgb(205, 85, 140); /* Darker hover effect */
 }
 
 /*  When button is disabled styling */
@@ -385,12 +354,6 @@ button:disabled {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
-}
-
-/* Camera styling */
-video {
-  border: 1px solid #ccc;
-  border-radius: 10px;
 }
 
 .participants-grid {
@@ -499,7 +462,7 @@ input[type="text"] {
 #game-id-headline {
   color: rgb(252, 181, 212);
 
-  position: fixed; 
+  position: fixed;
   top: 1rem;
   left: 50%; /* Center horizontally */
   transform: translate(-50%, -50%); /* Adjust for centering */
