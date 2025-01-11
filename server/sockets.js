@@ -83,6 +83,16 @@ function sockets(io, socket, data) {
     });
   });
 
+  socket.on("adminLeavePoll", function (d) {
+    const poll = data.getPoll(d.pollId);
+    if (poll) {
+      // Remove the poll from the data
+      
+      // Notify all clients in the poll room that the poll has ended
+      io.to(d.pollId).emit("adminLeftPoll");
+    }
+  });
+
   // Event: Join a poll
   socket.on("joinPoll", function (pollId) {
     // Add the client to the specified poll room

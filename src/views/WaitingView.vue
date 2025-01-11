@@ -65,9 +65,14 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-on:click="showModal = true" :disabled="!joined || isAdmin">
+        <button v-if="!isAdmin"  v-on:click="showModal = true" :disabled="!joined ">
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
+        <!-- Admin Leave Poll Button -->
+        <button v-if="isAdmin"  v-on:click="showModalAdmin = true" :disabled="!joined">
+          {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
+        </button>
+
         <ConfirmLeaveModal
           :show="showModal"
           :uiLabels="uiLabels"
@@ -75,6 +80,14 @@
           @confirm="leavePoll"
           @cancel="showModal = false"
         />
+        <ConfirmLeaveModal
+          :show="showModalAdmin"
+          :uiLabels="uiLabels"
+          :lang="lang"
+          @confirm="adminLeavePoll"
+          @cancel="showModalAdmin = false"
+        />
+
       </div>
     </div>
   </div>
@@ -123,6 +136,7 @@ export default {
 
       //leave poll lobby
       showModal: false,
+      showModalAdmin: false,
     };
   },
   created: function () {
@@ -174,6 +188,7 @@ export default {
       this.participants = p;
       // Ensure the check runs after the participants array is updated
       console.log("participants är", this.participants);
+
     });
 
     socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
@@ -196,6 +211,13 @@ export default {
 
     // Emit events to join the poll and get UI labels
 
+    socket.on("adminLeftPoll", () => {
+      this.leavePoll();
+      console.log("adminLeftPoll event received");
+      if(!this.isAdmin) {
+      alert("The admin has left the poll.");}
+    });
+
     this.joined = true;
   },
 
@@ -204,6 +226,12 @@ export default {
     updateLanguage(lang) {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
+    },
+    adminLeavePoll(){
+      this.showModalAdmin = false;
+      socket.emit("adminLeavePoll", {
+        pollId: this.pollId,
+      });
     },
 
     leavePoll() {
