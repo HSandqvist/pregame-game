@@ -47,12 +47,14 @@ function sockets(io, socket, data) {
   socket.on("leavePoll", function (d) {
     const { pollId, userId } = d;
     const poll = data.getPoll(pollId);
-    console.log("leavePoll körs av ",  userId);
+    console.log("leavePoll körs av ", userId);
 
     if (poll) {
       // Remove the participant from the poll
       console.log("leavePoll körs från socket", pollId);
-      poll.participants = poll.participants.filter((participant) => participant.userId !== Number(userId));
+      poll.participants = poll.participants.filter(
+        (participant) => participant.userId !== Number(userId)
+      );
       // Notify all clients in the poll room about the updated participant list
       console.log("participants update blev", poll.participants);
 
@@ -97,6 +99,19 @@ function sockets(io, socket, data) {
     // Send the adminId to the client after joining
     const poll = data.getPoll(pollId);
     socket.emit("adminId", poll.adminId);
+
+    // Send currently taken avatars to the client
+    const takenAvatars = data.getSelectedAvatars(pollId);
+    io.to(pollId).emit("updateTakenAvatars", takenAvatars);
+  });
+
+  // Handle avatar selection
+  socket.on("select-avatar", ({ pollId, userId, avatar }) => {
+    data.storeSelectedAvatar(pollId, userId, avatar);
+
+    // Broadcast updated avatar list to all clients in the poll
+    const updatedAvatars = data.getSelectedAvatars(pollId);
+    io.to(pollId).emit("updateTakenAvatars", updatedAvatars);
   });
 
   socket.on("getAllParticipantsForGame", function (pollId) {
@@ -120,19 +135,14 @@ function sockets(io, socket, data) {
     io.emit("participantsUpdate", data.getParticipants(pollId));
   });
   socket.on("getPolls", function (pollId) {
-
     io.to(pollId).emit("pollsUpdate", data.getPoll(pollId));
-  }
-);
-  
-
+  });
 
   // Event: Start a poll
   socket.on("startGame", function (pollId) {
     // Notify all clients in the poll room that the poll has started
     console.log("In socket Admin start");
     io.to(pollId).emit("adminStartGame");
-    
   });
 
   socket.on("nextQuestion", function (pollId) {

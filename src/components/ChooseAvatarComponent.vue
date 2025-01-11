@@ -16,9 +16,10 @@
       <div class="avatar-scroll-container">
         <!-- Avatar Option List -->
         <div
-          v-for="(avatarOption, index) in avatarOptions"
-          :key="index"
+          v-for="avatarOption in avatarOptions"
+          :key="avatarOption"
           class="avatar-option"
+          :class="{ disabled: isAvatarTaken(avatarOption) }"
           @click="selectAvatar(avatarOption)"
         >
           <img
@@ -33,15 +34,15 @@
 </template>
 
 <script>
-import defaultAvatar from '@/assets/img/avatarsImg/Avatar1.png';
-import avatar1 from '@/assets/img/avatarsImg/avatar1.png';
-import avatar2 from '@/assets/img/avatarsImg/avatar2.png';
-import avatar3 from '@/assets/img/avatarsImg/avatar3.png';
-import avatar4 from '@/assets/img/avatarsImg/avatar4.png';
-import avatar5 from '@/assets/img/avatarsImg/avatar5.png';
-import avatar6 from '@/assets/img/avatarsImg/avatar6.png';
-import avatar7 from '@/assets/img/avatarsImg/avatar7.png';
-import avatar8 from '@/assets/img/avatarsImg/avatar8.png';
+import defaultAvatar from "@/assets/img/avatarsImg/Avatar1.png";
+import avatar1 from "@/assets/img/avatarsImg/avatar1.png";
+import avatar2 from "@/assets/img/avatarsImg/avatar2.png";
+import avatar3 from "@/assets/img/avatarsImg/avatar3.png";
+import avatar4 from "@/assets/img/avatarsImg/avatar4.png";
+import avatar5 from "@/assets/img/avatarsImg/avatar5.png";
+import avatar6 from "@/assets/img/avatarsImg/avatar6_1.png";
+import avatar7 from "@/assets/img/avatarsImg/avatar7_1.png";
+import avatar8 from "@/assets/img/avatarsImg/avatar8_1.png";
 
 export default {
   props: {
@@ -50,19 +51,45 @@ export default {
       type: Boolean,
       required: true,
     },
+    takenAvatars: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
-      chosenAvatar: defaultAvatar, 
+      chosenAvatar: defaultAvatar,
       defaultAvatar,
-      avatarOptions: [ avatar1, avatar2, avatar3, avatar4, avatar5, avatar6, avatar7, avatar8 ],
+      avatarOptions: [
+        avatar1,
+        avatar2,
+        avatar3,
+        avatar4,
+        avatar5,
+        avatar6,
+        avatar7,
+        avatar8,
+      ],
     };
   },
   methods: {
     selectAvatar(avatar) {
-      this.chosenAvatar = avatar;
-      this.$emit("update:avatar", avatar);
-      this.$emit("update:isPictureTaken", true);
+
+      console.log("avatarOptions", this.avatarOptions.length);
+      console.log("takenAvatars", this.takenAvatars.length);
+
+      if (!this.isAvatarTaken(avatar)) {
+        this.chosenAvatar = avatar;
+        //this.$emit("update:avatar", avatar);
+        this.$emit("update:isPictureTaken", true);
+        this.$emit("avatar-selected", avatar); // Notify parent component
+      }
+    },
+
+    isAvatarTaken(avatar) {
+      console.log('Checking if avatar is taken:', avatar);
+
+      return this.takenAvatars.includes(avatar);
     },
   },
 };
@@ -146,6 +173,38 @@ export default {
   cursor: pointer;
   transform: scale(1.04);
 }
+
+.avatar-option.disabled {
+    position: relative;
+    cursor: not-allowed;
+  }
+
+  .avatar-option.disabled img {
+    opacity: 0.5;
+    pointer-events: none;
+    border-radius: 2rem;
+    border-color: aliceblue;
+  }
+  .avatar-option.disabled img:hover {
+    transform: none;
+  }
+
+  avatar-option.disabled::after {
+    content: ""; /* Create a pseudo-element to add the overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.6
+    ); /* Semi-transparent white background */
+    border-radius: 50%; /* Ensure the overlay matches the border-radius of the image */
+    z-index: 100; /* Place the overlay above the image */
+  }
 
 @media (max-width: 768px) {
   .choose-avatar-container {
