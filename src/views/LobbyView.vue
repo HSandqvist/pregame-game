@@ -79,7 +79,7 @@
         :lang="lang"
         viewKey="AVATARVIEW"
       />
-      <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}</h2>
+      <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}:</h2>
       <div class="curved-text">
         <span
           v-for="(char, i) in userName.split('')"
@@ -460,6 +460,10 @@ input[type="text"] {
   font-weight: bold;
   color: rgb(252, 160, 198);
   letter-spacing: 0.05rem; /* Adjusts spacing between letters */
+}
+
+h2 {
+  margin-bottom: 3rem;
 }
 
 

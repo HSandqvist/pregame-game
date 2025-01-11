@@ -89,7 +89,7 @@ export default {
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 9999;
+  z-index: 1010;
 
 }
 
