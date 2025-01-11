@@ -212,7 +212,7 @@ export default {
     socket.on("questionsForGame", (qs) => {
       if (qs) {
         this.questions = qs;
-        this.updateCurrentQuestion(0); // Start with the first question
+        this.updateCurrentQuestion(this.currentQuestionIndex); // Start with the first question
         //console.log("Questions received from server:", this.questions);
       } else {
         console.error("Received empty questions array from server.");
@@ -291,9 +291,9 @@ export default {
     nextQuestion: function () {
       // Check if the current question is NOT the last question
       this.hasVoted = false;
-      this.numberOfVotes = 0;
-
-      this.updateCurrentQuestion(this.currentQuestionIndex);      
+      this.numberOfVotes = 0;   
+      
+      this.updateCurrentQuestion(this.currentQuestionIndex);
     },
 
     adminNext: function () {
@@ -310,7 +310,9 @@ export default {
         }
       } else if (this.view === "results_view" || this.view === "final_view") {
         console.log("participant next question");
+
         this.nextQuestion();
+        
     }
   },
     updateCurrentQuestion: function (index) {
