@@ -209,27 +209,11 @@ img {
 }
 
 .camera-buttons button {
-  padding: 0.75rem 1.25rem;
   background-color: rgb(225, 95, 150); /* Darker pink */
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
 }
 
 .camera-buttons button:hover {
   background-color: rgb(205, 85, 140); /* Darker hover effect */
-}
-
-button:disabled {
-  pointer-events: none; /* Prevent any mouse interactions */
-  opacity: 0.5; /* Make the button appear transparent */
-  cursor: not-allowed; /* Change the cursor to indicate the button is disabled */
-  transition: none; /* Disable any hover or transition effects */
 }
 
 button {

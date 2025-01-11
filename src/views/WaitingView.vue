@@ -368,24 +368,6 @@ export default {
   margin: auto; /* Center the container horizontally */
 }
 
-/* General Button Styling */
-button {
-  padding: 15px 25px;
-  background-color: rgb(252, 160, 198);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  background-color: rgb(255, 131, 203);
-}
-
 /* Action Buttons Container */
 .action-buttons {
   margin-top: 50px; /* Adds spacing from the content above */
