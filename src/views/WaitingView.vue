@@ -43,14 +43,21 @@
           ]"
         >
           <!-- Participant avatar -->
+          <div class="curved-text">
+            <span
+              v-for="(char, i) in participant.name.split('')"
+              :key="i"
+              :style="getCurvedStyle(i, participant.name.length)"
+            >
+              {{ char }}
+            </span>
+          </div>
           <img
             :src="participant.avatar"
             alt="User Avatar"
             class="avatar"
             :class="{ host: participant.isAdmin }"
           />
-
-          <p>{{ participant.name }}</p>
         </div>
       </div>
 
@@ -269,6 +276,16 @@ export default {
         this.atLeastThree = true;
       }
     },
+
+    getCurvedStyle(index, length) {
+      const angleStep = 12; // Adjust for curvature intensity
+      const midpoint = length / 2;
+      const rotationAngle = (index - midpoint) * angleStep;
+
+      return {
+        transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
+      };
+    },
   },
 };
 </script>
@@ -394,6 +411,23 @@ button:disabled {
   text-align: center;
 }
 
+.curved-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  transform: translateY(-0.02rem); /* Moves text above the avatar */
+  position: relative;
+}
+
+.curved-text span {
+  display: inline-block;
+  transform-origin: bottom center;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgb(252, 160, 198);
+  letter-spacing: 0.05rem; /* Adjusts spacing between letters */
+}
+
 img.avatar {
   width: 100%;
   /* Gör bilderna flexibla */
@@ -418,13 +452,6 @@ img.avatar {
 img.avatar.host {
   border-color: rgb(15, 177, 69);
   /* Grön kant för admin */
-}
-
-.participant-item p {
-  margin-top: 10px;
-  /* Avstånd mellan bild och namn */
-  font-size: 14px;
-  /* Mindre textstorlek */
 }
 
 @media (max-width: 768px) {
