@@ -3,7 +3,7 @@
     <MusicPlayer :viewKey="'LOBBYVIEW'" />
   </div>
 
-  <div class="center-container">
+  <div class="screen-container">
     <div class="language-switcher-container">
       <!-- Language switcher component -->
       <LanguageSwitcher @language-changed="updateLanguage" />
@@ -23,17 +23,21 @@
       </div>
     </div>
 
-    <div class="waiting-area">
-      <h1 id="game-id-headline">
-        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
-      </h1>
-      <h2>
-        {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
-        {{ participants.length }}
-      </h2>
+    <div class="top-box">
+      <div class="waiting-area">
+        <h1 id="game-id-headline">
+          {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
+        </h1>
+        <h2>
+          {{ this.uiLabels.numberOfPlayers || "Number of players" }}:
+          {{ participants.length }}
+        </h2>
+      </div>
+    </div>
 
+    <div class="middle-box">
       <!-- Participants grid -->
-      <div class="participants-grid">
+      <div class="participants-grid" :class="{ 'multi-participants': participants.length > 1 }">
         <div
           v-for="(participant, index) in participants"
           :key="index"
@@ -60,7 +64,9 @@
           />
         </div>
       </div>
+    </div>
 
+    <div class="bottom-box">
       <!-- Actions -->
       <div class="submit-section">
         <button
@@ -72,11 +78,19 @@
         </button>
 
         <!-- Leave Poll Button -->
-        <button v-if="!isAdmin"  v-on:click="showModal = true" :disabled="!joined ">
+        <button
+          v-if="!isAdmin"
+          v-on:click="showModal = true"
+          :disabled="!joined"
+        >
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
         <!-- Admin Leave Poll Button -->
-        <button v-if="isAdmin"  v-on:click="showModalAdmin = true" :disabled="!joined">
+        <button
+          v-if="isAdmin"
+          v-on:click="showModalAdmin = true"
+          :disabled="!joined"
+        >
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
 
@@ -94,7 +108,6 @@
           @confirm="adminLeavePoll"
           @cancel="showModalAdmin = false"
         />
-
       </div>
     </div>
   </div>
@@ -195,7 +208,6 @@ export default {
       this.participants = p;
       // Ensure the check runs after the participants array is updated
       console.log("participants är", this.participants);
-
     });
 
     socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
@@ -221,8 +233,9 @@ export default {
     socket.on("adminLeftPoll", () => {
       this.leavePoll();
       console.log("adminLeftPoll event received");
-      if(!this.isAdmin) {
-      alert("The admin has left the poll.");}
+      if (!this.isAdmin) {
+        alert("The admin has left the poll.");
+      }
     });
 
     this.joined = true;
@@ -234,7 +247,8 @@ export default {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
-    adminLeavePoll(){
+
+    adminLeavePoll() {
       this.showModalAdmin = false;
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
@@ -249,8 +263,6 @@ export default {
         userId: this.userId,
       });
       // Reset local state
-      // Optionally, navigate back to the start view
-
       this.$router.push("/");
     },
     // Move to the next step
@@ -278,11 +290,6 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
-      //if (!this.avatar) {
-      //alert("Please select or capture an avatar!");
-      //return;
-      //}
-
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -320,23 +327,48 @@ export default {
 
 <style scoped>
 /* Utility class for centering containers */
-.center-container {
+.screen-container {
   display: flex;
   flex-direction: column;
+  height: 100vh; /* Full height of the screen */
+  width: 100vw; /* Fill screen width */
+  gap: 0.2rem; /* Optional: Adds space between boxes */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+/* Top box styles */
+.top-box {
+  min-height: 15vh; /* Fixed height, adjust as needed */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  padding-top: 4rem;
+}
+
+/* Middle box styles */
+.middle-box {
+  flex-grow: 1; /* Take up remaining space */
+  min-height: 45vh; /* Adjust based on available space */
+  text-align: center;
+  display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  min-height: 100vh; /* Ensures it takes up the full viewport height */
+}
+
+/* Bottom box styles */
+.bottom-box {
+  min-height: 30vh; /* Adjust height as needed */
   text-align: center;
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Adjust other containers to ensure consistent styling */
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
   margin: auto; /* Center the container horizontally */
-  padding: 20px; /* Optional: Add padding */
-  box-sizing: border-box; /* Include padding in width/height calculations */
 }
 
 /* General Button Styling */
@@ -392,22 +424,14 @@ button:disabled {
   background-color: rgb(219, 34, 142);
 }
 
-/* Avatar styles */
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-}
-
 .participants-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
+  gap: 2rem;
+  width: 60rem;
   max-width: 100%;
-  box-sizing: border-box; /* Inkludera padding i bredden */
+  box-sizing: border-box; 
+  margin: 2rem;
 }
 
 .participant-item.current-user img.avatar {
@@ -458,44 +482,23 @@ button:disabled {
 
 img.avatar {
   width: 100%;
-  /* Gör bilderna flexibla */
   height: auto;
-  /* Behåll proportionerna */
   aspect-ratio: 1 / 1;
-  /* Fyrkantiga bilder */
   border-radius: 50%;
-  /* Runda bilder */
   object-fit: cover;
-  /* Beskär inte bilder */
-  max-width: 150px;
-  /* Maximal bildstorlek */
-  border: 4px solid transparent;
-  /* Standardkant */
+  border: 0.3rem solid transparent;
   border-color: white;
-  /* Default-kantfärg */
   transition: border-color 0.3s ease;
-  /* Mjuk övergång för kantfärg */
+  height: 8rem;
+  width: 8rem;
 }
 
-img.avatar.host {
-  border-color: rgb(15, 177, 69);
-  /* Grön kant för admin */
-}
-
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .participants-grid {
     grid-template-columns: repeat(2, 1fr);
     /* Två bilder per rad på små skärmar */
   }
 }
-
-@media (max-width: 480px) {
-  .participants-grid {
-    grid-template-columns: repeat(1, 1fr);
-    /* En bild per rad på mycket små skärmar */
-  }
-}
-
 /* Style for the name input box */
 input[type="text"] {
   width: 100%;
@@ -518,7 +521,7 @@ input[type="text"] {
   color: rgb(252, 181, 212);
 
   position: fixed;
-  top: 1rem;
+  top: 3rem;
   left: 50%; /* Center horizontally */
   transform: translate(-50%, -50%); /* Adjust for centering */
   z-index: 2; /* Ensures it stays above other content */

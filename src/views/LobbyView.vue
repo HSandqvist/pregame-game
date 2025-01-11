@@ -80,7 +80,15 @@
         viewKey="AVATARVIEW"
       />
       <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}</h2>
-      <h1>{{ userName }}</h1>
+      <div class="curved-text">
+        <span
+          v-for="(char, i) in userName.split('')"
+          :key="i"
+          :style="getCurvedStyle(i, userName.length)"
+        >
+          {{ char }}
+        </span>
+      </div>
       <img :src="avatar" alt="User Avatar" class="avatar" />
 
       <div class="action-buttons">
@@ -311,6 +319,16 @@ export default {
         this.avatar = avatar; // Update the user's avatar
       }
     },
+
+    getCurvedStyle(index, length) {
+      const angleStep = 12; // Adjust for curvature intensity
+      const midpoint = length / 2;
+      const rotationAngle = (index - midpoint) * angleStep;
+
+      return {
+        transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
+      };
+    },
   },
 };
 </script>
@@ -339,7 +357,7 @@ export default {
 
 /* General Button Styling */
 button {
-  padding: 15px 25px;
+  padding: 0.5rem 0.75rem;
   background-color: rgb(252, 160, 198);
   color: white;
   border: none;
@@ -422,10 +440,34 @@ input[type="text"] {
 
 /* Avatar styles */
 .avatar {
-  width: 100px;
-  height: 100px;
+  width: 15rem;
+  height: 15rem;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
+}
+
+.curved-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  transform: translateY(-0.02rem); /* Moves text above the avatar */
+  position: relative;
+}
+
+.curved-text span {
+  display: inline-block;
+  transform-origin: bottom center;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgb(252, 160, 198);
+  letter-spacing: 0.05rem; /* Adjusts spacing between letters */
+}
+
+
+@media (max-width: 768px) {
+  button {
+    max-width: 7em;
+  }
 }
 </style>

@@ -164,9 +164,9 @@ export default {
 }
 
 .drop-zone {
-  width: 140px;
-  height: 140px;
-  border: 6px dotted rgb(252, 160, 198);
+  width: 8rem;
+  height: 8rem;
+  border: 0.3rem dotted rgb(252, 160, 198);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -240,4 +240,17 @@ h2 span {
   display: inline-block;
   margin: 0 2px; /* Small space between characters */
 }
+
+@media (max-width: 430px) {
+
+  .participant-avatar {
+    max-width: 5rem;
+    max-height:  5rem;
+  }
+  .drop-zone {
+    max-width: 6rem;
+    max-height: 6rem;
+  }
+}
+
 </style>

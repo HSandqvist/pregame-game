@@ -11,8 +11,6 @@
 
     <!-- Scrollable Avatar Options -->
     <div class="avatar-options">
-      <p>{{ uiLabels.selectAnAvatar || "Avatars:" }}</p>
-
       <div class="avatar-scroll-container">
         <!-- Avatar Option List -->
         <div
@@ -74,7 +72,6 @@ export default {
   },
   methods: {
     selectAvatar(avatar) {
-
       console.log("avatarOptions", this.avatarOptions.length);
       console.log("takenAvatars", this.takenAvatars.length);
 
@@ -87,7 +84,7 @@ export default {
     },
 
     isAvatarTaken(avatar) {
-      console.log('Checking if avatar is taken:', avatar);
+      console.log("Checking if avatar is taken:", avatar);
 
       return this.takenAvatars.includes(avatar);
     },
@@ -102,7 +99,6 @@ export default {
   align-items: flex-start; /* Align items at the top */
   gap: 2rem;
   width: 100%;
-  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -110,7 +106,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   flex-direction: column;
 }
 
@@ -119,7 +114,7 @@ export default {
   border-radius: 50%;
   background-color: #f01984;
   width: 15rem;
-  height: 14rem;
+  height: 15rem;
 }
 
 .avatar-image {
@@ -136,23 +131,21 @@ export default {
   gap: 1rem;
   align-items: center;
   background-color: #ffa0d0;
-  border-radius: 1rem;
-  min-width: 20%;
-}
-
-.avatar-options p {
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-align: center;
-  color: #f01984;
+  border-radius: 3rem;
+  height:22rem;
+  width: 5rem;
+  max-width: 40%;
+  padding: 1rem;
 }
 
 .avatar-scroll-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
-  max-height: 300px;
   overflow-y: auto; /* Enable vertical scrolling */
+  padding: 2rem;
+  width: 3rem;
 }
 
 .avatar-option {
@@ -175,41 +168,42 @@ export default {
 }
 
 .avatar-option.disabled {
-    position: relative;
-    cursor: not-allowed;
-  }
+  position: relative;
+  cursor: not-allowed;
+}
 
-  .avatar-option.disabled img {
-    opacity: 0.5;
-    pointer-events: none;
-    border-radius: 2rem;
-    border-color: aliceblue;
-  }
-  .avatar-option.disabled img:hover {
-    transform: none;
-  }
+.avatar-option.disabled img {
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: 2rem;
+  border-color: aliceblue;
+}
+.avatar-option.disabled img:hover {
+  transform: none;
+}
 
-  avatar-option.disabled::after {
-    content: ""; /* Create a pseudo-element to add the overlay */
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(
-      255,
-      255,
-      255,
-      0.6
-    ); /* Semi-transparent white background */
-    border-radius: 50%; /* Ensure the overlay matches the border-radius of the image */
-    z-index: 100; /* Place the overlay above the image */
-  }
+avatar-option.disabled::after {
+  content: ""; /* Create a pseudo-element to add the overlay */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.6
+  ); /* Semi-transparent white background */
+  border-radius: 50%; /* Ensure the overlay matches the border-radius of the image */
+  z-index: 100; /* Place the overlay above the image */
+}
 
 @media (max-width: 768px) {
   .choose-avatar-container {
     flex-direction: column; /* Stack items vertically on mobile */
     align-items: center;
+    width: 100%;
   }
 
   .chosen-avatar {
@@ -220,11 +214,25 @@ export default {
   .avatar-options {
     width: 100%; /* Ensure options container takes full width on mobile */
     align-items: center;
+    flex-direction: row;
+    height: 6rem;
+    max-height: 40%;
+    gap: 1rem;
   }
 
   .avatar-option img {
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
   }
+
+  .avatar-scroll-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    overflow-x: auto; /* Enable vertical scrolling */
+    padding: 0.3rem;
+  }
+
 }
 </style>

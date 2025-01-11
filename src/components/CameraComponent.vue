@@ -232,25 +232,33 @@ button:disabled {
   transition: none; /* Disable any hover or transition effects */
 }
 
+button {
+  min-width: 8rem;
+  min-height: 3rem;
+}
+
 /* Ensure responsive design */
 @media (max-width: 768px) {
-  .camera-picture-container {
+  .camera-container {
     flex-direction: column; /* Stack vertically on smaller screens */
     align-items: center; /* Center items horizontally */
   }
 
   .camera-view {
-    width: 80%; /* Make the camera view smaller on mobile */
-    height: auto;
+    min-width: 12rem; /* Make the camera view smaller on mobile */
+    min-height: 12rem;
   }
 
   .camera-buttons {
-    width: 100%;
     align-items: center; /* Center the buttons */
+    flex-direction: row;
+    width: 100%;
+    gap: 1rem;
   }
 
   button {
-    width: 100%; /* Buttons take full width */
+    min-height: 4rem;
+    width: 100%;
   }
 }
 </style>
