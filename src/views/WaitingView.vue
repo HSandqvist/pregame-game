@@ -110,7 +110,7 @@ import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
 const socket = io("localhost:3000");
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
-//const socket = io("172.20.10.2:3000"); // Initialize mutliple joiners
+//const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners
 
 export default {
   name: "WaitingView",
@@ -278,10 +278,6 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
-      //if (!this.avatar) {
-      //alert("Please select or capture an avatar!");
-      //return;
-      //}
 
       socket.emit("participateInPoll", {
         userId: this.userId,
@@ -415,18 +411,18 @@ button:disabled {
   /* Lila kant runt aktuell användare */
   border-style: solid;
   /* Fylld kant */
-  animation: borderHighlight 1s infinite alternate;
+  animation: borderHighlight 0.8s infinite alternate;
   /* Animerar kantfärgen */
 }
 
 @keyframes borderHighlight {
   from {
-    border-color: rgb(255, 139, 230);
+    border-color: rgb(153, 51, 204);
     /* Startfärg */
   }
 
   to {
-    border-color: rgb(244, 34, 255);
+    border-color: rgb(245, 85, 160);
     /* Slutfärg */
   }
 }

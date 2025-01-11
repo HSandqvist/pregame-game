@@ -34,15 +34,17 @@
 </template>
 
 <script>
-import defaultAvatar from "@/assets/img/avatarsImg/Avatar1.png";
+import defaultAvatar from "@/assets/img/avatarsImg/defaultAvatar.png";
 import avatar1 from "@/assets/img/avatarsImg/avatar1.png";
 import avatar2 from "@/assets/img/avatarsImg/avatar2.png";
 import avatar3 from "@/assets/img/avatarsImg/avatar3.png";
 import avatar4 from "@/assets/img/avatarsImg/avatar4.png";
 import avatar5 from "@/assets/img/avatarsImg/avatar5.png";
-import avatar6 from "@/assets/img/avatarsImg/avatar6_1.png";
-import avatar7 from "@/assets/img/avatarsImg/avatar7_1.png";
-import avatar8 from "@/assets/img/avatarsImg/avatar8_1.png";
+import avatar6 from "@/assets/img/avatarsImg/avatar6.png";
+import avatar7 from "@/assets/img/avatarsImg/avatar7.png";
+import avatar8 from "@/assets/img/avatarsImg/avatar8.png";
+import avatar9 from "@/assets/img/avatarsImg/avatar9.png";
+
 
 export default {
   props: {
@@ -69,6 +71,7 @@ export default {
         avatar6,
         avatar7,
         avatar8,
+        avatar9
       ],
     };
   },
@@ -150,7 +153,7 @@ export default {
 .avatar-scroll-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1rem;
   max-height: 300px;
   overflow-y: auto; /* Enable vertical scrolling */
 }
