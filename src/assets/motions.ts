@@ -41,3 +41,38 @@ export const motionGrowBigger = {
       },
     },
   };
+
+
+  export const motionGlowNeon = {
+    initial: {
+      "boxShadow": "0 0 10px rgba(232, 218, 239, 1)", // No glow 255, 145, 195
+    },
+    enter: {
+      "boxShadow": "0 0 50px rgba(255, 188, 246, 1)", // Bright light pink glow
+      transition: {
+        duration: 1000, // 1 second
+        repeat: Infinity,
+        repeatType: "reverse",
+      },
+    },
+  }
+
+  export const popEffect = {
+    initial: {
+      scale: 0.5,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 500,
+        damping: 10,
+      },
+    },
+    leave: {
+      scale: 0.5,
+      opacity: 0,
+    },
+  };

@@ -227,7 +227,7 @@ export default {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5rem); /* Bounce upwards */
+    transform: translateY(-2rem); /* Bounce upwards */
   }
   100% {
     transform: translateY(0);

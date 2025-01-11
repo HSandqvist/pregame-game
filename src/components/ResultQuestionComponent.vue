@@ -5,8 +5,6 @@
         {{ topAnswer }} {{ this.uiLabels.topAnswer || "got most votes" }} 
       </h2>
 
-      <!-- p>{{ this.uiLabels.amountVotes || "Votes:" }} {{ maxVotes }}</p -->
-
       <div>
         <img
           :src="topAvatar"
