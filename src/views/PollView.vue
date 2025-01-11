@@ -1,14 +1,15 @@
 <template>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
   <div v-if="isAdmin">
-      <MusicPlayer :viewKey="'POLLVIEW'"/>
-    </div>
+    <MusicPlayer :viewKey="'POLLVIEW'" />
+  </div>
 
   <div class="screen-container">
     <!-- top screen content -->
     <div class="top-box">
-      <h1 id="game-id-headline"> {{this.uiLabels.gameID || "Game ID"}}: {{ pollId }}</h1>
-
+      <h1 id="game-id-headline">
+        {{ this.uiLabels.gameID || "Game ID" }}: {{ pollId }}
+      </h1>
     </div>
     <!-- middle screen content -->
     <div class="middle-box">
@@ -45,7 +46,11 @@
     <div class="bottom-box">
       <div class="admin-functions-in-poll">
         <div v-if="view === 'question_view'">
-          <button v-if="isAdmin" v-on:click="adminNext()" :disabled= "numberOfVotes == 0">
+          <button
+            v-if="isAdmin"
+            v-on:click="adminNext()"
+            :disabled="numberOfVotes == 0"
+          >
             {{ this.uiLabels.showResult || "Show result" }}
           </button>
           <!-- Amount of votes only visible by admin -->
@@ -60,7 +65,7 @@
           <div v-if="isAdmin === true">
             <button
               @click="adminNext"
-              :disabled="currentQuestionIndex === questions.length -1 "
+              :disabled="currentQuestionIndex === questions.length - 1"
             >
               {{ this.uiLabels.nextQuestion || "Next question" }}
             </button>
@@ -85,7 +90,6 @@ import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import MusicPlayer from "@/components/MusicPlayer.vue";
-
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -146,16 +150,15 @@ export default {
       userId: this.userId,
     });
 
-    socket.emit("pollInfoUpdatePersonal", {pollId: this.pollId});
+    socket.emit("pollInfoUpdatePersonal", { pollId: this.pollId });
 
     socket.on("pollInfoUpdate", (data) => {
       console.log("pollInfoUpdate", data);
-      this.view= data.currentView;
-      console.log("view", data.currentView); 
+      this.view = data.currentView;
+      console.log("view", data.currentView);
       this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
       console.log("currentQuestionIndex", data.currentQuestion);
       this.updateCurrentQuestion(this.currentQuestionIndex);
-
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
@@ -179,7 +182,11 @@ export default {
       //console.log("Updated question:", q); // Add this log
     }); // Update the current question
 */
-    socket.on("participantNextQuestion", () => this.particpantNext(), this.updateCurrentQuestion(this.currentQuestionIndex));
+    socket.on(
+      "participantNextQuestion",
+      () => this.particpantNext(),
+      this.updateCurrentQuestion(this.currentQuestionIndex)
+    );
 
     //LISTENER FOR GAME END
     socket.on("finishGame", () => this.toResults());
@@ -214,7 +221,7 @@ export default {
     socket.on("questionsForGame", (qs) => {
       if (qs) {
         this.questions = qs;
-         // Start with the first question
+        // Start with the first question
         //console.log("Questions received from server:", this.questions);
         this.currentQuestion = this.questions[this.currentQuestionIndex];
       } else {
@@ -294,30 +301,30 @@ export default {
     nextQuestion: function () {
       // Check if the current question is NOT the last question
       this.hasVoted = false;
-      this.numberOfVotes = 0;   
-      
-     
+      this.numberOfVotes = 0;
     },
 
     adminNext: function () {
       socket.emit("nextQuestion", this.pollId, this.userId);
-      socket.emit("updatePollInfo", {pollId: this.pollId, currentView: this.view})
+      socket.emit("updatePollInfo", {
+        pollId: this.pollId,
+        currentView: this.view,
+      });
       console.log("In admin next");
     },
 
     particpantNext: function () {
       if (this.view === "question_view") {
         console.log("participant next result");
-        if (this.isAdmin)  {
+        if (this.isAdmin) {
           socket.emit("votingReset", this.pollId);
         }
       } else if (this.view === "results_view" || this.view === "final_view") {
         console.log("participant next question");
 
         this.nextQuestion();
-        
-    }
-  },
+      }
+    },
     updateCurrentQuestion: function (index) {
       console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
@@ -355,7 +362,7 @@ export default {
 
 /* Top box styles */
 .top-box {
-  min-height: 10vh; /* Fixed height, adjust as needed */
+  min-height: 20vh; /* Fixed height, adjust as needed */
   text-align: center;
   display: flex;
   justify-content: center;
@@ -366,12 +373,13 @@ export default {
 /* Middle box styles */
 .middle-box {
   flex-grow: 1; /* Take up remaining space */
-  min-height: 60vh; /* Adjust based on available space */
+  min-height: 55vh; /* Adjust based on available space */
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: sticky;
+  position: relative;
+  margin: 1rem;
 }
 
 /* Bottom box styles */
@@ -386,12 +394,12 @@ export default {
 
 .admin-functions-in-poll {
   position: absolute; /* i förhållande till bottom box, alt sätta som relative */
-  top: 10px; /* Space from the top of the bottom box */
-  right: 10px; /* Space from the right */
-  z-index: 3; /* Make sure it stays above other content */
+  top: 2rem;
+  right: 2rem;
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .admin-functions-in-poll button {
@@ -402,15 +410,14 @@ export default {
   color: rgb(252, 181, 212);
 
   position: sticky; /* Kan bli problem på mobiltelefon */
-  top: 1rem;
+  top: 3rem;
   z-index: 2; /* Ensures it stays above other content */
+  max-width: 50%;
 }
-
-
 
 /* General Button Styling */
 button {
-  padding: 15px 25px;
+  padding: 0.5rem 0.75rem;
   background-color: rgb(252, 63, 173);
   color: white;
   border: none;
@@ -431,5 +438,20 @@ button:hover {
 button:disabled {
   background-color: #cccccc; /* Grey out disabled buttons */
   cursor: not-allowed;
+}
+
+@media (max-width: 430px) {
+  .admin-functions-in-poll {
+    position: absolute; /* i förhållande till bottom box, alt sätta som relative */
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%); /* Center element horizontally */
+  }
 }
 </style>
