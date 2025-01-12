@@ -1,31 +1,30 @@
 <template>
-  <div>
-      <MusicPlayer :viewKey="'RESULTVIEW'"/>
-    </div>
+  <div> <MusicPlayer :viewKey="'RESULTVIEW'"/> </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   
-  <header>
-    <h1 v-if ="showPopup" v-motion="popEffect"> TOP...</h1>
+  <header id = "header-text">
+    <h1 v-if ="showPopup" v-motion="popEffect"> {{ this.uiLabels.theMost || "THE MOST"}} </h1>
     <h1 v-if = "resultsShown && !showPopup"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
   </header>
 
   <div class="result-view">
-
     <!-- Button to fetch and display results -->
     <button 
       v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button" v-motion="motionGlowNeon">
       <p >{{ this.uiLabels.showEndResults|| "Show Results"}} </p>
     </button>
 
-    <!-- Popup for individual category winners -->
       <div v-if="showPopup" class="popup">
-        <h2> {{ currentPopupCategory }}</h2>
-        <h1>{{ currentPopupWinner }}</h1>
-      </div>
+        <h2>{{ currentPopupCategory }}</h2>
+        <div class="winner-details">
+        <img :src="currentPopupWinnerAvatar" alt="Winner Avatar" class="winner-avatar" v-if="currentPopupWinnerAvatar" />
+        <h1>{{ currentPopupWinner}}</h1>
+        </div>
+    </div>
       
       <div v-if="showPopup">
       <button @click="skipToResults" class="skip-button">
-      {{this.uiLabels.skip}}
+      {{this.uiLabels.skip|| "Skip"}}
       </button>
       </div>
 
@@ -36,7 +35,7 @@
         :key="category">
         <div class="one-result-each"> 
         <h2> <span id="the-most"> {{ this.uiLabels.theMost || "THE MOST"}} </span> {{ category }}</h2>
-        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
+        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted.name }}!</h1>
       </div>
       </div>
     </div>
@@ -51,9 +50,9 @@
 </template>
 
 <script>
-import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import InstructionButton from "@/components/InstructionButton.vue"; 
 import MusicPlayer from "@/components/MusicPlayer.vue";
-import { motionGrowBiggerAndGlow, motionGlowNeon, popEffect } from "@/assets/motions.ts"; //Import motion settings
+import { motionGrowBiggerAndGlow, motionGlowNeon, popEffect } from "@/assets/motions.ts"; 
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -78,56 +77,51 @@ export default {
       submittedAnswers: {},
       resultsShown: false, 
       categoriesAnswers: {},
-      showPopup: false, // Track if a popup is being displayed
-      popupQueue: [], // Queue to hold the category winners for the popup
-      currentPopupCategory: "", // Current category being displayed in the popup
-      currentPopupWinner: "", // Current winner being displayed in the popup
-      motionGrowBiggerAndGlow, // Motion settings
+      showPopup: false, 
+      popupQueue: [], 
+      currentPopupCategory: "", 
+      currentPopupWinner: "", 
+      motionGrowBiggerAndGlow, 
       motionGlowNeon,
       popEffect,
     };
   },
 
   created: function () {
-    // Set the poll ID from the route parameter
     this.pollId = this.$route.params.id;
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
     socket.on("submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
-    ); // Update submitted answers
+    ); 
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
     socket.emit("joinPoll", this.pollId);
-
     socket.on("categoriesWithAnswers", (categories) => {
       this.categoriesAnswers = categories;
     });
   },
 
   computed: {
-    // Computed property to determine the top-voted person for each category
     topVotedCategories() {
-      const result = {};
-      for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
-        const topVoted = Object.entries(votes).reduce(
-          (max, [person, count]) => {
-            if (count > max.count) return { person, count };
-            return max;
-          },
-          { person: null, count: -1 }
-        ).person;
-
-        result[category] = topVoted;
-      }
-      return result;
-    },
+    const result = {};
+    for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
+      const topVoted = Object.entries(votes).reduce(
+        (max, [person, data]) => {
+          if (data.count > max.count) return { name: person, avatar: data.avatar, count: data.count };
+          return max;
+        },
+        { name: null, avatar: null, count: -1 }
+      );
+      result[category] = topVoted; // Include avatar and name
+    }
+    return result;
+  },
   },
   methods: {
-    // Method to fetch categories with answers
     fetchCategoriesWithAnswers() {
-      this.resultsShown = true; // Mark the results as shown after button is clicked
+      this.resultsShown = true; 
       socket.emit("getCategoriesWithAnswers", this.pollId);
       socket.on("categoriesWithAnswers", (categories) => {
         console.log("är i socket on categorieswith answers");
@@ -137,45 +131,51 @@ export default {
     },
 
     handleResults() {
-      const categories = Object.keys(this.topVotedCategories);
+      const categories = Object.keys(this.categoriesAnswers);
       if (categories.length <= 5) {
-        // Prepare popups for categories
-        this.popupQueue = categories.map((category) => ({
-          category,
-          winner: this.topVotedCategories[category],
-        }));
-        this.displayNextPopup();
-      }
+      // Add both winner name and avatar to the popupQueue
+      this.popupQueue = categories.map((category) => {
+        const winner = this.topVotedCategories[category];
+          return {
+        category,
+        winnerName: winner.name,
+        winnerAvatar: winner.avatar,
+          };
+        });
+      this.displayNextPopup();
+  }
     },
 
     skipToResults() {
-        this.showPopup = false; // Hide the popup
-        this.popupQueue = []; // Clear the popup queue
-        this.resultsShown = true; // Show the full results
+        this.showPopup = false; 
+        this.popupQueue = [];
+        this.resultsShown = true; 
     },
 
     displayNextPopup() {
-      if (this.popupQueue.length > 0) {
-        const nextPopup = this.popupQueue.shift();
-        this.currentPopupCategory = nextPopup.category;
-        this.currentPopupWinner = nextPopup.winner;
-        this.showPopup = true;
+    if (this.popupQueue.length > 0) {
+    const nextPopup = this.popupQueue.shift();
+    this.currentPopupCategory = nextPopup.category;
+    this.currentPopupWinner = nextPopup.winnerName;
+    this.currentPopupWinnerAvatar = nextPopup.winnerAvatar; 
+    this.showPopup = true;
 
-        setTimeout(() => {
-          this.showPopup = false;
-          this.displayNextPopup();
-        }, 2000);
-      } else {
-        this.showPopup = false;
-      }
-    },
+    setTimeout(() => {
+      this.showPopup = false;
+      this.displayNextPopup();
+    }, 2000);
+  } else {
+    this.showPopup = false;
+  }
+  },
 
-    returnToStart() {
-      alert("Returning to start");
-      this.$router.push("/");
-    },
+  returnToStart() {
+    alert("Returning to start");
+    this.$router.push("/");
+  },
   },
 };
+
 </script>
 
 <style>
@@ -184,37 +184,36 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  position: absolute; /* Make it position absolute */
-  top: 0; /* Move it 50% from the top of the screen */
-  left: 50%; /* Move it 50% from the left of the screen */
-  transform: translate(-50%,0); /* Offset by 50% of its own size to center it exactly */
-
-  margin-top: 4rem; /* Set to the height of the header (100px) */
+  position: absolute; 
+  top: 0; 
+  left: 50%; 
+  transform: translate(-50%,0); 
+  margin-top: 4rem; 
   width: 100%;
-  height: calc(100vh - 4rem); /* Subtract header height from full viewport height */
+  height: calc(100vh - 4rem); /* Subtract header height */
   box-sizing: border-box; /* Include padding and borders in the height calculation */
 }
 
 header {
   display: flex;
-  justify-content: center; /* Center the content horizontally */
-  align-items: center; /* Center the content vertically */
-  width: 100%; /* Full width */
-  height: 100px; /* Adjust height as needed */
-  position: fixed; /* Fix it at the top of the page */
+  justify-content: center; 
+  align-items: center; 
+  width: 100%;
+  height: 100px; 
+  position: fixed; 
   top: 3rem;
-  z-index: 2000; /* Ensure it stays above other content */
+  z-index: 2000; 
 }
 
 .result-button {
   padding: 0.7rem;
   font-size: 2rem;
-  background-color: rgb(187, 143, 206);
+  background-color: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
   border: 0.3rem solid white;
   border-radius: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  z-index: 10; /* Ensure it's above other content */
+  z-index: 10;
 }
 
 .result-button:hover {
@@ -235,7 +234,7 @@ header {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  z-index: 10; /* Ensure it's above other content */
+  z-index: 10; 
   margin-top: 2rem;
 }
 
@@ -253,7 +252,7 @@ header {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background: rgb(255, 179, 205);
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
   border: 0.3rem solid white;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
@@ -277,20 +276,22 @@ header {
   margin: 2rem;
   padding: 1rem;
   text-align: center;
-  background: rgb(161, 75, 201);/* Gradient pink background */
+  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
   border-radius: 2rem;
   border: 0.3rem solid white;
   font-size: 1rem;
-  animation: bounce 1.5s infinite; /* Bouncy animation */
-  max-width: 80%; /* Ensures it doesn’t exceed 90% of the screen width */
-  max-height: 60vh; /* Limits the height to 70% of the viewport */
-  overflow-y: auto; /* Adds a scroll bar if the content overflows vertically */
-  overflow-x: hidden; /* Hides horizontal overflow if needed */
-  box-sizing: border-box; /* Ensures padding is included in the total size */
+  animation: bounce 1.5s infinite; 
+  max-width: 80%; 
+  max-height: 60vh; 
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  box-sizing: border-box; 
 }
 
 #the-most {
   color: rgb(255, 156, 222 );
+  text-shadow: -0.05rem -0.05rem 0 white, 0.05rem -0.05rem 0 white, 0.05rem 0.05rem 0 white,
+  0.05rem 0.05rem 0 white;
 }
 
 @keyframes pulse {
@@ -312,11 +313,11 @@ header {
 }
 
 .skip-button {
-  position: fixed; /* Fix the button relative to the viewport */
-  bottom: 5%; /* Position it near the bottom of the screen */
-  left: 50%; /* Center it horizontally */
-  transform: translateX(-50%); /* Offset by half its width to align it perfectly */
-  z-index: 999; /* Ensure it's below the popup (popup z-index is 1000) */
+  position: fixed; 
+  bottom: 5%;
+  left: 50%; 
+  transform: translateX(-50%); 
+  z-index: 999;
 }
 
 
@@ -330,11 +331,32 @@ header {
   }
 }
 
+#header-text{
+  text-shadow: -0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem 0.1rem 0 rgb(102, 0, 153),
+  0.1rem 0.1rem 0 rgb(102, 0, 153);
+}
+
 .one-result-each {
   margin-bottom: 2rem;
 }
 
 h1, h2 {
   margin:2%;
+}
+
+.winner-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.winner-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>

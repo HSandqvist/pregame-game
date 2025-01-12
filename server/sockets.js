@@ -318,6 +318,7 @@ function sockets(io, socket, data) {
   socket.on("getCategoriesWithAnswers", function (pollId) {
     const categoriesWithAnswers = data.polls[pollId].categoryWinners;
     socket.emit("categoriesWithAnswers", categoriesWithAnswers);
+    console.log("är i socket categorieswithanswers skickar", categoriesWithAnswers)
   });
 }
 

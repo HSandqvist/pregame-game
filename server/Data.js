@@ -53,6 +53,7 @@ Data.prototype.createPoll = function (
       categoryWinners: {}, // To store the top participants for each category
       categories: this.categories, // Add the passed categories
       globalTopAnswer: "test",
+      globalTopAvatar: "test",
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
     //console.log("Poll created", pollId, poll, "Admin is:", adminId);
@@ -180,7 +181,8 @@ Data.prototype.votingReset = function (pollId) {
     this.updateCategoryWinner(
       pollId,
       poll.questions[currentQuestion].q,
-      this.globalTopAnswer
+      this.globalTopAnswer,
+      this.globalTopAvatar
     );
 
     // Move to the next question
@@ -215,6 +217,8 @@ Data.prototype.runQuestion = function (pollId) {
         topAvatar = avatar;
         //topAnswer = {answer, avatar};
         this.globalTopAnswer = topAnswer;
+        this.globalTopAvatar = topAvatar;
+
       }
     }
 
@@ -231,7 +235,8 @@ Data.prototype.runQuestion = function (pollId) {
 Data.prototype.updateCategoryWinner = function (
   pollId,
   question,
-  topParticipant
+  topParticipantName,
+  topParticipantAvatar
 ) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
@@ -244,12 +249,19 @@ Data.prototype.updateCategoryWinner = function (
       poll.categoryWinners[category] = {};
     }
 
-    // Increment the vote count for the topParticipant in the category winners object
-    if (!poll.categoryWinners[category][topParticipant]) {
-      poll.categoryWinners[category][topParticipant] = 0; // Initialize count
-    }
+    // Check if the participant already exists and fetch their current count
+    const existingCount = poll.categoryWinners[category][topParticipantName]
+      ? poll.categoryWinners[category][topParticipantName].count
+      : 0;
 
-    poll.categoryWinners[category][topParticipant] += 1; // Increment count
+    // Increment the count
+    const count = existingCount + 1;
+
+    // Update the winner object
+    poll.categoryWinners[category][topParticipantName] = {
+      count: count,
+      avatar: topParticipantAvatar || "", // Include avatar
+    };
 
     console.log(
       `Updated categoryWinners for category '${category}':`,
