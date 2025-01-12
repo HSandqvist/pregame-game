@@ -65,7 +65,7 @@
 import io from "socket.io-client"; // Import WebSocket library
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
-import ErrorMessage from "../components/ErrorMessage.vue";
+import ErrorMessage from "../components/modals/ErrorMessage.vue";
 
 import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; //Import motion settings
 

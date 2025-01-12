@@ -228,33 +228,8 @@ export default {
   position: relative;
   color: white;
 }
-/* Buttons */
-button {
-  padding: 15px 25px;
-  background-color: rgb(252, 160, 198);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
-}
 
-button:hover {
-  background-color: rgb(255, 131, 203);
-}
 
-button.selected {
-  background-color: rgb(255, 131, 203);
-  border: 2px solid white;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 /* Button groups */
 .amount-questions-buttons,

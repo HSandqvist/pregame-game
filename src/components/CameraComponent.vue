@@ -210,6 +210,7 @@ img {
 
 .camera-buttons button {
   background-color: rgb(225, 95, 150); /* Darker pink */
+  min-width: 10rem;
 }
 
 .camera-buttons button:hover {
@@ -244,5 +245,21 @@ button {
     min-height: 4rem;
     width: 100%;
   }
+}
+
+@media (max-height: 667px) {
+  .camera-picture-container {
+    margin-top: 3rem;
+    max-height: 40%;
+  }
+  .camera-view {
+    max-width: 12rem; /* Make the camera view smaller on mobile */
+    max-height: 12rem;
+    margin-bottom: 0;
+  }
+  .camera-buttons {
+    margin:0;
+  }
+
 }
 </style>

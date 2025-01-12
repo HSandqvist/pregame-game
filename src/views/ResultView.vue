@@ -1,7 +1,9 @@
 <template>
-  <div> <MusicPlayer :viewKey="'RESULTVIEW'"/> </div>
+  <div>
+    <MusicPlayer :viewKey="'RESULTVIEW'" />
+  </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
-  
+  <LanguageSwitcher @language-changed="updateLanguage" />
   <header id = "header-text">
     <h1 v-if ="showPopup" v-motion="popEffect"> {{ this.uiLabels.theMost || "THE MOST"}} </h1>
     <h1 v-if = "resultsShown && !showPopup"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
@@ -9,9 +11,13 @@
 
   <div class="result-view">
     <!-- Button to fetch and display results -->
-    <button 
-      v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button" v-motion="motionGlowNeon">
-      <p >{{ this.uiLabels.showEndResults|| "Show Results"}} </p>
+    <button
+      v-if="!resultsShown"
+      @click="fetchCategoriesWithAnswers"
+      class="result-button"
+      v-motion="motionGlowNeon"
+    >
+      <p>{{ this.uiLabels.showEndResults || "Show Results" }}</p>
     </button>
 
       <div v-if="showPopup" class="popup">
@@ -26,7 +32,7 @@
       <button @click="skipToResults" class="skip-button">
       {{this.uiLabels.skip|| "Skip"}}
       </button>
-      </div>
+    </div>
 
     <!-- Render the full results after popups -->
     <div v-if="resultsShown && !showPopup" class="results">
@@ -41,18 +47,28 @@
     </div>
 
     <div v-if="resultsShown && !showPopup">
-      <button v-on:click="returnToStart" class="center-button">
-        {{ this.uiLabels.startNewGame|| "Start new game!"}}
+      <button v-on:click="showReturnStartModal = true" class="center-button">
+        {{ this.uiLabels.startNewGame || "Start new game!" }}
       </button>
     </div>
   </div>
-  
+  <ReturnStartModal
+    :show="showReturnStartModal"
+    v-model:uiLabels="uiLabels"
+    @confirm="returnToStart"
+  />
 </template>
 
 <script>
-import InstructionButton from "@/components/InstructionButton.vue"; 
+import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import MusicPlayer from "@/components/MusicPlayer.vue";
-import { motionGrowBiggerAndGlow, motionGlowNeon, popEffect } from "@/assets/motions.ts"; 
+import ReturnStartModal from "@/components/modals/ReturnStartModal.vue";
+import {
+  motionGrowBiggerAndGlow,
+  motionGlowNeon,
+  popEffect,
+} from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -66,16 +82,19 @@ export default {
   components: {
     InstructionButton,
     MusicPlayer,
+    LanguageSwitcher,
+    ReturnStartModal,
   },
 
   data: function () {
     return {
-      lang: localStorage.getItem("lang") || "en", 
+      lang: localStorage.getItem("lang") || "en",
       uiLabels: {},
+
       pollId: "",
       question: "",
       submittedAnswers: {},
-      resultsShown: false, 
+      resultsShown: false,
       categoriesAnswers: {},
       showPopup: false, 
       popupQueue: [], 
@@ -84,6 +103,7 @@ export default {
       motionGrowBiggerAndGlow, 
       motionGlowNeon,
       popEffect,
+      showReturnStartModal: false,
     };
   },
 
@@ -92,7 +112,8 @@ export default {
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
-    socket.on("submittedAnswersUpdate",
+    socket.on(
+      "submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
     ); 
     // Emit events to get UI labels and join the poll
@@ -120,6 +141,13 @@ export default {
   },
   },
   methods: {
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+
+    // Method to fetch categories with answers
     fetchCategoriesWithAnswers() {
       this.resultsShown = true; 
       socket.emit("getCategoriesWithAnswers", this.pollId);
@@ -169,10 +197,12 @@ export default {
   }
   },
 
-  returnToStart() {
-    alert("Returning to start");
-    this.$router.push("/");
-  },
+    returnToStart() {
+      //här borde läggas till så pollen tas bort/användare tas bort som i waitingroom
+
+      this.showReturnStartModal = false;
+      this.$router.push("/");
+    },
   },
 };
 
@@ -258,7 +288,7 @@ header {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
   text-align: center;
   z-index: 1000;
-  animation: popupIn 0.6s ease-out; 
+  animation: popupIn 0.6s ease-out;
 }
 
 @keyframes popupIn {
@@ -295,7 +325,8 @@ header {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px #f8b4d9, 0 0 20px #ff80b5;
   }
   50% {
@@ -304,7 +335,8 @@ header {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -319,7 +351,6 @@ header {
   transform: translateX(-50%); 
   z-index: 999;
 }
-
 
 @media (max-width: 430px) {
   .result-view h1 {
@@ -340,8 +371,24 @@ header {
   margin-bottom: 2rem;
 }
 
-h1, h2 {
-  margin:2%;
+h1,h2 {
+  margin: 2%;
+}
+
+.winner-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.winner-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .winner-details {

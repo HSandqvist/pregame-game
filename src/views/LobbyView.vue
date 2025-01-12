@@ -111,11 +111,10 @@
 import io from "socket.io-client";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
-import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
+import ConfirmLeaveModal from "@/components/modals/ConfirmLeaveModal.vue";
 
 import CameraComponent from "@/components/CameraComponent.vue";
 import ChooseAvatarComponent from "@/components/ChooseAvatarComponent.vue";
-
 
 const socket = io("localhost:3000");
 
@@ -451,6 +450,16 @@ h2 {
 @media (max-width: 768px) {
   button {
     max-width: 7em;
+  }
+}
+
+@media (max-height: 667px) {
+  .camera-picture-container {
+    margin-top: 3rem;
+    max-height: 50%;
+  }
+  .action-buttons {
+    margin-bottom: 3rem;
   }
 }
 </style>

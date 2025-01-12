@@ -4,8 +4,8 @@
         <p>
           <!-- Display the message, with a fallback if no label is provided -->
           {{
-            this.uiLabels.adminLeftGame ||
-            "Admin has ended game."
+            this.uiLabels.returnToStart ||
+            "Game finished, returning to start."
           }}
         </p>
         <!-- Button for confirming the action -->
@@ -18,51 +18,11 @@
   export default {
     props: {
       show: Boolean,
-      lang: {type: String, default: "en"},     // Language setting, default is English
       uiLabels: { type: Object, default: () => ({})},     // Labels for UI texts, fallback is an empty object
-    },
-    data: function () {
-      return {
-          labels: {}, // placeholder for labels for different languages
-      };
-    },
-    created: function () {
-      this.loadLabels();
     },
     methods: {
       confirm() {
         this.$emit("confirm");
-      },
-  
-      async loadLabels() {
-        let response;
-  
-        if (this.lang == "en") {
-          response = await fetch("/server/data/labels-en.json");
-        } else {
-          response = await fetch("/server/data/labels-sv.json");
-        }
-  
-        if (!response.ok) {
-          console.error("Failed to load language file:", response.status);
-          return;
-        }
-  
-        this.labels = await response.json();
-      },
-  
-      updateLanguage(newLang) {
-        this.lang = newLang;
-        this.loadLabels();
-      },
-    },
-  
-    watch: {
-      // Kolla om språket ändras i localStorage och ladda om labels
-      lang(newLang, oldLang) {
-        if (newLang !== oldLang) {
-          this.loadLabels();
-        }
       },
     },
   };
