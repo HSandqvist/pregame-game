@@ -61,7 +61,7 @@
           <!-- Amount of votes only visible by admin -->
           <p v-if="isAdmin">
             {{ this.numberOfVotes }} {{ this.uiLabels.outOf || "out of" }}
-            {{ this.participants.length }}
+            {{ this.totalNumberOfParticipants }}
             {{ this.uiLabels.hasVoted || "has voted" }}
           </p>
         </div>
@@ -125,6 +125,7 @@ export default {
       submittedAnswers: {},
       isAdmin: false,
       numberOfVotes: 0,
+      totalNumberOfParticipants: 0,
 
       questionCount: 0,
       questions: [], // Array of all questions
@@ -166,6 +167,7 @@ export default {
       this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
       console.log("currentQuestionIndex", data.currentQuestion);
       this.updateCurrentQuestion(this.currentQuestionIndex);
+      this.totalNumberOfParticipants = data.participants.length;
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
