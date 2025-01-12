@@ -37,10 +37,13 @@
           @keydown="handleBackspace(index, $event)"
         />
       </div>
-      <ErrorMessage :message="errorMessage" />
       <button class="btn" @click="attemptJoin">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
+      
+      <div class="error-message-container">
+      <ErrorMessage :message="errorMessage" />
+      </div>
 
       <div class="back-to-start">
         <button @click="goToStartPage">
@@ -270,5 +273,13 @@ export default {
   position: fixed;
   bottom: 3rem; /* Distance from the bottom of the screen */
   left: 3rem; /* Distance from the left side of the screen */
+}
+.error-message-container {
+  height: 1.5rem; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: red;
+  margin-bottom: 1rem; 
 }
 </style>
