@@ -37,7 +37,10 @@
 
     <div class="middle-box">
       <!-- Participants grid -->
-      <div class="participants-grid" :class="{ 'multi-participants': participants.length > 1 }">
+      <div
+        class="participants-grid"
+        :class="{ 'multi-participants': participants.length > 1 }"
+      >
         <div
           v-for="(participant, index) in participants"
           :key="index"
@@ -69,7 +72,6 @@
     <div class="bottom-box">
       <!-- Actions -->
       <div class="submit-section">
-    
         <!-- Leave Poll Button -->
         <button
           v-if="!isAdmin"
@@ -87,6 +89,7 @@
           {{ this.uiLabels.leaveLobby || "Leave Lobby" }}
         </button>
         <button
+          id="start-game-button"
           v-if="isAdmin"
           v-on:click="adminStartGame"
           :disabled="!joined || participants.length < 3"
@@ -243,7 +246,7 @@ export default {
       //this.leavePoll();
       console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
-        this.showModalGameEnds = true;      
+        this.showModalGameEnds = true;
       }
     });
 
@@ -252,12 +255,12 @@ export default {
 
   methods: {
     // Update language when changed in LanguageSwitcher
-    updateLanguage: function(lang) {
+    updateLanguage: function (lang) {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
 
-    adminLeavePoll: function() {
+    adminLeavePoll: function () {
       this.showModalAdmin = false;
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
@@ -265,7 +268,7 @@ export default {
       this.leavePoll();
     },
 
-    leavePoll: function() {
+    leavePoll: function () {
       socket.emit("leavePoll", {
         pollId: this.pollId,
         userId: this.userId,
@@ -286,7 +289,6 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
-
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -309,7 +311,7 @@ export default {
       }
     },
 
-    getCurvedStyle: function(index, length) {
+    getCurvedStyle: function (index, length) {
       const angleStep = 12; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
@@ -409,7 +411,7 @@ button:disabled {
   gap: 2rem;
   width: 60rem;
   max-width: 100%;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   margin: 2rem;
 }
 
@@ -505,5 +507,13 @@ input[type="text"] {
   transform: translate(-50%, -50%); /* Adjust for centering */
   z-index: 2; /* Ensures it stays above other content */
   text-align: center;
+}
+
+#start-game-button {
+  background-color: rgb(252, 63, 173);
+}
+
+#start-game-button:hover {
+  background-color: rgb(219, 34, 142);
 }
 </style>
