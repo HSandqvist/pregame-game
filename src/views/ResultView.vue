@@ -109,6 +109,8 @@ export default {
 
   created: function () {
     this.pollId = this.$route.params.id;
+
+    this.userId = this.$route.params.userId;
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 

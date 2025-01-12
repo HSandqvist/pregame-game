@@ -49,17 +49,30 @@ function sockets(io, socket, data) {
     const poll = data.getPoll(pollId);
     console.log("leavePoll körs av ", userId);
 
+    
     if (poll) {
       // Remove the participant from the poll
       console.log("leavePoll körs från socket", pollId);
-      poll.participants = poll.participants.filter(
-        (participant) => participant.userId !== Number(userId)
-      );
+      console.log("participants innan", poll.participants);
+      try{if(poll.participants.length === 1){
+        poll.participants = {};
+        console.log("deleting poll");
+        delete data.polls[pollId];
+
+      console.log("polls after delete", data.polls);
+      }
+      else{
+        poll.participants = poll.participants.filter(
+          (participant) => participant.userId !== Number(userId))}
+        }
+        catch(err){console.log("Rushing in socket for deleting poll caught", err)}
+     
       // Notify all clients in the poll room about the updated participant list
-      console.log("participants update blev", poll.participants);
+      console.log("participants update kördes från socket", poll.participants);
 
       io.to(pollId).emit("waitingParticipantsUpdate", poll.participants);
-    }
+      console.log("participants update blev", poll.participants);}
+    
   });
 
   socket.on("updatePollInfo", function (d) {

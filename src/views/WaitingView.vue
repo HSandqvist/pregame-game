@@ -244,7 +244,9 @@ export default {
       console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
         this.showModalGameEnds = true;
+        
       }
+      this.leavePoll();
     });
 
     this.joined = true;
@@ -262,7 +264,7 @@ export default {
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
       });
-      this.leavePoll();
+     
     },
 
     leavePoll: function () {
