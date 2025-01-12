@@ -108,6 +108,12 @@
           @confirm="adminLeavePoll"
           @cancel="showModalAdmin = false"
         />
+        <AdminLeftModal
+          :show="showModalGameEnds"
+          :uiLabels="uiLabels"
+          :lang="lang"
+          @confirm="leavePoll"
+        />
       </div>
     </div>
   </div>
@@ -119,6 +125,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import Lang
 import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
+import AdminLeftModal from "@/components/AdminLeftModal.vue";
 
 const socket = io("localhost:3000");
 
@@ -132,6 +139,7 @@ export default {
     InstructionButton,
     MusicPlayer,
     ConfirmLeaveModal,
+    AdminLeftModal,
   },
   data: function () {
     return {
@@ -157,6 +165,7 @@ export default {
       //leave poll lobby
       showModal: false,
       showModalAdmin: false,
+      showModalGameEnds: false,
     };
   },
   created: function () {
@@ -231,10 +240,10 @@ export default {
     // Emit events to join the poll and get UI labels
 
     socket.on("adminLeftPoll", () => {
-      this.leavePoll();
+      //this.leavePoll();
       console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
-        alert("The admin has left the poll.");
+        this.showModalGameEnds = true;      
       }
     });
 
@@ -243,29 +252,28 @@ export default {
 
   methods: {
     // Update language when changed in LanguageSwitcher
-    updateLanguage(lang) {
+    updateLanguage: function(lang) {
       this.lang = lang;
       socket.emit("getUILabels", this.lang);
     },
 
-    adminLeavePoll() {
+    adminLeavePoll: function() {
       this.showModalAdmin = false;
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
       });
+      this.leavePoll();
     },
 
-    leavePoll() {
-      this.showModal = false;
-      // Emit an event to the server to remove the participant
+    leavePoll: function() {
       socket.emit("leavePoll", {
         pollId: this.pollId,
         userId: this.userId,
       });
-      // Reset local state
+      this.showModal = false;
+
       this.$router.push("/");
     },
-    // Move to the next step
 
     adminStartGame: function () {
       console.log("adminStartGame event emitted");
@@ -274,18 +282,6 @@ export default {
 
     participantStartGame: function () {
       this.$router.push(`/poll/${this.pollId}/${this.userId}`);
-    },
-
-    // Handle manual avatar upload
-    handleAvatarUpload: function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.avatar = reader.result;
-        };
-        reader.readAsDataURL(file); // Convert image to base64
-      }
     },
 
     // Participate in the poll
@@ -313,7 +309,7 @@ export default {
       }
     },
 
-    getCurvedStyle(index, length) {
+    getCurvedStyle: function(index, length) {
       const angleStep = 12; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
@@ -370,24 +366,6 @@ export default {
 .waiting-area {
   width: 100%; /* Ensures it spans the full width of the parent */
   margin: auto; /* Center the container horizontally */
-}
-
-/* General Button Styling */
-button {
-  padding: 15px 25px;
-  background-color: rgb(252, 160, 198);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  background-color: rgb(255, 131, 203);
 }
 
 /* Action Buttons Container */

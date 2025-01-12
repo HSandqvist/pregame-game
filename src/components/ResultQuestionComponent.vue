@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-motion="motionGrowBigger">
+    <div v-motion="slowPopEffect">
       <h2 v-motion="motionGlowText">
         {{ topAnswer }} {{ this.uiLabels.topAnswer || "got most votes" }} 
       </h2>
@@ -24,7 +24,7 @@ const socket = io("localhost:3000");
 //const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners
 
 
-import { motionGlowText, motionGrowBigger } from "@/assets/motions.ts"; //Import motion settings
+import { motionGlowText, slowPopEffect } from "@/assets/motions.ts"; //Import motion settings
 
 export default {
   name: "ResultQuestionComponent",
@@ -40,7 +40,7 @@ export default {
       lang: localStorage.getItem("lang") || "en", // Language preference
 
       motionGlowText, // Motion settings
-      motionGrowBigger,
+      slowPopEffect,
     };
   },
 

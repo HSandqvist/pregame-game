@@ -230,14 +230,14 @@ export default {
 /* Button styles */
 .btn {
   all: unset; /* Remove all default styles */
-  padding: 0.75rem 1.5rem;
+  padding: 0.9rem 1.2rem;
   width: 160px;
   background-color: rgb(252, 160, 198);
   color: white;
   text-decoration: none;
   font-size: 18px;
   font-weight: bold;
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   text-align: center;
   cursor: pointer;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
