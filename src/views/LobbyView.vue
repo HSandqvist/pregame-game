@@ -60,7 +60,7 @@
           {{ this.uiLabels.back || "Back" }}
         </button>
 
-        <button
+        <button id="avatar-or-pic-button"
           v-on:click="chooseAvatar"
           v-if="!choseCustomAvatar"
           :disabled="disableSwitcher"
@@ -68,7 +68,7 @@
           {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
         </button>
 
-        <button v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
+        <button id="avatar-or-pic-button" v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
           {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
         </button>
 
@@ -413,6 +413,16 @@ button:disabled {
 
 #submitNameButton:hover {
   background-color: rgb(219, 34, 142);
+}
+
+
+#avatar-or-pic-button {
+  background-color: rgb(254, 78, 152); /* Darker pink */
+  border: solid 0.06rem rgb(160, 15, 75);
+}
+
+#avatar-or-pic-button:hover {
+  background-color: rgb(243, 41, 125); /* Darker hover effect */
 }
 
 /* Style for the name input box */
