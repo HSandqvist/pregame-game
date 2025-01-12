@@ -417,27 +417,11 @@ export default {
 
 /* General Button Styling */
 button {
-  padding: 0.5rem 0.75rem;
-  background-color: rgb(252, 63, 173);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
   margin-right: 10px; /* Adds spacing between buttons */
 }
 
 button:hover {
-  background-color: rgb(219, 34, 142);
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Adds a shadow on hover */
-}
-
-button:disabled {
-  background-color: #cccccc; /* Grey out disabled buttons */
-  cursor: not-allowed;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 430px) {
