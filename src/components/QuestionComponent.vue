@@ -56,37 +56,21 @@
 </template>
 
 <script>
-// Initialize the WebSocket connection
-import io from "socket.io-client";
-const socket = io("localhost:3000");
-
-//const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners
-
-
 export default {
   name: "QuestionComponent",
   props: {
-    question: Object, // The question object containing the question text and answer options
-    participants: Array, // List of participants, // Already randomized in data
+    question: Object,
+    participants: Array,
     voting: Boolean,
+    uiLabels: { type: Object, default: () => ({}) },
   },
   emits: ["answer"], // Declare the custom event "answer" emitted by this component
 
   data() {
     return {
       draggedParticipant: null, // Temporarily holds the dragged participant
-      uiLabels: {}, // UI labels for different languages
-      lang: localStorage.getItem("lang") || "en", // Language preference
     };
   },
-
-  created: function () {
-    socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
-    // Emit events to get UI labels and join the poll
-    socket.emit("getUILabels", this.lang);
-    //console.log("Participants data:", this.participants);
-  },
-
   computed: {
     textArray() {
       // Split the text into an array of individual characters
@@ -119,22 +103,15 @@ export default {
       }
     },
 
-    /*
-    // Method to handle answer selection
-    answer: function (participant) {
-      // Emit the "answer" event to the parent component with the selected answer as payload
-      this.$emit("answer", participant);
-    },
-    */
     getCurvedStyle(index, length) {
-    const angleStep = 12; // Adjust for curvature intensity
-    const midpoint = length / 2;
-    const rotationAngle = (index - midpoint) * angleStep;
+      const angleStep = 12; // Adjust for curvature intensity
+      const midpoint = length / 2;
+      const rotationAngle = (index - midpoint) * angleStep;
 
-    return {
-      transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
-    };
-  }
+      return {
+        transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
+      };
+    },
   },
 };
 </script>
@@ -221,7 +198,6 @@ export default {
   letter-spacing: 0.05rem; /* Adjusts spacing between letters */
 }
 
-
 @keyframes bounce {
   0% {
     transform: translateY(0);
@@ -245,15 +221,13 @@ h2 span {
 }
 
 @media (max-width: 430px) {
-
   .participant-avatar {
     max-width: 5rem;
-    max-height:  5rem;
+    max-height: 5rem;
   }
   .drop-zone {
     max-width: 6rem;
     max-height: 6rem;
   }
 }
-
 </style>

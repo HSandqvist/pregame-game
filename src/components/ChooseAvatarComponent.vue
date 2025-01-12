@@ -43,7 +43,6 @@ import avatar7 from "@/assets/img/avatarsImg/avatar7.png";
 import avatar8 from "@/assets/img/avatarsImg/avatar8.png";
 import avatar9 from "@/assets/img/avatarsImg/avatar9.png";
 
-
 export default {
   props: {
     uiLabels: Object, // Language support for UI Labels
@@ -69,7 +68,7 @@ export default {
         avatar6,
         avatar7,
         avatar8,
-        avatar9
+        avatar9,
       ],
     };
   },
@@ -135,7 +134,7 @@ export default {
   align-items: center;
   background-color: #ffa0d0;
   border-radius: 3rem;
-  height:22rem;
+  height: 22rem;
   width: 5rem;
   max-width: 40%;
   padding: 1rem;
@@ -237,5 +236,14 @@ avatar-option.disabled::after {
     padding: 0.3rem;
   }
 
+  @media (max-height: 667px) {
+    .choose-avatar-container {
+      margin-top: 1.5rem;
+      max-height: 40%;
+    }
+    .avatar-options {
+      max-height: 3.5rem;
+    }
+  }
 }
 </style>

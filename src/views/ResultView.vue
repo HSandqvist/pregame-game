@@ -1,59 +1,79 @@
 <template>
   <div>
-      <MusicPlayer :viewKey="'RESULTVIEW'"/>
-    </div>
+    <MusicPlayer :viewKey="'RESULTVIEW'" />
+  </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
-  
+  <LanguageSwitcher @language-changed="updateLanguage" />
+
   <header>
-    <h1 v-if ="showPopup" v-motion="popEffect"> TOP...</h1>
-    <h1 v-if = "resultsShown && !showPopup"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
+    <h1 v-if="showPopup" v-motion="popEffect">TOP...</h1>
+    <h1 v-if="resultsShown && !showPopup">
+      {{ this.uiLabels.allResults || "ALL RESULTS" }}
+    </h1>
   </header>
 
   <div class="result-view">
-
     <!-- Button to fetch and display results -->
-    <button 
-      v-if="!resultsShown" @click="fetchCategoriesWithAnswers" class="result-button" v-motion="motionGlowNeon">
-      <p >{{ this.uiLabels.showEndResults|| "Show Results"}} </p>
+    <button
+      v-if="!resultsShown"
+      @click="fetchCategoriesWithAnswers"
+      class="result-button"
+      v-motion="motionGlowNeon"
+    >
+      <p>{{ this.uiLabels.showEndResults || "Show Results" }}</p>
     </button>
 
     <!-- Popup for individual category winners -->
-      <div v-if="showPopup" class="popup">
-        <h2> {{ currentPopupCategory }}</h2>
-        <h1>{{ currentPopupWinner }}</h1>
-      </div>
-      
-      <div v-if="showPopup">
+    <div v-if="showPopup" class="popup">
+      <h2>{{ currentPopupCategory }}</h2>
+      <h1>{{ currentPopupWinner }}</h1>
+    </div>
+
+    <div v-if="showPopup">
       <button @click="skipToResults" class="skip-button">
-      {{this.uiLabels.skip}}
+        {{ this.uiLabels.skip }}
       </button>
-      </div>
+    </div>
 
     <!-- Render the full results after popups -->
     <div v-if="resultsShown && !showPopup" class="results">
-      <div
-        v-for="(topVoted, category) in topVotedCategories"
-        :key="category">
-        <div class="one-result-each"> 
-        <h2> <span id="the-most"> {{ this.uiLabels.theMost || "THE MOST"}} </span> {{ category }}</h2>
-        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
-      </div>
+      <div v-for="(topVoted, category) in topVotedCategories" :key="category">
+        <div class="one-result-each">
+          <h2>
+            <span id="the-most">
+              {{ this.uiLabels.theMost || "THE MOST" }}
+            </span>
+            {{ category }}
+          </h2>
+          <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
+        </div>
       </div>
     </div>
 
     <div v-if="resultsShown && !showPopup">
-      <button v-on:click="returnToStart" class="center-button">
-        {{ this.uiLabels.startNewGame|| "Start new game!"}}
+      <button v-on:click="showReturnStartModal = true" class="center-button">
+        {{ this.uiLabels.startNewGame || "Start new game!" }}
       </button>
     </div>
   </div>
-  
+  <ReturnStartModal
+    :show="showReturnStartModal"
+    :uiLabels="uiLabels"
+    :lang="lang"
+    @confirm="returnToStart"
+  />
 </template>
 
 <script>
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import MusicPlayer from "@/components/MusicPlayer.vue";
-import { motionGrowBiggerAndGlow, motionGlowNeon, popEffect } from "@/assets/motions.ts"; //Import motion settings
+import ReturnStartModal from "@/components/modals/ReturnStartModal.vue";
+import {
+  motionGrowBiggerAndGlow,
+  motionGlowNeon,
+  popEffect,
+} from "@/assets/motions.ts"; //Import motion settings
 
 // Initialize the WebSocket connection
 import io from "socket.io-client";
@@ -67,16 +87,19 @@ export default {
   components: {
     InstructionButton,
     MusicPlayer,
+    LanguageSwitcher,
+    ReturnStartModal,
   },
 
   data: function () {
     return {
-      lang: localStorage.getItem("lang") || "en", 
+      lang: localStorage.getItem("lang") || "en",
       uiLabels: {},
+
       pollId: "",
       question: "",
       submittedAnswers: {},
-      resultsShown: false, 
+      resultsShown: false,
       categoriesAnswers: {},
       showPopup: false, // Track if a popup is being displayed
       popupQueue: [], // Queue to hold the category winners for the popup
@@ -85,6 +108,7 @@ export default {
       motionGrowBiggerAndGlow, // Motion settings
       motionGlowNeon,
       popEffect,
+      showReturnStartModal: false,
     };
   },
 
@@ -94,7 +118,8 @@ export default {
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
-    socket.on("submittedAnswersUpdate",
+    socket.on(
+      "submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
     ); // Update submitted answers
     // Emit events to get UI labels and join the poll
@@ -125,6 +150,12 @@ export default {
     },
   },
   methods: {
+    // Update language when changed in LanguageSwitcher
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+
     // Method to fetch categories with answers
     fetchCategoriesWithAnswers() {
       this.resultsShown = true; // Mark the results as shown after button is clicked
@@ -149,9 +180,9 @@ export default {
     },
 
     skipToResults() {
-        this.showPopup = false; // Hide the popup
-        this.popupQueue = []; // Clear the popup queue
-        this.resultsShown = true; // Show the full results
+      this.showPopup = false; // Hide the popup
+      this.popupQueue = []; // Clear the popup queue
+      this.resultsShown = true; // Show the full results
     },
 
     displayNextPopup() {
@@ -171,7 +202,9 @@ export default {
     },
 
     returnToStart() {
-      alert("Returning to start");
+      //här borde läggas till så pollen tas bort/användare tas bort som i waitingroom
+
+      this.showReturnStartModal = false;
       this.$router.push("/");
     },
   },
@@ -187,11 +220,16 @@ export default {
   position: absolute; /* Make it position absolute */
   top: 0; /* Move it 50% from the top of the screen */
   left: 50%; /* Move it 50% from the left of the screen */
-  transform: translate(-50%,0); /* Offset by 50% of its own size to center it exactly */
+  transform: translate(
+    -50%,
+    0
+  ); /* Offset by 50% of its own size to center it exactly */
 
   margin-top: 4rem; /* Set to the height of the header (100px) */
   width: 100%;
-  height: calc(100vh - 4rem); /* Subtract header height from full viewport height */
+  height: calc(
+    100vh - 4rem
+  ); /* Subtract header height from full viewport height */
   box-sizing: border-box; /* Include padding and borders in the height calculation */
 }
 
@@ -259,7 +297,7 @@ header {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
   text-align: center;
   z-index: 1000;
-  animation: popupIn 0.6s ease-out; 
+  animation: popupIn 0.6s ease-out;
 }
 
 @keyframes popupIn {
@@ -277,7 +315,7 @@ header {
   margin: 2rem;
   padding: 1rem;
   text-align: center;
-  background: rgb(161, 75, 201);/* Gradient pink background */
+  background: rgb(161, 75, 201); /* Gradient pink background */
   border-radius: 2rem;
   border: 0.3rem solid white;
   font-size: 1rem;
@@ -290,11 +328,12 @@ header {
 }
 
 #the-most {
-  color: rgb(255, 156, 222 );
+  color: rgb(255, 156, 222);
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px #f8b4d9, 0 0 20px #ff80b5;
   }
   50% {
@@ -303,7 +342,8 @@ header {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -315,10 +355,11 @@ header {
   position: fixed; /* Fix the button relative to the viewport */
   bottom: 5%; /* Position it near the bottom of the screen */
   left: 50%; /* Center it horizontally */
-  transform: translateX(-50%); /* Offset by half its width to align it perfectly */
+  transform: translateX(
+    -50%
+  ); /* Offset by half its width to align it perfectly */
   z-index: 999; /* Ensure it's below the popup (popup z-index is 1000) */
 }
-
 
 @media (max-width: 430px) {
   .result-view h1 {
@@ -334,7 +375,8 @@ header {
   margin-bottom: 2rem;
 }
 
-h1, h2 {
-  margin:2%;
+h1,
+h2 {
+  margin: 2%;
 }
 </style>

@@ -124,8 +124,8 @@ import io from "socket.io-client";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
 import MusicPlayer from "@/components/MusicPlayer.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
-import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
-import AdminLeftModal from "@/components/AdminLeftModal.vue";
+import ConfirmLeaveModal from "@/components/modals/ConfirmLeaveModal.vue";
+import AdminLeftModal from "@/components/modals/AdminLeftModal.vue";
 
 const socket = io("localhost:3000");
 

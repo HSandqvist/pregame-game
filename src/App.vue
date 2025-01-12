@@ -47,7 +47,8 @@ import { RouterView } from "vue-router";
   position: relative;
   width: 100%;
   height: 100vh;
-  overflow: auto; /* Prevent scrollbars */
+  /*overflow: auto; /* Prevent scrollbars */
+  overflow: hidden;
 }
 
 /* Global font styles */

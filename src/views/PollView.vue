@@ -3,6 +3,7 @@
   <div v-if="isAdmin">
     <MusicPlayer :viewKey="'POLLVIEW'" />
   </div>
+  <LanguageSwitcher @language-changed="updateLanguage" />
 
   <div class="screen-container">
     <!-- top screen content -->
@@ -18,8 +19,10 @@
         <QuestionComponent
           v-bind:question="currentQuestion"
           v-bind:participants="currentQuestion.a"
-          v-on:answer="submitAnswer($event)"
           :voting="hasVoted"
+          v-model:uiLabels="uiLabels"
+          v-on:answer="submitAnswer($event)"
+          
         />
       </div>
 
@@ -29,6 +32,7 @@
           :topAnswer="topAnswer"
           :maxVotes="maxVotes"
           :topAvatar="topAvatar"
+          v-model:uiLabels="uiLabels"
         />
       </div>
 
@@ -38,6 +42,7 @@
           :topAnswer="topAnswer"
           :maxVotes="maxVotes"
           :topAvatar="topAvatar"
+          v-model:uiLabels="uiLabels"
         />
       </div>
     </div>
@@ -89,6 +94,7 @@
 import QuestionComponent from "@/components/QuestionComponent.vue";
 import ResultQuestionComponent from "@/components/ResultQuestionComponent.vue";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 import MusicPlayer from "@/components/MusicPlayer.vue";
 
 // Initialize the WebSocket connection
@@ -105,6 +111,7 @@ export default {
     ResultQuestionComponent, //Register the ResultQuestionComponent
     InstructionButton,
     MusicPlayer,
+    LanguageSwitcher,
   },
   data: function () {
     return {
@@ -257,6 +264,11 @@ export default {
   },
 
   methods: {
+    updateLanguage(lang) {
+      this.lang = lang;
+      socket.emit("getUILabels", this.lang);
+    },
+
     submitAnswer: function (answer) {
       const voter = this.currentParticipant; // Assume `currentParticipant` contains the voter's info
 
@@ -276,7 +288,7 @@ export default {
       //flyttat socket.on top answer update till created delen
     },
 
-    checkAdminStatus(callback) {
+    checkAdminStatus: function(callback) {
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
@@ -394,8 +406,8 @@ export default {
 
 .admin-functions-in-poll {
   position: absolute; /* i förhållande till bottom box, alt sätta som relative */
-  top: 2rem;
-  right: 2rem;
+  top: 1rem;
+  right: 3rem;
   z-index: 3;
   display: flex;
   flex-direction: column;
