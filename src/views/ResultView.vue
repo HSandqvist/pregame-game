@@ -390,20 +390,4 @@ h1,h2 {
   border: 3px solid white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-.winner-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.winner-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin-bottom: 1rem;
-  border: 3px solid white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
 </style>
