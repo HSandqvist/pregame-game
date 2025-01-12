@@ -46,7 +46,7 @@
           :key="index"
           :class="[
             'participant-item',
-            { 'current-user': participant.userId === userId },
+            { 'current-user': participant.userId == userId },
           ]"
         >
           <!-- Participant avatar -->

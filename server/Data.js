@@ -56,7 +56,7 @@ Data.prototype.createPoll = function (
       globalTopAvatar: "test",
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
-    //console.log("Poll created", pollId, poll, "Admin is:", adminId);
+    console.log("Poll created", pollId, poll, "Admin is:", adminId);
   }
   return this.polls[pollId];
 };
@@ -76,8 +76,10 @@ Data.prototype.participateInPoll = function (
   userId,
   isAdmin
 ) {
-  console.log("participant will be added to", pollId, name, userId, isAdmin);
+ 
   // console.log("participant will be added to", pollId, name);
+  
+  console.log("participant will be added to", pollId, name, userId, isAdmin);
   this.polls[pollId].participants.push({
     name: name,
     avatar: avatar,

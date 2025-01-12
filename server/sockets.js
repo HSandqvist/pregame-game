@@ -147,7 +147,11 @@ function sockets(io, socket, data) {
     //see who is joining
     console.log("Participant joining poll:", d.name);
     // Add a new participant to the poll
-    data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
+    var testerIsAdmin= false;
+    if( d.userId == data.getPoll(d.pollId).adminId){ testerIsAdmin = true;}
+    console.log("isAdmin", testerIsAdmin);
+
+    data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, testerIsAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit("participantsUpdate", data.getParticipants(d.pollId));
     //console.log("participants update körs från socket", data.getParticipants(d.pollId));
