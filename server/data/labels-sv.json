@@ -51,8 +51,10 @@
 	"QUESTION COMPONENT": "",
 		"whichPlayer": "Vilken spelare?",
 		"dropAnswerHere": "Dra svar hit",
+		"clickHere": "Klicka ditt svar här",
 		"outOf": "av",
 		"hasVoted": "spelare har röstat",
+
 
 	"RESULT QUESTION COMPONENT":"",
 		"topAnswer":"fick mest röster!",

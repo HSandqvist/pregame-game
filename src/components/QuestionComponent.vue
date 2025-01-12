@@ -13,16 +13,17 @@
           class="draggable"
           draggable="true"
           @dragstart="onDragStart(participant)"
+          @touchstart="onTouch(participant)"
         >
-          <div class="participant-container">
+            <div :class="draggedParticipant === participant ? 'participant-container-touched' : 'participant-container'">
             <!-- p>{{ participant.name }}</p-->
             <div class="curved-text">
               <span
-                v-for="(char, i) in participant.name.split('')"
-                :key="i"
-                :style="getCurvedStyle(i, participant.name.length)"
+              v-for="(char, i) in participant.name.split('')"
+              :key="i"
+              :style="getCurvedStyle(i, participant.name.length)"
               >
-                {{ char }}
+              {{ char }}
               </span>
             </div>
             <img
@@ -30,13 +31,20 @@
               alt="Participant Avatar"
               class="participant-avatar"
             />
-          </div>
+            </div>
         </div>
       </div>
 
       <!-- Drop zone -->
-      <div class="drop-zone" @dragover.prevent @drop="onDrop">
-        {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
+      <div class="drop-zone" @dragover.prevent @drop="onDrop" @touchend="onDrop">
+        <div v-if="!touched">
+          {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
+        </div>
+        <div v-if="touched">
+          {{ this.uiLabels.clickHere || "Click your answer here" }}
+        </div>
+
+       
       </div>
     </div>
 
@@ -69,6 +77,7 @@ export default {
   data() {
     return {
       draggedParticipant: null, // Temporarily holds the dragged participant
+      touched: false
     };
   },
   computed: {
@@ -91,17 +100,23 @@ export default {
     onDragStart: function (participant) {
       this.draggedParticipant = participant;
     },
+    onTouch(participant) {
+      this.onDragStart(participant);
+      this.touched = true;
+
+    },
 
     // When an item is dropped in the drop zone
     onDrop: function () {
       if (this.draggedParticipant) {
         // Emit the dragged participant as the selected answer
         this.$emit("answer", this.draggedParticipant);
-
+        this.touched = false;
         // Clear the temporary variable
         this.draggedParticipant = null;
       }
     },
+   
 
     getCurvedStyle(index, length) {
       const angleStep = 12; // Adjust for curvature intensity
@@ -180,6 +195,12 @@ export default {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   align-items: center; /* Center name and avatar horizontally */
+}
+.participant-container-touched {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center name and avatar horizontally */
+  transform: scale(1.5); /* Make the container a bit bigger */
 }
 
 .curved-text {
