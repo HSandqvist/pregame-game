@@ -388,8 +388,6 @@ h1,h2 {
   border: 0.2rem solid white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-<<<<<<< HEAD
-=======
 
 @media (max-width: 430px) {
   .result-view h1 {
@@ -411,5 +409,4 @@ h1,h2 {
  }
 }
 
->>>>>>> main
 </style>
