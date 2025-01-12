@@ -1,7 +1,5 @@
 <template>
-  <div>
-      <MusicPlayer :viewKey="'RESULTVIEW'"/>
-    </div>
+  <div> <MusicPlayer :viewKey="'RESULTVIEW'"/> </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   
   <header id = "header-text">
@@ -16,11 +14,13 @@
       <p >{{ this.uiLabels.showEndResults|| "Show Results"}} </p>
     </button>
 
-    <!-- Popup for individual category winners -->
       <div v-if="showPopup" class="popup">
-        <h2> {{ currentPopupCategory }}</h2>
-        <h1>{{ currentPopupWinner }}</h1>
-      </div>
+        <h2>{{ currentPopupCategory }}</h2>
+        <div class="winner-details">
+        <img :src="currentPopupWinnerAvatar" alt="Winner Avatar" class="winner-avatar" v-if="currentPopupWinnerAvatar" />
+        <h1>{{ currentPopupWinner}}</h1>
+        </div>
+    </div>
       
       <div v-if="showPopup">
       <button @click="skipToResults" class="skip-button">
@@ -35,7 +35,7 @@
         :key="category">
         <div class="one-result-each"> 
         <h2> <span id="the-most"> {{ this.uiLabels.theMost || "THE MOST"}} </span> {{ category }}</h2>
-        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted }}!</h1>
+        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted.name }}!</h1>
       </div>
       </div>
     </div>
@@ -105,20 +105,19 @@ export default {
 
   computed: {
     topVotedCategories() {
-      const result = {};
-      for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
-        const topVoted = Object.entries(votes).reduce(
-          (max, [person, count]) => {
-            if (count > max.count) return { person, count };
-            return max;
-          },
-          { person: null, count: -1 }
-        ).person;
-
-        result[category] = topVoted;
-      }
-      return result;
-    },
+    const result = {};
+    for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
+      const topVoted = Object.entries(votes).reduce(
+        (max, [person, data]) => {
+          if (data.count > max.count) return { name: person, avatar: data.avatar, count: data.count };
+          return max;
+        },
+        { name: null, avatar: null, count: -1 }
+      );
+      result[category] = topVoted; // Include avatar and name
+    }
+    return result;
+  },
   },
   methods: {
     fetchCategoriesWithAnswers() {
@@ -132,14 +131,19 @@ export default {
     },
 
     handleResults() {
-      const categories = Object.keys(this.topVotedCategories);
+      const categories = Object.keys(this.categoriesAnswers);
       if (categories.length <= 5) {
-        this.popupQueue = categories.map((category) => ({
-          category,
-          winner: this.topVotedCategories[category],
-        }));
-        this.displayNextPopup();
-      }
+      // Add both winner name and avatar to the popupQueue
+      this.popupQueue = categories.map((category) => {
+        const winner = this.topVotedCategories[category];
+          return {
+        category,
+        winnerName: winner.name,
+        winnerAvatar: winner.avatar,
+          };
+        });
+      this.displayNextPopup();
+  }
     },
 
     skipToResults() {
@@ -149,27 +153,29 @@ export default {
     },
 
     displayNextPopup() {
-      if (this.popupQueue.length > 0) {
-        const nextPopup = this.popupQueue.shift();
-        this.currentPopupCategory = nextPopup.category;
-        this.currentPopupWinner = nextPopup.winner;
-        this.showPopup = true;
+    if (this.popupQueue.length > 0) {
+    const nextPopup = this.popupQueue.shift();
+    this.currentPopupCategory = nextPopup.category;
+    this.currentPopupWinner = nextPopup.winnerName;
+    this.currentPopupWinnerAvatar = nextPopup.winnerAvatar; 
+    this.showPopup = true;
 
-        setTimeout(() => {
-          this.showPopup = false;
-          this.displayNextPopup();
-        }, 2000);
-      } else {
-        this.showPopup = false;
-      }
-    },
+    setTimeout(() => {
+      this.showPopup = false;
+      this.displayNextPopup();
+    }, 2000);
+  } else {
+    this.showPopup = false;
+  }
+  },
 
-    returnToStart() {
-      alert("Returning to start");
-      this.$router.push("/");
-    },
+  returnToStart() {
+    alert("Returning to start");
+    this.$router.push("/");
+  },
   },
 };
+
 </script>
 
 <style>
@@ -336,5 +342,21 @@ header {
 
 h1, h2 {
   margin:2%;
+}
+
+.winner-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.winner-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>
