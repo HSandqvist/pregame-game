@@ -289,6 +289,8 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
+      this.nextStep(); //hoppa till nästa steg
+
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -302,7 +304,7 @@ export default {
         this.atLeastThree = true;
       }
 
-      this.nextStep(); //hoppa till nästa steg
+     
 
       if (this.isAdmin) {
         localStorage.setItem("userId", this.userId);

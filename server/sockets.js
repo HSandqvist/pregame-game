@@ -49,17 +49,30 @@ function sockets(io, socket, data) {
     const poll = data.getPoll(pollId);
     console.log("leavePoll körs av ", userId);
 
+    
     if (poll) {
       // Remove the participant from the poll
       console.log("leavePoll körs från socket", pollId);
-      poll.participants = poll.participants.filter(
-        (participant) => participant.userId !== Number(userId)
-      );
+      console.log("participants innan", poll.participants);
+      try{if(poll.participants.length === 1){
+        poll.participants = {};
+        console.log("deleting poll");
+        delete data.polls[pollId];
+
+      console.log("polls after delete", data.polls);
+      }
+      else{
+        poll.participants = poll.participants.filter(
+          (participant) => participant.userId != userId)}
+        }
+        catch(err){console.log("Rushing in socket for deleting poll caught", err)}
+     
       // Notify all clients in the poll room about the updated participant list
-      console.log("participants update blev", poll.participants);
+      console.log("participants update kördes från socket", poll.participants);
 
       io.to(pollId).emit("waitingParticipantsUpdate", poll.participants);
-    }
+      console.log("participants update blev", poll.participants);}
+    
   });
 
   socket.on("updatePollInfo", function (d) {
@@ -134,7 +147,11 @@ function sockets(io, socket, data) {
     //see who is joining
     console.log("Participant joining poll:", d.name);
     // Add a new participant to the poll
-    data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, d.isAdmin);
+    var testerIsAdmin= false;
+    if( d.userId == data.getPoll(d.pollId).adminId){ testerIsAdmin = true;}
+    console.log("isAdmin", testerIsAdmin);
+
+    data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, testerIsAdmin);
     // Notify all clients in the poll room about the updated participant list
     io.to(d.pollId).emit("participantsUpdate", data.getParticipants(d.pollId));
     //console.log("participants update körs från socket", data.getParticipants(d.pollId));
@@ -186,7 +203,7 @@ function sockets(io, socket, data) {
     if (poll && poll.participants) {
       // Find the participant with the matching userId
       const participantData = poll.participants.find(
-        (participant) => participant.userId === userId
+        (participant) => participant.userId == userId
       );
 
       if (participantData) {
@@ -254,9 +271,13 @@ function sockets(io, socket, data) {
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {
     const { pollId, userId } = d; // Extract pollId and userId from the client
+
+
     if (data.pollExists(pollId)) {
-      const isAdmin = data.getPoll(pollId).adminId === userId; // Compare userId with adminId
+      const isAdmin = data.getPoll(pollId).adminId == userId; // Compare userId with adminId
+      console.log(`User ${userId} is admin for poll ${pollId}: ${isAdmin}`);
       socket.emit("adminCheckResult", { isAdmin }); // Emit result back to the client
+
     } else {
       socket.emit("adminCheckResult", {
         isAdmin: false,

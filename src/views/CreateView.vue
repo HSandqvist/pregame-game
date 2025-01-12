@@ -141,7 +141,7 @@ export default {
     },
 
     generateAdminID: function () {
-      this.adminId = Math.floor(10000 + Math.random() * 90000).toString(); //specified adminId to set a participant to admin
+      this.adminId = Math.floor(10000 + Math.random() * 90000); //specified adminId to set a participant to admin
       const userId = this.adminId;
       console.log("Admin ID is:", this.adminId);
 
