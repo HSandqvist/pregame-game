@@ -16,34 +16,6 @@ function sockets(io, socket, data) {
     socket.emit("pollData", data.getPoll(d.pollId));
   });
 
-  //används ej
-  /*
-  // Event: Add a new question to a poll
-  socket.on("addQuestion", function (d) {
-    // Add the question and answer options to the specified poll
-    data.addQuestion(d.pollId, { q: d.q, a: d.a });
-    // Emit the updated question data to the client
-    socket.emit("questionUpdate", data.getQuestion(d.pollId));
-  });*/
-
-  //används ej
-  /*
-  // Event: Add a new question to a poll //KOLLA VAD DENNA GÖR EXAKT!!
-  socket.on("addQuestion", function (d) {
-    const pollId = d.pollId;
-    const question = d.q; // The question text
-
-    // Add the question and random answer options to the poll
-    data.addQuestion(pollId, question);
-
-    // Emit the updated question data with answers to the client
-    const questionData = data.getQuestion(pollId);
-    socket.emit("questionUpdate", questionData);
-
-    // Optionally, broadcast the updated question to all participants
-    io.to(pollId).emit("questionUpdate", questionData);
-  });*/
-
   socket.on("leavePoll", function (d) {
     const { pollId, userId } = d;
     const poll = data.getPoll(pollId);
