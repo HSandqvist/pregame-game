@@ -407,23 +407,17 @@ button:disabled {
 }
 
 /* Special styling for button: */
-#submitNameButton {
+#submitNameButton, #avatar-or-pic-button  {
   background-color: rgb(252, 63, 173);
+  border: 0.06rem solid rgb(218, 48, 147);
 }
 
-#submitNameButton:hover {
+#submitNameButton:hover, #avatar-or-pic-button:hover {
   background-color: rgb(219, 34, 142);
 }
 
 
-#avatar-or-pic-button {
-  background-color: rgb(254, 78, 152); /* Darker pink */
-  border: solid 0.06rem rgb(160, 15, 75);
-}
 
-#avatar-or-pic-button:hover {
-  background-color: rgb(243, 41, 125); /* Darker hover effect */
-}
 
 /* Style for the name input box */
 input[type="text"] {

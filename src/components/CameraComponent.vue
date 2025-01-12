@@ -209,13 +209,13 @@ img {
 }
 
 .camera-buttons button {
-  background-color: rgb(254, 78, 152); /* Darker pink */
+  background-color: rgb(252, 63, 173);
   min-width: 10rem;
-  border: solid 0.06rem rgb(160, 15, 75);
+  border: solid 0.06rem rgb(214, 25, 135);
 }
 
 .camera-buttons button:hover {
-  background-color: rgb(243, 41, 125); /* Darker hover effect */
+  background-color: rgb(214, 25, 135); /* Darker hover effect */
 }
 
 button {
