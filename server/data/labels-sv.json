@@ -15,12 +15,11 @@
 	"participateGame": "Delta i spel",
 	"about": "Om oss",
 	"startGame": "Starta spel",
-	"secondsPerQuestion": "Sekunder per fråga ",
 	"changeLanguage": "Change to English",
 
 "CREATEVIEW":"", 
 
-	"participateInGame": "Delta i spelet",
+	"participateInGame": "Gå med i spel",
 	"numberOfQuestions": "Antal frågor",
 	"languageForQuestions": "Välj språk på frågor",
 	"swedish": "Svenska",
