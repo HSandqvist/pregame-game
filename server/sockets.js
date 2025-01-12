@@ -164,19 +164,6 @@ function sockets(io, socket, data) {
     io.to(pollId).emit("finishGame");
   });
 
-  /*// Event: Run a specific question in a poll
-  socket.on("runQuestion", function (d) {
-    // Get the specified question and update the current question in the poll
-    let question = data.getQuestion(d.pollId, d.questionNumber);
-    // Notify all clients in the poll room with the question data
-    io.to(d.pollId).emit("questionUpdate", question);
-    // Notify all clients with the submitted answers for the current question
-    io.to(d.pollId).emit(
-      "submittedAnswersUpdate",
-      data.getSubmittedAnswers(d.pollId)
-    );
-  });*/
-
   socket.on("getCurrentParticipant", function ({ pollId, userId }) {
     // Retrieve the poll using the provided pollId
     const poll = data.getPoll(pollId);
