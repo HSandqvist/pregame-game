@@ -56,6 +56,7 @@
     :show="showReturnStartModal"
     v-model:uiLabels="uiLabels"
     @confirm="returnToStart"
+    @cancel="showReturnStartModal=false"
   />
 </template>
 
@@ -326,7 +327,7 @@ header {
 }
 
 #the-most {
-  color: rgb(255, 156, 222 );
+  color: rgb(255, 157, 230 );
   text-shadow: -0.05rem -0.05rem 0 white, 0.05rem -0.05rem 0 white, 0.05rem 0.05rem 0 white,
   0.05rem 0.05rem 0 white;
 }
@@ -359,16 +360,6 @@ header {
   z-index: 999;
 }
 
-@media (max-width: 430px) {
-  .result-view h1 {
-    font-size: 1.5em;
-  }
-
-  .result-view h2 {
-    font-size: 1.2em;
-  }
-}
-
 #header-text{
   text-shadow: -0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem 0.1rem 0 rgb(102, 0, 153),
   0.1rem 0.1rem 0 rgb(102, 0, 153);
@@ -390,27 +381,32 @@ h1,h2 {
 }
 
 .winner-avatar {
-  width: 80px;
-  height: 80px;
+  width: 14rem;
+  height: 14rem;
   border-radius: 50%;
-  margin-bottom: 1rem;
-  border: 3px solid white;
+  margin: 1rem 0rem;
+  border: 0.2rem solid white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.winner-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+@media (max-width: 430px) {
+  .result-view h1 {
+    font-size: 1.5em;
+  }
+  .result-view h2 {
+    font-size: 1.2em;
+  }
 }
 
-.winner-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin-bottom: 1rem;
-  border: 3px solid white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+@media (max-height: 667px) {
+  .winner-avatar{
+    width:10rem;
+    height: 10rem;
+  }
+
+ header {
+  top: 2rem;
+ }
 }
+
 </style>

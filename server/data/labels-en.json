@@ -9,7 +9,7 @@
 	"no": "No",
 	"sureLeaveGame": "Are you sure you want to leave game?",
 	"gameID": "Game ID",
-	"returnToStart": "Game finished, return to start.",
+	"returnToStart": "Game ended. Return to start?",
 
 
 "STARTVIEW": "",
@@ -68,7 +68,7 @@
 	"showEndResults": "SHOW RESULTS!",
 	"allResults": "ALL RESULTS",
 	"theMost": "THE MOST",
-	"startNewGame": "Start new game!",
+	"startNewGame": "End game!",
 	"skip": "Skip",
 
 

@@ -42,11 +42,11 @@ export default {
     uiLabels: {},
     disableSwitcher: {},
     isPictureTaken: {},
+    cameraState: {},
   },
   data: function () {
     return {
       avatar: null, // Ensure avatar is defined in the data
-      cameraState: false,
       stream: null, // The video stream to access the camera
       cameraPicIcon,
     };
@@ -65,7 +65,7 @@ export default {
       this.$emit("update:isPictureTaken", false);
       this.$emit("update:disableSwitcher", true);
       //this.isPictureTaken = false;
-      this.cameraState = true;
+      this.$emit("update:cameraState", true);
       //this.disableSwitcher = true;
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
@@ -91,7 +91,7 @@ export default {
           alert(
             "Unable to access the camera. Please check your camera settings."
           );
-          this.cameraState = false; // Allow retry if error occurs
+          this.$emit("update:cameraState", false); // Allow retry if error occurs
         });
     },
 
@@ -106,7 +106,7 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
-      this.cameraState = false;
+      this.$emit("update:cameraState", false)
       this.$emit("update:disableSwitcher", false);
       //this.disableSwitcher = false;
     },
@@ -135,7 +135,7 @@ export default {
         console.log("Avatar captured");
         //console.log("Captured Avatar: ", this.avatar);
 
-        this.cameraState = false; // Disable camera actions
+        this.$emit("update:cameraState", false); // Disable camera actions
 
         // Stop the camera stream after capturing the image
         this.stopCamera();
@@ -209,12 +209,13 @@ img {
 }
 
 .camera-buttons button {
-  background-color: rgb(225, 95, 150); /* Darker pink */
+  background-color: rgb(252, 63, 173);
   min-width: 10rem;
+  border: solid 0.06rem rgb(214, 25, 135);
 }
 
 .camera-buttons button:hover {
-  background-color: rgb(205, 85, 140); /* Darker hover effect */
+  background-color: rgb(214, 25, 135); /* Darker hover effect */
 }
 
 button {
