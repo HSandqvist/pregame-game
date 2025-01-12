@@ -203,6 +203,11 @@ export default {
       //här borde läggas till så pollen tas bort/användare tas bort som i waitingroom
 
       this.showReturnStartModal = false;
+      socket.emit("leavePoll", {
+        pollId: this.pollId,
+        userId: this.userId,
+      });
+      
       this.$router.push("/");
     },
   },

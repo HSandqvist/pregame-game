@@ -63,7 +63,7 @@ function sockets(io, socket, data) {
       }
       else{
         poll.participants = poll.participants.filter(
-          (participant) => participant.userId !== Number(userId))}
+          (participant) => participant.userId != userId)}
         }
         catch(err){console.log("Rushing in socket for deleting poll caught", err)}
      
@@ -199,7 +199,7 @@ function sockets(io, socket, data) {
     if (poll && poll.participants) {
       // Find the participant with the matching userId
       const participantData = poll.participants.find(
-        (participant) => participant.userId === userId
+        (participant) => participant.userId == userId
       );
 
       if (participantData) {
@@ -267,9 +267,13 @@ function sockets(io, socket, data) {
   // Event: Check if user is the admin
   socket.on("checkAdmin", function (d) {
     const { pollId, userId } = d; // Extract pollId and userId from the client
+
+
     if (data.pollExists(pollId)) {
-      const isAdmin = data.getPoll(pollId).adminId === userId; // Compare userId with adminId
+      const isAdmin = data.getPoll(pollId).adminId == userId; // Compare userId with adminId
+      console.log(`User ${userId} is admin for poll ${pollId}: ${isAdmin}`);
       socket.emit("adminCheckResult", { isAdmin }); // Emit result back to the client
+
     } else {
       socket.emit("adminCheckResult", {
         isAdmin: false,
