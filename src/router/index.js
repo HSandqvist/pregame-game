@@ -46,7 +46,7 @@ const router = createRouter({
     },
     {
       // Dynamic route for viewing poll results, with an `id` parameter
-      path: '/result/:id',
+      path: '/result/:id/:userId',
       name: 'ResultView',
       // Lazy-load the ResultView component
       component: () => import('../views/ResultView.vue')
