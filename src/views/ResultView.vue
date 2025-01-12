@@ -54,8 +54,7 @@
   </div>
   <ReturnStartModal
     :show="showReturnStartModal"
-    :uiLabels="uiLabels"
-    :lang="lang"
+    v-model:uiLabels="uiLabels"
     @confirm="returnToStart"
   />
 </template>

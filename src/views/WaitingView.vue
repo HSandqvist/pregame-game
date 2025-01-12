@@ -99,22 +99,19 @@
 
         <ConfirmLeaveModal
           :show="showModal"
-          :uiLabels="uiLabels"
-          :lang="lang"
+          v-model:uiLabels="uiLabels"
           @confirm="leavePoll"
           @cancel="showModal = false"
         />
         <ConfirmLeaveModal
           :show="showModalAdmin"
           :uiLabels="uiLabels"
-          :lang="lang"
           @confirm="adminLeavePoll"
           @cancel="showModalAdmin = false"
         />
         <AdminLeftModal
           :show="showModalGameEnds"
           :uiLabels="uiLabels"
-          :lang="lang"
           @confirm="leavePoll"
         />
       </div>
