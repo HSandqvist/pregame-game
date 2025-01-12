@@ -5,11 +5,12 @@
           <!-- Display the message, with a fallback if no label is provided -->
           {{
             this.uiLabels.returnToStart ||
-            "Game finished, returning to start."
+            "Do you want to return to start?"
           }}
         </p>
         <!-- Button for confirming the action -->
-        <button @click="confirm">{{ this.uiLabels.ok || "Okey" }} </button>
+        <button @click="confirm">{{ this.uiLabels.yes || "Yes" }} </button>
+        <button @click="cancel">{{ this.uiLabels.no || "No" }}</button>
       </div>
     </div>
   </template>
@@ -24,6 +25,9 @@
       confirm() {
         this.$emit("confirm");
       },
+      cancel() {
+        this.emit("cancel");
+      }
     },
   };
   </script>
