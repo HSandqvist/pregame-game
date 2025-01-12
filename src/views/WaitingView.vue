@@ -499,6 +499,11 @@ input[type="text"] {
 
 #game-id-headline {
   color: rgb(252, 181, 212);
+  text-shadow: 
+    1px 1px 0 rgb(196, 0, 111),
+    -1px 1px 0 rgb(196, 0, 111),
+    1px -1px 0 rgb(196, 0, 111),
+    -1px -1px 0 rgb(196, 0, 111);
 
   position: fixed;
   top: 3rem;

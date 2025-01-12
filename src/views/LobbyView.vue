@@ -36,9 +36,11 @@
             v-model:isPictureTaken="isPictureTaken"
             :uiLabels="uiLabels"
             :disableSwitcher="disableSwitcher"
+            :cameraState="cameraState"
             @update:avatar="avatar = $event"
             @update:disableSwitcher="disableSwitcher = $event"
             @update:isPictureTaken="isPictureTaken = $event"
+            @update:cameraState="cameraState = $event"
           />
         </div>
         <div v-if="choseCustomAvatar">
@@ -49,7 +51,6 @@
             @update:isPictureTaken="isPictureTaken = $event"
             @avatar-selected="handleAvatarSelection"
           />
-          <!-- @update:avatar="avatar = $event" -->
         </div>
       </div>
 
@@ -59,7 +60,7 @@
           {{ this.uiLabels.back || "Back" }}
         </button>
 
-        <button
+        <button id="avatar-or-pic-button"
           v-on:click="chooseAvatar"
           v-if="!choseCustomAvatar"
           :disabled="disableSwitcher"
@@ -67,7 +68,7 @@
           {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
         </button>
 
-        <button v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
+        <button id="avatar-or-pic-button" v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
           {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
         </button>
 
@@ -159,6 +160,7 @@ export default {
       //camera
       disableSwitcher: false, //connected to choose premade avatar button
       isPictureTaken: false,
+      cameraState: false,
 
       //leave poll lobby
       showModal: false,
@@ -252,7 +254,10 @@ export default {
     // Move to the previous step
     backStep: function () {
       if (this.step > 1) {
-        this.step--;
+        this.cameraState=false;
+        this.isPictureTaken=false;
+
+        this.step--;  
       }
     },
 
@@ -303,8 +308,6 @@ export default {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
-
-     
 
       if (this.isAdmin) {
         localStorage.setItem("userId", this.userId);
@@ -404,13 +407,17 @@ button:disabled {
 }
 
 /* Special styling for button: */
-#submitNameButton {
+#submitNameButton, #avatar-or-pic-button  {
   background-color: rgb(252, 63, 173);
+  border: 0.06rem solid rgb(218, 48, 147);
 }
 
-#submitNameButton:hover {
+#submitNameButton:hover, #avatar-or-pic-button:hover {
   background-color: rgb(219, 34, 142);
 }
+
+
+
 
 /* Style for the name input box */
 input[type="text"] {
