@@ -147,10 +147,18 @@ function sockets(io, socket, data) {
   socket.on("participateInPoll", function (d) {
     //see who is joining
     console.log("Participant joining poll:", d.name);
+
+    const poll = data.getPoll(d.pollId);
+    if (poll.participants.length >= 8) {
+      socket.emit("error", { message: "Lobby is full. Maximum participants reached." });
+      return; // Stop further processing
+    }
+
     // Add a new participant to the poll
     var testerIsAdmin= false;
-    if( d.userId == data.getPoll(d.pollId).adminId){ testerIsAdmin = true;}
-    console.log("isAdmin", testerIsAdmin);
+    if( d.userId == data.getPoll(d.pollId).adminId) { 
+      testerIsAdmin = true;
+    }
 
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, testerIsAdmin);
     // Notify all clients in the poll room about the updated participant list
@@ -289,9 +297,11 @@ function sockets(io, socket, data) {
 
   socket.on("checkLobbyExists", (pollId, callback) => {
     if (data.pollExists(pollId)) {
-      callback({ exists: true }); // Respond with true if the poll exists
+      const poll = data.getPoll(pollId);
+      const isLobbyFull = poll.participants.length >= 8;
+      callback({ exists: true, isFull: isLobbyFull }); // Respond with true if the poll exists
     } else {
-      callback({ exists: false }); // Respond with false if the poll doesn't exist
+      callback({ exists: false, isFull: false }); // Respond with false if the poll doesn't exist
     }
   });
 
