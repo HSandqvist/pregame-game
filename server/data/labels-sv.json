@@ -8,7 +8,7 @@
 	"no": "Nej",
 	"sureLeaveGame": "Är du säker på att du vill lämna spelet?",
 	"gameID": "Spel ID",
-	"returnToStart": "Spelet är slut, går till start",
+	"returnToStart": "Spelet är slut. Gå till start?",
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",

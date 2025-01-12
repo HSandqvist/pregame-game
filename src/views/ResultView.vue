@@ -56,6 +56,7 @@
     :show="showReturnStartModal"
     v-model:uiLabels="uiLabels"
     @confirm="returnToStart"
+    @cansel="showReturnStartModal=false"
   />
 </template>
 
