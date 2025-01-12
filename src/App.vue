@@ -212,7 +212,7 @@ button:hover {
 
 button.selected {
   background-color: rgb(255, 131, 203);
-  border: 2px solid white;
+  border: 0.25rem solid white;
 }
 
 button:disabled {

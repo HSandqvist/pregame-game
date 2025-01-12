@@ -36,9 +36,11 @@
             v-model:isPictureTaken="isPictureTaken"
             :uiLabels="uiLabels"
             :disableSwitcher="disableSwitcher"
+            :cameraState="cameraState"
             @update:avatar="avatar = $event"
             @update:disableSwitcher="disableSwitcher = $event"
             @update:isPictureTaken="isPictureTaken = $event"
+            @update:cameraState="cameraState = $event"
           />
         </div>
         <div v-if="choseCustomAvatar">
@@ -49,7 +51,6 @@
             @update:isPictureTaken="isPictureTaken = $event"
             @avatar-selected="handleAvatarSelection"
           />
-          <!-- @update:avatar="avatar = $event" -->
         </div>
       </div>
 
@@ -159,6 +160,7 @@ export default {
       //camera
       disableSwitcher: false, //connected to choose premade avatar button
       isPictureTaken: false,
+      cameraState: false,
 
       //leave poll lobby
       showModal: false,
@@ -252,7 +254,10 @@ export default {
     // Move to the previous step
     backStep: function () {
       if (this.step > 1) {
-        this.step--;
+        this.cameraState=false;
+        this.isPictureTaken=false;
+
+        this.step--;  
       }
     },
 
@@ -303,8 +308,6 @@ export default {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
-
-     
 
       if (this.isAdmin) {
         localStorage.setItem("userId", this.userId);
