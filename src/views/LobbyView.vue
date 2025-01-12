@@ -7,7 +7,12 @@
     <div v-if="step === 1" class="name-entry-section">
       <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
       <h1>{{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:</h1>
-      <input type="text" v-model="userName" />
+      <input 
+        type="text" 
+        v-model="userName"
+        maxlength="10"
+        @input="validateName"
+         />
 
       <div class="action-buttons">
         <button v-on:click="nextStep" :disabled="!userName">
@@ -284,6 +289,8 @@ export default {
 
     // Participate in the poll
     participateInPoll: function () {
+      this.nextStep(); //hoppa till nästa steg
+
       socket.emit("participateInPoll", {
         userId: this.userId,
         pollId: this.pollId,
@@ -297,7 +304,7 @@ export default {
         this.atLeastThree = true;
       }
 
-      this.nextStep(); //hoppa till nästa steg
+     
 
       if (this.isAdmin) {
         localStorage.setItem("userId", this.userId);
@@ -325,6 +332,12 @@ export default {
       return {
         transform: `rotate(${rotationAngle}deg) translateY(-10px)`,
       };
+    },
+
+    validateName(event) {
+      if (this.userName.length > 10) {
+        this.userName = this.userName.substring(0, 10);
+      }
     },
   },
 };

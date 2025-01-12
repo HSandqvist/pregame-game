@@ -46,7 +46,7 @@
           :key="index"
           :class="[
             'participant-item',
-            { 'current-user': participant.userId === userId },
+            { 'current-user': participant.userId == userId },
           ]"
         >
           <!-- Participant avatar -->
@@ -244,7 +244,9 @@ export default {
       console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
         this.showModalGameEnds = true;
+        
       }
+      this.leavePoll();
     });
 
     this.joined = true;
@@ -262,7 +264,7 @@ export default {
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
       });
-      this.leavePoll();
+     
     },
 
     leavePoll: function () {

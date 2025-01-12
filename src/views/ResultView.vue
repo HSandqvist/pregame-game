@@ -110,6 +110,8 @@ export default {
 
   created: function () {
     this.pollId = this.$route.params.id;
+
+    this.userId = this.$route.params.userId;
     // Listen for server events
     socket.on("uiLabels", (labels) => (this.uiLabels = labels)); // Update UI labels
 
@@ -202,6 +204,11 @@ export default {
       //här borde läggas till så pollen tas bort/användare tas bort som i waitingroom
 
       this.showReturnStartModal = false;
+      socket.emit("leavePoll", {
+        pollId: this.pollId,
+        userId: this.userId,
+      });
+      
       this.$router.push("/");
     },
   },

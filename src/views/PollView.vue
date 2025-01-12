@@ -354,7 +354,7 @@ export default {
 
     toResults: function () {
       console.log("game finished, going to result view");
-      this.$router.push(`/result/${this.pollId}`);
+      this.$router.push(`/result/${this.pollId}/${this.userId}`);
     },
   },
 };
