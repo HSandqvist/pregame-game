@@ -111,7 +111,7 @@
 import io from "socket.io-client";
 import InstructionButton from "@/components/InstructionButton.vue"; //Import InstructionButton component
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue"; // Import LanguageSwitcher component
-import ConfirmLeaveModal from "@/components/ConfirmLeaveModal.vue";
+import ConfirmLeaveModal from "@/components/modals/ConfirmLeaveModal.vue";
 
 import CameraComponent from "@/components/CameraComponent.vue";
 import ChooseAvatarComponent from "@/components/ChooseAvatarComponent.vue";
