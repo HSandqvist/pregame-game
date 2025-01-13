@@ -29,15 +29,25 @@
         </button>
       </div>
     </div>
+
+    <CameraError
+      :show="isCameraAvailable"
+      :uiLabels="uiLabels"
+      @confirm="isCameraAvailable = false"
+    />
   </div>
 </template>
 
 <script>
 //importera bild på kamera att ha som default när ingen bild har tagits
 import cameraPicIcon from "@/assets/img/cameraPicIcon.png";
+import CameraError from "@/components/modals/CameraError.vue";
 
 export default {
   name: "CameraComponent",
+  components: {
+    CameraError,
+  },
   props: {
     uiLabels: {},
     disableSwitcher: {},
@@ -49,6 +59,7 @@ export default {
       avatar: null, // Ensure avatar is defined in the data
       stream: null, // The video stream to access the camera
       cameraPicIcon,
+      isCameraAvailable: false,
     };
   },
   methods: {
@@ -85,10 +96,10 @@ export default {
         })
         .catch((error) => {
           console.error("Error accessing camera:", error);
-          alert(
-            "Unable to access the camera. Please check your camera settings."
-          );
+          this.stopCamera();
+          this.isCameraAvailable = true;
           this.$emit("update:cameraState", false); // Allow retry if error occurs
+          this.$emit("update:isPictureTaken", false); // Allow retry if error occurs
         });
     },
 
@@ -102,15 +113,13 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
-      this.$emit("update:cameraState", false)
+      this.$emit("update:cameraState", false);
       this.$emit("update:disableSwitcher", false);
     },
 
     // Capture the image from the video stream
     captureImage: function () {
       const video = this.$refs.video;
-
-      //this.isPictureTaken = true;
       this.$emit("update:isPictureTaken", true);
 
       if (video && video.videoWidth > 0 && video.videoHeight > 0) {
@@ -132,8 +141,11 @@ export default {
         this.stopCamera();
       } else {
         console.error("Video stream is not available.");
+        this.stopCamera();
+        this.isCameraAvailable = true;
+        this.$emit("update:cameraState", false); 
+        this.$emit("update:isPictureTaken", false);
       }
-
       this.$emit("update:avatar", this.avatar);
     },
 
@@ -250,8 +262,7 @@ button {
     margin-bottom: 0;
   }
   .camera-buttons {
-    margin:0;
+    margin: 0;
   }
-
 }
 </style>
