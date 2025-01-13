@@ -4,7 +4,6 @@
       <InstructionButton
         ref="instructionButton"
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'STARTVIEW'"
       />
 
@@ -20,7 +19,6 @@
     <div v-if="joinGameClicked" class="join-game-container">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'PINVIEW'"
       />
       <!-- :showInstructions="false" fanns i button ovan, enda som hade detta.-->

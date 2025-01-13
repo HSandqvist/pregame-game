@@ -7,7 +7,6 @@
     <div v-if="step === 1" class="name-entry-section">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'NAMEVIEW'"
       />
       <h1>{{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:</h1>
@@ -29,7 +28,6 @@
     <div v-else-if="step === 2" class="camera-container">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'CAMERAVIEW'"
       />
 
@@ -91,7 +89,6 @@
     <div v-else-if="step === 3" class="avatar-container">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'AVATARVIEW'"
       />
       <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}:</h2>

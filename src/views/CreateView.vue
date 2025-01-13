@@ -10,7 +10,6 @@
     <div v-if="step === 1" class="amount-questions-section">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'NOQUESTIONS'"
       />
       <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
@@ -35,7 +34,6 @@
     <div v-else-if="step === 2" class="language-for-questions-section">
       <InstructionButton
         :uiLabels="uiLabels"
-        :lang="lang"
         :viewKey="'LANGUAGECHOICE'"  
       />
       <h2>

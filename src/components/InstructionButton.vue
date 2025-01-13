@@ -16,7 +16,6 @@
 export default {
   name: "InstructionButton",
   props: {
-    lang: { type: String, default: "en" },
     viewKey: { type: String, required: true },
     uiLabels: { type: Object, default: () => ({}) },
   },
@@ -24,7 +23,6 @@ export default {
   data() {
     return {
       showInstructions: false,
-      //labels: {}, // Placeholder for language-specific labels
     };
   },
   computed: {
@@ -36,9 +34,8 @@ export default {
     },
     instructionsTitle() {
       return (
-        //this.labels?.INSTRUCTIONS_TITLE ||
-        this.uiLabels?.instructions || // ifall du vill falla tillbaka på props
-        "Instructions" // fallback om inget annat finns
+        this.uiLabels?.instructions || 
+        "Instructions" 
       );
     },
   },
@@ -52,40 +49,6 @@ export default {
       }
     },
   }
-    /*async loadLabels() {
-      let response;
-
-      if (this.lang == "en") {
-        response = await fetch("/server/data/labels-en.json");
-      } else {
-        response = await fetch("/server/data/labels-sv.json");
-      }
-
-      if (!response.ok) {
-        console.error("Failed to load language file:", response.status);
-        return;
-      }
-
-      this.labels = await response.json();
-    },
-
-    updateLanguage(newLang) {
-      this.lang = newLang;
-      this.loadLabels();
-    },
-  },
-  watch: {
-    // Kolla om språket ändras i localStorage och ladda om labels
-    lang(newLang, oldLang) {
-      if (newLang !== oldLang) {
-        this.loadLabels();
-      }
-    },
-  },
-  created() {
-    // Listen for UI label updates from the server
-    this.loadLabels();
-  },*/
 };
 </script>
 
