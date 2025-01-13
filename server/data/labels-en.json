@@ -28,7 +28,7 @@
 	"backToStart": "Back to Start",
 
 "LOBBYVIEW": "",
-	"pleaseEnterYourName": "Enter your name",
+	"pleaseEnterYourName": "Name your avatar",
 	"captureYourAvatar": "Capture your avatar",
 	"chooseYourAvatar": "Choose your avatar",
 	"startCamera": "Start camera",
@@ -72,7 +72,7 @@
 	"startNewGame": "End game!",
 	"skip": "Skip",
 
-
+	"INSTRUCTIONS_TITLE": "Instructions",
 	"INSTRUCTIONS": {
 	"STARTVIEW": "Welcome to the start page!<br>Here, you can choose whether to create a new game or join an existing game.",
 	"PINVIEW": "Here, you enter the Lobby ID displayed on the screen of the person who created the game.",
@@ -84,6 +84,7 @@
 	"ADMINLOBBYVIEW": "This is the lobby where you can see all the participants.<br>Wait until all participants are ready before starting the game.",
 	"LOBBYVIEW": "This is the lobby where you can see all the participants.<br>When all participants are ready, the admin will start the game.",
 	"POLLVIEW": "On this page, you can vote for your fellow players<br>by dragging and dropping their avatars.",
+	"ADMINPOLLVIEW": "On this page, you can vote for your fellow players<br>by dragging and dropping their avatars. <br> When you press 'Next question', all players will move on to the next question,<br>regardless of whether they have voted or not.",
 	"RESULTVIEW": "Well done!<br>Here, you can see the results of the game. If you want to play again, you can click 'Start a new game'."
 }
 	}
