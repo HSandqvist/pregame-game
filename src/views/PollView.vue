@@ -159,17 +159,17 @@ export default {
 
     socket.emit("pollInfoUpdatePersonal", { pollId: this.pollId });
 
-    socket.on("pollInfoUpdate", (data) => {
-      this.view = data.currentView;
-      this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
+    socket.on("pollInfoUpdate", (d) => {
+      this.view = d.currentView;
+      this.currentQuestionIndex = d.currentQuestion; //current question i data är ett index
       this.updateCurrentQuestion(this.currentQuestionIndex);
-      this.totalNumberOfParticipants = data.participants.length;
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
 
     socket.on("allParticpantsForGame", (participantData) => {
       this.participants = participantData; // Ensure the array is directly assigned here.
+      this.totalNumberOfParticipants = participantData.length;
     });
 
     // Get this participant
