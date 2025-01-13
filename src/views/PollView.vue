@@ -1,11 +1,10 @@
 <template>
   <div v-if="!isAdmin">
-    <InstructionButton :uiLabels="uiLabels" :lang="lang" :viewKey="'POLLVIEW'" />
+    <InstructionButton :uiLabels="uiLabels" :viewKey="'POLLVIEW'" />
   </div>
   <div v-if="isAdmin">
     <InstructionButton
       :uiLabels="uiLabels"
-      :lang="lang"
       :viewKey="'ADMINPOLLVIEW'"
     />
     <MusicPlayer :viewKey="'POLLVIEW'" />

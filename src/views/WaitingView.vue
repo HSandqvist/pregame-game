@@ -10,14 +10,12 @@
       <div v-if="isAdmin">
         <InstructionButton
           :uiLabels="uiLabels"
-          :lang="lang"
           :viewKey="'ADMINLOBBYVIEW'"
         />
       </div>
       <div v-if="!isAdmin">
         <InstructionButton
           :uiLabels="uiLabels"
-          :lang="lang"
           :viewKey="'LOBBYVIEW'"
         />
       </div>

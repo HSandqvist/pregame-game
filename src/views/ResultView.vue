@@ -2,7 +2,7 @@
   <div v-if="isAdmin">
     <MusicPlayer :viewKey="'RESULTVIEW'" />
   </div>
-  <InstructionButton :uiLabels="uiLabels" :lang="lang" :viewKey="'RESULTVIEW'" />
+  <InstructionButton :uiLabels="uiLabels" :viewKey="'RESULTVIEW'" />
   <LanguageSwitcher @language-changed="updateLanguage" />
   <header id="header-text">
     <h1 v-if="showPopup" v-motion="popEffect">
