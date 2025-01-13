@@ -10,7 +10,7 @@
 	"sureLeaveGame": "Are you sure you want to leave game?",
 	"gameID": "Game ID",
 	"returnToStart": "Game ended. Return to start?",
-
+	"cameraNotWorkning": "Camera doesn't work. Please, chose an avatar instead.", 
 
 "STARTVIEW": "",
 	"createGame": "Create Game",
