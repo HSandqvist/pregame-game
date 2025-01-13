@@ -24,19 +24,19 @@ export default {
   data() {
     return {
       showInstructions: false,
-      labels: {}, // Placeholder for language-specific labels
+      //labels: {}, // Placeholder for language-specific labels
     };
   },
   computed: {
     instructions() {
       return (
-        this.labels?.INSTRUCTIONS?.[this.viewKey] ??
+        this.uiLabels?.INSTRUCTIONS?.[this.viewKey] ??
         "No instructions available."
       );
     },
     instructionsTitle() {
       return (
-        this.labels?.INSTRUCTIONS_TITLE ||
+        //this.labels?.INSTRUCTIONS_TITLE ||
         this.uiLabels?.instructions || // ifall du vill falla tillbaka på props
         "Instructions" // fallback om inget annat finns
       );
@@ -51,7 +51,8 @@ export default {
         this.showInstructions = !this.showInstructions;
       }
     },
-    async loadLabels() {
+  }
+    /*async loadLabels() {
       let response;
 
       if (this.lang == "en") {
@@ -84,7 +85,7 @@ export default {
   created() {
     // Listen for UI label updates from the server
     this.loadLabels();
-  },
+  },*/
 };
 </script>
 
