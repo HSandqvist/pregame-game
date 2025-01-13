@@ -5,7 +5,7 @@
         ref="instructionButton"
         :uiLabels="uiLabels"
         :lang="lang"
-        viewKey="STARTVIEW"
+        :viewKey="'STARTVIEW'"
       />
 
       <!-- Language switcher component -->
@@ -21,9 +21,9 @@
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
-        :showInstructions="false"
-        viewKey="PINVIEW"
+        :viewKey="'PINVIEW'"
       />
+      <!-- :showInstructions="false" fanns i button ovan, enda som hade detta.-->
       <PinInput :pin-length="6" @pin-updated="updatePin" />
       
       <button class="btn" @click="attemptJoin" :disabled="isLobbyFull">
@@ -227,5 +227,11 @@ export default {
   align-items: center;
   color: red;
   margin-bottom: 1rem; 
+}
+
+@media (max-width: 400px) {
+  .game-title {
+    font-size: 2.3rem;
+  }
 }
 </style>

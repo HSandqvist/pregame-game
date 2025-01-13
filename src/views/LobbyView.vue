@@ -5,14 +5,18 @@
 
     <!-- Step 1: Enter your name -->
     <div v-if="step === 1" class="name-entry-section">
-      <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="NAMEVIEW" />
+      <InstructionButton
+        :uiLabels="uiLabels"
+        :lang="lang"
+        :viewKey="'NAMEVIEW'"
+      />
       <h1>{{ this.uiLabels.pleaseEnterYourName || "Enter your name" }}:</h1>
-      <input 
-        type="text" 
+      <input
+        type="text"
         v-model="userName"
         maxlength="10"
         @input="validateName"
-         />
+      />
 
       <div class="action-buttons">
         <button v-on:click="nextStep" :disabled="!userName">
@@ -26,7 +30,7 @@
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
-        viewKey="CAMERAVIEW"
+        :viewKey="'CAMERAVIEW'"
       />
 
       <!-- Camera/Picture for avatar -->
@@ -60,7 +64,8 @@
           {{ this.uiLabels.back || "Back" }}
         </button>
 
-        <button id="avatar-or-pic-button"
+        <button
+          id="avatar-or-pic-button"
           v-on:click="chooseAvatar"
           v-if="!choseCustomAvatar"
           :disabled="disableSwitcher"
@@ -68,7 +73,11 @@
           {{ this.uiLabels.choosePreMadeAvatar || "Choose Pre-made Avatar" }}
         </button>
 
-        <button id="avatar-or-pic-button" v-on:click="returnToPictureMode" v-if="choseCustomAvatar">
+        <button
+          id="avatar-or-pic-button"
+          v-on:click="returnToPictureMode"
+          v-if="choseCustomAvatar"
+        >
           {{ this.uiLabels.takeAPictureInstead || "Take A Picture Instead" }}
         </button>
 
@@ -83,7 +92,7 @@
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
-        viewKey="AVATARVIEW"
+        :viewKey="'AVATARVIEW'"
       />
       <h2>{{ this.uiLabels.yourAvatar || "Your avatar" }}:</h2>
       <div class="curved-text">
@@ -248,10 +257,10 @@ export default {
     // Move to the previous step
     backStep: function () {
       if (this.step > 1) {
-        this.cameraState=false;
-        this.isPictureTaken=false;
+        this.cameraState = false;
+        this.isPictureTaken = false;
 
-        this.step--;  
+        this.step--;
       }
     },
 
@@ -401,17 +410,16 @@ button:disabled {
 }
 
 /* Special styling for button: */
-#submitNameButton, #avatar-or-pic-button  {
+#submitNameButton,
+#avatar-or-pic-button {
   background-color: rgb(252, 63, 173);
   border: 0.06rem solid rgb(218, 48, 147);
 }
 
-#submitNameButton:hover, #avatar-or-pic-button:hover {
+#submitNameButton:hover,
+#avatar-or-pic-button:hover {
   background-color: rgb(219, 34, 142);
 }
-
-
-
 
 /* Style for the name input box */
 input[type="text"] {

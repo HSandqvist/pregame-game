@@ -83,7 +83,6 @@ export default {
     },
 
     isAvatarTaken(avatar) {
-
       return this.takenAvatars.includes(avatar);
     },
   },

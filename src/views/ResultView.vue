@@ -2,7 +2,7 @@
   <div v-if="isAdmin">
     <MusicPlayer :viewKey="'RESULTVIEW'" />
   </div>
-  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
+  <InstructionButton :uiLabels="uiLabels" :lang="lang" :viewKey="'RESULTVIEW'" />
   <LanguageSwitcher @language-changed="updateLanguage" />
   <header id="header-text">
     <h1 v-if="showPopup" v-motion="popEffect">
@@ -140,7 +140,7 @@ export default {
     socket.on("categoriesWithAnswers", (categories) => {
       this.categoriesAnswers = categories;
     });
-    
+
     socket.on("adminCheckResult", (data) => {
       if (data.isAdmin) {
         this.isAdmin = true; // Set admin flag
@@ -195,18 +195,19 @@ export default {
     handleResults() {
       const categories = Object.keys(this.categoriesAnswers);
 
-      const limitedCategories = categories.length > 5 ? categories.slice(0, 5) : categories;
+      const limitedCategories =
+        categories.length > 5 ? categories.slice(0, 5) : categories;
 
-        // Add both winner name and avatar to the popupQueue
-        this.popupQueue = limitedCategories.map((category) => {
-          const winner = this.topVotedCategories[category];
-          return {
-            category,
-            winnerName: winner.name,
-            winnerAvatar: winner.avatar,
-          };
-        });
-        this.displayNextPopup();
+      // Add both winner name and avatar to the popupQueue
+      this.popupQueue = limitedCategories.map((category) => {
+        const winner = this.topVotedCategories[category];
+        return {
+          category,
+          winnerName: winner.name,
+          winnerAvatar: winner.avatar,
+        };
+      });
+      this.displayNextPopup();
     },
 
     skipToResults() {
@@ -226,7 +227,7 @@ export default {
         setTimeout(() => {
           this.showPopup = false;
           this.displayNextPopup();
-        }, 2000);
+        }, 3500);
       } else {
         this.showPopup = false;
       }

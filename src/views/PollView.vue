@@ -1,9 +1,13 @@
 <template>
-  <div v-if ="!isAdmin">
-  <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="POLLVIEW" />
+  <div v-if="!isAdmin">
+    <InstructionButton :uiLabels="uiLabels" :lang="lang" :viewKey="'POLLVIEW'" />
   </div>
   <div v-if="isAdmin">
-    <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="ADMINPOLLVIEW" />
+    <InstructionButton
+      :uiLabels="uiLabels"
+      :lang="lang"
+      :viewKey="'ADMINPOLLVIEW'"
+    />
     <MusicPlayer :viewKey="'POLLVIEW'" />
   </div>
   <LanguageSwitcher @language-changed="updateLanguage" />
@@ -25,7 +29,6 @@
           :voting="hasVoted"
           v-model:uiLabels="uiLabels"
           v-on:answer="submitAnswer($event)"
-          
         />
       </div>
 
@@ -254,7 +257,6 @@ export default {
     },
 
     submitAnswer: function (answer) {
-
       // Emit the answer to the server
       socket.emit("submitAnswer", {
         pollId: this.pollId,
@@ -270,7 +272,7 @@ export default {
       //flyttat socket.on top answer update till created delen
     },
 
-    checkAdminStatus: function(callback) {
+    checkAdminStatus: function (callback) {
       // Emit admin check request
       socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
 
@@ -310,7 +312,6 @@ export default {
           socket.emit("votingReset", this.pollId);
         }
       } else if (this.view === "results_view" || this.view === "final_view") {
-
         this.nextQuestion();
       }
     },
@@ -391,11 +392,8 @@ export default {
 
 #game-id-headline {
   color: rgb(252, 181, 212);
-  text-shadow: 
-    1px 1px 0 rgb(196, 0, 111),
-    -1px 1px 0 rgb(196, 0, 111),
-    1px -1px 0 rgb(196, 0, 111),
-    -1px -1px 0 rgb(196, 0, 111);
+  text-shadow: 1px 1px 0 rgb(196, 0, 111), -1px 1px 0 rgb(196, 0, 111),
+    1px -1px 0 rgb(196, 0, 111), -1px -1px 0 rgb(196, 0, 111);
 
   position: sticky; /* Kan bli problem på mobiltelefon */
   top: 3rem;
