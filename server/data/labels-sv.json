@@ -9,6 +9,7 @@
 	"sureLeaveGame": "Är du säker på att du vill lämna spelet?",
 	"gameID": "Spel ID",
 	"returnToStart": "Spelet är slut. Gå till start?",
+	"cameraNotWorkning": "Kamera fungerar ej. Välj en avatar istället.", 
 
 "STARTVIEW": "",
 	"createGame": "Skapa spel",
