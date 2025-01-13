@@ -143,8 +143,8 @@ export default {
         console.error("Video stream is not available.");
         this.stopCamera();
         this.isCameraAvailable = true;
-        this.$emit("update:cameraState", false); // Allow retry if error occurs
-        this.$emit("update:isPictureTaken", false); // Allow retry if error occurs
+        this.$emit("update:cameraState", false); 
+        this.$emit("update:isPictureTaken", false);
       }
       this.$emit("update:avatar", this.avatar);
     },
