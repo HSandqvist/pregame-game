@@ -64,9 +64,7 @@ export default {
     startCamera: function () {
       this.$emit("update:isPictureTaken", false);
       this.$emit("update:disableSwitcher", true);
-      //this.isPictureTaken = false;
       this.$emit("update:cameraState", true);
-      //this.disableSwitcher = true;
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -84,7 +82,6 @@ export default {
         .then((stream) => {
           this.stream = stream;
           this.$refs.video.srcObject = stream;
-          console.log("Camera stream is active:", stream);
         })
         .catch((error) => {
           console.error("Error accessing camera:", error);
@@ -98,7 +95,6 @@ export default {
     // Stop the camera stream
     stopCamera: function () {
       if (this.stream) {
-        console.log("stopping stream", this.stream);
         const tracks = this.stream.getTracks();
         tracks.forEach((track) => track.stop()); //stop all tracks
         this.stream = null; //added
@@ -108,7 +104,6 @@ export default {
       }
       this.$emit("update:cameraState", false)
       this.$emit("update:disableSwitcher", false);
-      //this.disableSwitcher = false;
     },
 
     // Capture the image from the video stream
@@ -130,10 +125,6 @@ export default {
 
         // Convert canvas to a base64 image string
         this.avatar = canvas.toDataURL("image/png");
-
-        // Log to check the base64 image
-        console.log("Avatar captured");
-        //console.log("Captured Avatar: ", this.avatar);
 
         this.$emit("update:cameraState", false); // Disable camera actions
 

@@ -92,7 +92,6 @@ export default {
 .answer {
   padding: 1em;
   border: 1px solid black;
-  user-drag: none; /* Doesn't seem to exist */
 }
 
 /* Highlight the currently dragged item with a wiggle animation */

@@ -1,6 +1,4 @@
-// Import necessary functions from Vue Router for creating a router and history
 import { createRouter, createWebHistory } from 'vue-router'
-// Import the StartView component for the root path
 import StartView from '../views/StartView.vue'
 
 // Create a router instance and configure it

@@ -179,9 +179,6 @@ export default {
 
     socket.on("participantsUpdate", (p) => {
       this.participants = p;
-      // Ensure the check runs after the participants array is updated
-      //console.log("participants är", this.participants);
-
       this.$router.push(`/waiting/${this.pollId}/${this.userId}`);
 
       socket.off("participantsUpdate");
@@ -215,7 +212,6 @@ export default {
       } else if (this.step < 5) {
         this.step++;
       }
-      console.log(this.step);
     },
 
     setUserId: function () {
@@ -236,14 +232,12 @@ export default {
       // Listen for the server's response
       socket.on("adminCheckResult", (data) => {
         if (data.isAdmin) {
-          console.log("You are the admin for this poll.");
           this.isAdmin = true; // Set admin flag
         } else if (data.error) {
           console.error(data.error); // Handle errors (e.g., poll does not exist)
           alert(data.error);
           return; // Stop further execution
         } else {
-          console.log("You are not the admin for this poll.");
           this.isAdmin = false; // Set participant flag
         }
         // Execute the callback after admin check

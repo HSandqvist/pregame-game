@@ -180,17 +180,11 @@ export default {
     socket.emit("getUILabels", this.lang);
 
     socket.on("pollsUpdate", (data) => {
-      console.log("pollData event received:");
       this.pollData = data;
       this.participants = data.participants;
 
-      console.log("pollData är", this.pollData);
-      console.log("participants är", this.participants);
-
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
-        console.log("atLeastThree är", this.participants.length);
-        console.log("this joined är", this.joined);
       }
     });
     socket.emit("getPolls", this.pollId);
@@ -198,14 +192,12 @@ export default {
 
     socket.on("adminCheckResult", (data) => {
       if (data.isAdmin) {
-        console.log("You are the admin for this poll.");
         this.isAdmin = true; // Set admin flag
       } else if (data.error) {
         console.error(data.error); // Handle errors (e.g., poll does not exist)
         alert(data.error);
         return; // Stop further execution
       } else {
-        console.log("You are not the admin for this poll.");
         this.isAdmin = false; // Set participant flag
       }
       // Execute the callback after admin check
@@ -213,23 +205,10 @@ export default {
     });
 
     socket.on("waitingParticipantsUpdate", (p) => {
-      console.log("waitingParticipantsUpdate event received:");
       this.participants = p;
-      // Ensure the check runs after the participants array is updated
-      console.log("participants är", this.participants);
     });
 
     socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
-
-    //socket.on("participantsUpdate", (p) => {
-    // console.log("participantsUpdate event received:");
-    // this.participants = p;
-    // this.checkAtLeastThree();
-    // this.tempUserID= localStorage.getItem("userId")
-
-    // Ensure the check runs after the participants array is updated
-    //console.log("participants är", this.participants);
-    //});
 
     //Listen for start game from server
     socket.on("adminStartGame", () => this.participantStartGame());
@@ -240,11 +219,8 @@ export default {
     // Emit events to join the poll and get UI labels
 
     socket.on("adminLeftPoll", () => {
-      //this.leavePoll();
-      console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
         this.showModalGameEnds = true;
-        
       }
       this.leavePoll();
     });
@@ -264,7 +240,6 @@ export default {
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
       });
-     
     },
 
     leavePoll: function () {
@@ -278,7 +253,6 @@ export default {
     },
 
     adminStartGame: function () {
-      console.log("adminStartGame event emitted");
       socket.emit("startGame", this.pollId);
     },
 
@@ -300,7 +274,6 @@ export default {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
-
       this.nextStep(); //hoppa till nästa steg
     },
 

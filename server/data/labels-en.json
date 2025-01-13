@@ -86,9 +86,5 @@
 	"POLLVIEW": "On this page, you can vote for your fellow players<br>by dragging and dropping their avatars.",
 	"ADMINPOLLVIEW": "On this page, you can vote for your fellow players<br>by dragging and dropping their avatars. <br> When you press 'Next question', all players will move on to the next question,<br>regardless of whether they have voted or not.",
 	"RESULTVIEW": "Well done!<br>Here, you can see the results of the game. If you want to play again, you can click 'Start a new game'."
-}
 	}
-
-
-
-
+}
