@@ -127,7 +127,7 @@ import InstructionButton from "@/components/InstructionButton.vue"; //Import Ins
 import ConfirmLeaveModal from "@/components/modals/ConfirmLeaveModal.vue";
 import AdminLeftModal from "@/components/modals/AdminLeftModal.vue";
 
-const socket = io("localhost:3000");
+const socket = io(sessionStorage.getItem("dataServer"));
 
 // ---- FOR ALLOWING OTHERS TO JOIN, CHANGE TO YOUR LOCAL IP ADDRESS ----
 //const socket = io("130.243.223.240:3000"); // Initialize mutliple joiners

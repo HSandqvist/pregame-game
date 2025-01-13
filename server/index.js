@@ -1,18 +1,32 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
+import express from "express";
 
-// Create an HTTP server instance
-const httpServer = createServer();
+let httpServer;
+let io;
 
-// Initialize a new Socket.io server instance and configure it
-const io = new Server(httpServer, {
-  cors: {
-    //THIS SHOULD BE CHANGED AFTER DEVLPOMENT
-    origin: "*", // Allow requests from the specified frontend origin
-    methods: ["GET"], // Specify allowed HTTP methods
-    credentials: true // Enable sending credentials (e.g., cookies) with cross-origin requests
-  }
-});
+if (process.env.NODE_ENV === "production") {
+  const app = express();
+  httpServer = createServer(app);
+  io = new Server(httpServer);
+  let path = import.meta.dirname.split("/");
+  path.pop();
+  app.use(express.static(path.join("/") + "/dist/"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join("/") + "/dist/index.html");
+  });
+} else {
+  // Create an HTTP server instance
+  httpServer = createServer();
+  // Initialize a new Socket.io server instance and configure it
+  io = new Server(httpServer, {
+    cors: {
+      origin: "*",
+      methods: ["GET"],
+      credentials: true
+    }
+  });
+}
 
 // Import the Data class to manage server-side data
 // This class handles all poll-related data and logic
