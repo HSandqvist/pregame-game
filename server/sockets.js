@@ -16,34 +16,6 @@ function sockets(io, socket, data) {
     socket.emit("pollData", data.getPoll(d.pollId));
   });
 
-  //används ej
-  /*
-  // Event: Add a new question to a poll
-  socket.on("addQuestion", function (d) {
-    // Add the question and answer options to the specified poll
-    data.addQuestion(d.pollId, { q: d.q, a: d.a });
-    // Emit the updated question data to the client
-    socket.emit("questionUpdate", data.getQuestion(d.pollId));
-  });*/
-
-  //används ej
-  /*
-  // Event: Add a new question to a poll //KOLLA VAD DENNA GÖR EXAKT!!
-  socket.on("addQuestion", function (d) {
-    const pollId = d.pollId;
-    const question = d.q; // The question text
-
-    // Add the question and random answer options to the poll
-    data.addQuestion(pollId, question);
-
-    // Emit the updated question data with answers to the client
-    const questionData = data.getQuestion(pollId);
-    socket.emit("questionUpdate", questionData);
-
-    // Optionally, broadcast the updated question to all participants
-    io.to(pollId).emit("questionUpdate", questionData);
-  });*/
-
   socket.on("leavePoll", function (d) {
     const { pollId, userId } = d;
     const poll = data.getPoll(pollId);
@@ -147,10 +119,18 @@ function sockets(io, socket, data) {
   socket.on("participateInPoll", function (d) {
     //see who is joining
     console.log("Participant joining poll:", d.name);
+
+    const poll = data.getPoll(d.pollId);
+    if (poll.participants.length >= 8) {
+      socket.emit("error", { message: "Lobby is full. Maximum participants reached." });
+      return; // Stop further processing
+    }
+
     // Add a new participant to the poll
     var testerIsAdmin= false;
-    if( d.userId == data.getPoll(d.pollId).adminId){ testerIsAdmin = true;}
-    console.log("isAdmin", testerIsAdmin);
+    if( d.userId == data.getPoll(d.pollId).adminId) { 
+      testerIsAdmin = true;
+    }
 
     data.participateInPoll(d.pollId, d.name, d.avatar, d.userId, testerIsAdmin);
     // Notify all clients in the poll room about the updated participant list
@@ -183,19 +163,6 @@ function sockets(io, socket, data) {
     console.log("in to Results socket");
     io.to(pollId).emit("finishGame");
   });
-
-  /*// Event: Run a specific question in a poll
-  socket.on("runQuestion", function (d) {
-    // Get the specified question and update the current question in the poll
-    let question = data.getQuestion(d.pollId, d.questionNumber);
-    // Notify all clients in the poll room with the question data
-    io.to(d.pollId).emit("questionUpdate", question);
-    // Notify all clients with the submitted answers for the current question
-    io.to(d.pollId).emit(
-      "submittedAnswersUpdate",
-      data.getSubmittedAnswers(d.pollId)
-    );
-  });*/
 
   socket.on("getCurrentParticipant", function ({ pollId, userId }) {
     // Retrieve the poll using the provided pollId
@@ -289,9 +256,11 @@ function sockets(io, socket, data) {
 
   socket.on("checkLobbyExists", (pollId, callback) => {
     if (data.pollExists(pollId)) {
-      callback({ exists: true }); // Respond with true if the poll exists
+      const poll = data.getPoll(pollId);
+      const isLobbyFull = poll.participants.length >= 8;
+      callback({ exists: true, isFull: isLobbyFull }); // Respond with true if the poll exists
     } else {
-      callback({ exists: false }); // Respond with false if the poll doesn't exist
+      callback({ exists: false, isFull: false }); // Respond with false if the poll doesn't exist
     }
   });
 

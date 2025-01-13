@@ -38,7 +38,7 @@
         />
       </div>
       <ErrorMessage :message="errorMessage" />
-      <button class="btn" @click="attemptJoin">
+      <button class="btn" @click="attemptJoin" :disabled="isLobbyFull">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
 
@@ -91,6 +91,7 @@ export default {
       errorMessage: "", // Error message for invalid Lobby ID
 
       motionGrowBiggerAndGlow, // Motion settings
+      isLobbyFull: false,
     };
   },
   created() {
@@ -159,13 +160,17 @@ export default {
         return;
       }
 
-      // Validate lobby existence
+      // Validate lobby existence and participant count
       socket.emit("checkLobbyExists", lobbyId, (response) => {
-        if (response.exists) {
+        if (!response.exists) {
+          this.errorMessage = "Lobby does not exist. Please check the ID.";
+        } else if (response.isFull) {
+          this.errorMessage = "Lobby is full. Please try another lobby.";
+          this.isLobbyFull = true; // Update the full lobby status
+        } else {
+          this.isLobbyFull = false; // Reset if not full
           localStorage.removeItem("userId");
           this.$router.push(`/lobby/${lobbyId}`);
-        } else {
-          this.errorMessage = "Lobby does not exist. Please check the ID.";
         }
       });
     },
