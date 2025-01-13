@@ -126,8 +126,7 @@ export default {
     socket.on("uiLabels", (labels) => (this.uiLabels = labels));
     socket.on("pollData", (data) => (this.pollData = data));
     socket.emit("getUILabels", this.lang);
-    //this.generateAdminID() görs redan
-  },
+    },
 
   methods: {
     // Update language when changed in LanguageSwitcher
@@ -143,11 +142,9 @@ export default {
     generateAdminID: function () {
       this.adminId = Math.floor(10000 + Math.random() * 90000); //specified adminId to set a participant to admin
       const userId = this.adminId;
-      console.log("Admin ID is:", this.adminId);
 
       //setting in local storage name item, visuable to admin only
       localStorage.setItem("userId", userId);
-      console.log("User ID stored:", localStorage.getItem("userId"));
     },
 
     finalizeQuestions: function () {
@@ -201,7 +198,6 @@ export default {
 
       // Emit the JSON data to the server
       try {
-        //console.log("Questions to be sent:", allQuestionsFromFile);
         socket.emit("sendQuestionsFromFileData", allQuestionsFromFile); // Send data to the server
       } catch (error) {
         console.error("Error sending questions to server:", error);

@@ -4,13 +4,12 @@
         <p>
           <!-- Display the message, with a fallback if no label is provided -->
           {{
-            this.uiLabels.returnToStart ||
-            "Do you want to return to start?"
+            this.uiLabels.cameraNotWorkning ||
+            "Camera doesn't support you device. Please, chose an avatar."
           }}
         </p>
         <!-- Button for confirming the action -->
-        <button @click="confirm">{{ this.uiLabels.yes || "Yes" }} </button>
-        <button @click="cancel">{{ this.uiLabels.no || "No" }}</button>
+        <button @click="confirm">{{ this.uiLabels.ok || "Okey" }} </button>
       </div>
     </div>
   </template>
@@ -25,9 +24,6 @@
       confirm() {
         this.$emit("confirm");
       },
-      cancel() {
-        this.$emit("cancel");
-      }
     },
   };
   </script>

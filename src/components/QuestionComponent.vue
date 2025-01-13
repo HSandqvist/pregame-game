@@ -13,16 +13,16 @@
           class="draggable"
           draggable="true"
           @dragstart="onDragStart(participant)"
+          @touchstart="onTouch(participant)"
         >
-          <div class="participant-container">
-            <!-- p>{{ participant.name }}</p-->
+            <div :class="draggedParticipant === participant ? 'participant-container-touched' : 'participant-container'">
             <div class="curved-text">
               <span
-                v-for="(char, i) in participant.name.split('')"
-                :key="i"
-                :style="getCurvedStyle(i, participant.name.length)"
+              v-for="(char, i) in participant.name.split('')"
+              :key="i"
+              :style="getCurvedStyle(i, participant.name.length)"
               >
-                {{ char }}
+              {{ char }}
               </span>
             </div>
             <img
@@ -30,13 +30,20 @@
               alt="Participant Avatar"
               class="participant-avatar"
             />
-          </div>
+            </div>
         </div>
       </div>
 
       <!-- Drop zone -->
-      <div class="drop-zone" @dragover.prevent @drop="onDrop">
-        {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
+      <div class="drop-zone" @dragover.prevent @drop="onDrop" @touchend="onDrop">
+        <div v-if="!touched">
+          {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
+        </div>
+        <div v-if="touched">
+          {{ this.uiLabels.clickHere || "Click your answer here" }}
+        </div>
+
+       
       </div>
     </div>
 
@@ -51,7 +58,6 @@
       </span>
     </h2>
 
-    <!-- h2 v-if="voting" v-motion="jumpingCharacter"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </h2 -->
   </div>
 </template>
 
@@ -69,6 +75,7 @@ export default {
   data() {
     return {
       draggedParticipant: null, // Temporarily holds the dragged participant
+      touched: false
     };
   },
   computed: {
@@ -92,18 +99,24 @@ export default {
       this.draggedParticipant = participant;
     },
 
+    onTouch: function(participant) {
+      this.onDragStart(participant);
+      this.touched = true;
+
+    },
+
     // When an item is dropped in the drop zone
     onDrop: function () {
       if (this.draggedParticipant) {
         // Emit the dragged participant as the selected answer
         this.$emit("answer", this.draggedParticipant);
-
+        this.touched = false;
         // Clear the temporary variable
         this.draggedParticipant = null;
       }
     },
-
-    getCurvedStyle(index, length) {
+   
+    getCurvedStyle: function(index, length) {
       const angleStep = 12; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
@@ -132,7 +145,7 @@ export default {
 }
 
 .participant-avatar:active {
-  transform: scale(1.1); /* Slightly enlarge the avatar when dragging */
+  transform: scale(1.05); /* Slightly enlarge the avatar when dragging */
 }
 
 /* Draggable answer options */
@@ -158,7 +171,7 @@ export default {
 
 .draggable:active {
   cursor: grabbing;
-  transform: scale(1.05);
+  transform: scale(1.00);
 }
 
 /* Container for draggable items */
@@ -180,6 +193,13 @@ export default {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   align-items: center; /* Center name and avatar horizontally */
+}
+
+.participant-container-touched {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center name and avatar horizontally */
+  transform: scale(1.2); /* Make the container a bit bigger */
 }
 
 .curved-text {
@@ -229,5 +249,9 @@ h2 span {
     max-width: 6rem;
     max-height: 6rem;
   }
+
+  .participant-avatar:active {
+  transform: scale(1.01); /* Slightly enlarge the avatar when dragging */
+}
 }
 </style>

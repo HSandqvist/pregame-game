@@ -74,19 +74,15 @@ export default {
   },
   methods: {
     selectAvatar(avatar) {
-      console.log("avatarOptions", this.avatarOptions.length);
-      console.log("takenAvatars", this.takenAvatars.length);
 
       if (!this.isAvatarTaken(avatar)) {
         this.chosenAvatar = avatar;
-        //this.$emit("update:avatar", avatar);
         this.$emit("update:isPictureTaken", true);
         this.$emit("avatar-selected", avatar); // Notify parent component
       }
     },
 
     isAvatarTaken(avatar) {
-      console.log("Checking if avatar is taken:", avatar);
 
       return this.takenAvatars.includes(avatar);
     },

@@ -6,7 +6,7 @@
       <div class="camera-view">
         <p v-if="!cameraState && !isPictureTaken">
           <img
-            :src="cameraPicIcon"
+            :src="noImageIcon"
             alt="Default Camera Placeholder"
             width="320"
             height="240"
@@ -29,26 +29,37 @@
         </button>
       </div>
     </div>
+
+    <CameraError
+      :show="isCameraAvailable"
+      :uiLabels="uiLabels"
+      @confirm="isCameraAvailable = false"
+    />
   </div>
 </template>
 
 <script>
 //importera bild på kamera att ha som default när ingen bild har tagits
-import cameraPicIcon from "@/assets/img/cameraPicIcon.png";
+import noImageIcon from "@/assets/img/noImageIcon.png";
+import CameraError from "@/components/modals/CameraError.vue";
 
 export default {
   name: "CameraComponent",
+  components: {
+    CameraError,
+  },
   props: {
     uiLabels: {},
     disableSwitcher: {},
     isPictureTaken: {},
+    cameraState: {},
   },
   data: function () {
     return {
       avatar: null, // Ensure avatar is defined in the data
-      cameraState: false,
       stream: null, // The video stream to access the camera
-      cameraPicIcon,
+      noImageIcon,
+      isCameraAvailable: false,
     };
   },
   methods: {
@@ -64,9 +75,7 @@ export default {
     startCamera: function () {
       this.$emit("update:isPictureTaken", false);
       this.$emit("update:disableSwitcher", true);
-      //this.isPictureTaken = false;
-      this.cameraState = true;
-      //this.disableSwitcher = true;
+      this.$emit("update:cameraState", true);
 
       // Stop any existing camera stream before starting a new one, make sure always turned off
       if (this.stream) {
@@ -84,21 +93,19 @@ export default {
         .then((stream) => {
           this.stream = stream;
           this.$refs.video.srcObject = stream;
-          console.log("Camera stream is active:", stream);
         })
         .catch((error) => {
           console.error("Error accessing camera:", error);
-          alert(
-            "Unable to access the camera. Please check your camera settings."
-          );
-          this.cameraState = false; // Allow retry if error occurs
+          this.stopCamera();
+          this.isCameraAvailable = true;
+          this.$emit("update:cameraState", false); // Allow retry if error occurs
+          this.$emit("update:isPictureTaken", false); // Allow retry if error occurs
         });
     },
 
     // Stop the camera stream
     stopCamera: function () {
       if (this.stream) {
-        console.log("stopping stream", this.stream);
         const tracks = this.stream.getTracks();
         tracks.forEach((track) => track.stop()); //stop all tracks
         this.stream = null; //added
@@ -106,16 +113,13 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.srcObject = null; // Clear the video element source
       }
-      this.cameraState = false;
+      this.$emit("update:cameraState", false);
       this.$emit("update:disableSwitcher", false);
-      //this.disableSwitcher = false;
     },
 
     // Capture the image from the video stream
     captureImage: function () {
       const video = this.$refs.video;
-
-      //this.isPictureTaken = true;
       this.$emit("update:isPictureTaken", true);
 
       if (video && video.videoWidth > 0 && video.videoHeight > 0) {
@@ -131,18 +135,17 @@ export default {
         // Convert canvas to a base64 image string
         this.avatar = canvas.toDataURL("image/png");
 
-        // Log to check the base64 image
-        console.log("Avatar captured");
-        //console.log("Captured Avatar: ", this.avatar);
-
-        this.cameraState = false; // Disable camera actions
+        this.$emit("update:cameraState", false); // Disable camera actions
 
         // Stop the camera stream after capturing the image
         this.stopCamera();
       } else {
         console.error("Video stream is not available.");
+        this.stopCamera();
+        this.isCameraAvailable = true;
+        this.$emit("update:cameraState", false); 
+        this.$emit("update:isPictureTaken", false);
       }
-
       this.$emit("update:avatar", this.avatar);
     },
 
@@ -209,12 +212,13 @@ img {
 }
 
 .camera-buttons button {
-  background-color: rgb(225, 95, 150); /* Darker pink */
+  background-color: rgb(252, 63, 173);
   min-width: 10rem;
+  border: solid 0.06rem rgb(214, 25, 135);
 }
 
 .camera-buttons button:hover {
-  background-color: rgb(205, 85, 140); /* Darker hover effect */
+  background-color: rgb(214, 25, 135); /* Darker hover effect */
 }
 
 button {
@@ -258,8 +262,7 @@ button {
     margin-bottom: 0;
   }
   .camera-buttons {
-    margin:0;
+    margin: 0;
   }
-
 }
 </style>
