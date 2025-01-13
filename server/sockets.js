@@ -67,7 +67,6 @@ function sockets(io, socket, data) {
       pollId: poll.pollId,
       currentView: poll.currentView,
       currentQuestion: poll.currentQuestion,
-      participants: poll.participants,
     });
   });
 
