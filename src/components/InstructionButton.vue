@@ -9,11 +9,10 @@
       <p v-html="instructions"></p>
       <button @click="toggleInstructions">X</button>
     </div>
-</div>
+  </div>
 </template>
 
 <script>
-
 export default {
   name: "InstructionButton",
   props: {
@@ -31,18 +30,18 @@ export default {
   computed: {
     instructions() {
       return (
-        this.labels?.INSTRUCTIONS?.[this.viewKey] ||
+        this.labels?.INSTRUCTIONS?.[this.viewKey] ??
         "No instructions available."
       );
     },
     instructionsTitle() {
-    return (
-      this.labels?.INSTRUCTIONS_TITLE ||
-      this.uiLabels?.instructions || // ifall du vill falla tillbaka på props
-      "Instructions"                 // fallback om inget annat finns
-    );
+      return (
+        this.labels?.INSTRUCTIONS_TITLE ||
+        this.uiLabels?.instructions || // ifall du vill falla tillbaka på props
+        "Instructions" // fallback om inget annat finns
+      );
+    },
   },
-},
   methods: {
     toggleInstructions() {
       this.showInstructions = !this.showInstructions;
@@ -95,7 +94,6 @@ export default {
   top: 1rem;
   left: 1rem;
   z-index: 1010;
-
 }
 
 .instruction-button {
@@ -152,6 +150,6 @@ export default {
   cursor: pointer;
 }
 .instructions-popup button:hover {
-    transform: scale(1.1); /* Liten zoom vid hover */
+  transform: scale(1.1); /* Liten zoom vid hover */
 }
 </style>

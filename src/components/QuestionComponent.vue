@@ -261,9 +261,28 @@ h2 span {
     transform: scale(1.01); /* Slightly enlarge the avatar when dragging */
   }
 
+  .curved-text span {
+    font-size: 0.7rem;
+  }
+
   #waiting-answers-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     min-width:21rem;
+  }
+}
+
+@media (max-height: 750px) {
+  .participant-avatar {
+    max-width: 3.5rem;
+    max-height: 3.5rem;
+  }
+
+  .curved-text span {
+    font-size: 0.55rem;
+  }
+  .drop-zone {
+    max-width: 5rem;
+    max-height: 5rem;
   }
 }
 </style>

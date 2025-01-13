@@ -11,7 +11,7 @@
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
-        viewKey="NOQUESTIONS"
+        :viewKey="'NOQUESTIONS'"
       />
       <h2>{{ this.uiLabels.numberOfQuestions || "Number of questions" }}:</h2>
       <div class="amount-questions-buttons">
@@ -36,7 +36,7 @@
       <InstructionButton
         :uiLabels="uiLabels"
         :lang="lang"
-        viewKey="LANGUAGECHOICE"  
+        :viewKey="'LANGUAGECHOICE'"  
       />
       <h2>
         {{
