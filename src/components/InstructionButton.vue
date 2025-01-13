@@ -5,7 +5,7 @@
     </button>
 
     <div v-if="showInstructions" class="instructions-popup">
-      <h3>{{ uiLabels.instructions || "Instructions" }}</h3>
+      <h3>{{ instructionsTitle }}</h3>
       <p v-html="instructions"></p>
       <button @click="toggleInstructions">X</button>
     </div>
@@ -35,7 +35,14 @@ export default {
         "No instructions available."
       );
     },
+    instructionsTitle() {
+    return (
+      this.labels?.INSTRUCTIONS_TITLE ||
+      this.uiLabels?.instructions || // ifall du vill falla tillbaka på props
+      "Instructions"                 // fallback om inget annat finns
+    );
   },
+},
   methods: {
     toggleInstructions() {
       this.showInstructions = !this.showInstructions;

@@ -29,7 +29,7 @@
 
 
 "LOBBYVIEW": "",
-	"pleaseEnterYourName": "Skriv in ditt namn",
+	"pleaseEnterYourName": "Välj avatarnamn",
 	"captureYourAvatar": "Ta din avatarbild",
 	"chooseYourAvatar": "Välj din avatar",
 	"startCamera": "Starta Kameran",
@@ -73,6 +73,7 @@
 	"startNewGame": "Avsluta spel!",
 	"skip": "Skippa",
 
+	"INSTRUCTIONS_TITLE": "Instruktioner",
 "INSTRUCTIONS": {
 	"STARTVIEW": "Välkommen till startsidan!<br>Här kan du välja om du vill skapa ett nytt spel eller gå med i ett existerande spel.",
 	"PINVIEW":"Här anger du det Lobby-ID som visas på skärmen hos den som skapade spelet.",
@@ -84,6 +85,7 @@
 	"ADMINLOBBYVIEW": "Detta är lobbyn där du kan se alla deltagare.<br>Vänta tills alla deltagare är redo innan du startar spelet.",
 	"LOBBYVIEW": "Detta är lobbyn där du kan se alla deltagare.<br>När alla deltagare är redo kommer admin att starta spelet.",
 	"POLLVIEW": "På denna sida kan du rösta på dina medspelare<br>genom att dra och släppa deras avatarer.",
+	"ADMINPOLLVIEW": "På denna sida kan du rösta på dina medspelare<br>genom att dra och släppa deras avatarer. <br> När du trycker på 'Nästa fråga' kommer samtliga spelare att gå vidare till nästa fråga,<br>oavsett om de har röstat eller inte.",
 	"RESULTVIEW": "Bra jobbat! <br> Här kan du se resultaten av spelet. Vill du spela en gång till så kan du trycka på 'Starta nytt spel'."
 	}
 }

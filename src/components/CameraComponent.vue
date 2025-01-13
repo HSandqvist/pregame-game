@@ -6,7 +6,7 @@
       <div class="camera-view">
         <p v-if="!cameraState && !isPictureTaken">
           <img
-            :src="cameraPicIcon"
+            :src="noImageIcon"
             alt="Default Camera Placeholder"
             width="320"
             height="240"
@@ -40,7 +40,7 @@
 
 <script>
 //importera bild på kamera att ha som default när ingen bild har tagits
-import cameraPicIcon from "@/assets/img/cameraPicIcon.png";
+import noImageIcon from "@/assets/img/noImageIcon.png";
 import CameraError from "@/components/modals/CameraError.vue";
 
 export default {
@@ -58,7 +58,7 @@ export default {
     return {
       avatar: null, // Ensure avatar is defined in the data
       stream: null, // The video stream to access the camera
-      cameraPicIcon,
+      noImageIcon,
       isCameraAvailable: false,
     };
   },
