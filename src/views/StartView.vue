@@ -25,7 +25,7 @@
         viewKey="PINVIEW"
       />
       <PinInput :pin-length="6" @pin-updated="updatePin" />
-    
+      
       <button class="btn" @click="attemptJoin" :disabled="isLobbyFull">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
@@ -221,7 +221,6 @@ export default {
   bottom: 3rem;
   left: 3rem;
 }
-
 .error-message-container {
   height: 1.5rem; 
   display: flex;
