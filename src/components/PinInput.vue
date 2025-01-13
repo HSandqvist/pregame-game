@@ -1,21 +1,16 @@
 <template>
-  <div class="pin-container">
-    <div class="pin-box-container">
-      <input
-        v-for="(digit, index) in digits"
-        :key="index"
-        type="text"
-        maxlength="1"
-        inputmode="numeric"
-        class="pin-box"
-        :value="digit"
-        @input="$emit('input-change', index, $event.target.value)"
-        @keydown.backspace="$emit('backspace', index)"
-        ref="pinBoxes"
-      />
-    </div>
-    <button class="btn" @click="$emit('submit')">Submit PIN</button>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+  <div class="pin-input-container">
+    <input
+      v-for="(value, index) in pin"
+      :key="index"
+      type="text"
+      maxlength="1"
+      class="pin-input"
+      v-model="pin[index]"
+      :ref="'pin-' + index"
+      @input="handleInput(index, $event)"
+      @keydown="handleBackspace(index, $event)"
+    />
   </div>
 </template>
 
@@ -23,65 +18,70 @@
 export default {
   name: "PinInput",
   props: {
-    digits: {
-      type: Array,
-      required: true,
+    pinLength: {
+      type: Number,
+      default: 6, // Default PIN length
     },
-    errorMessage: {
-      type: String,
-      default: "",
+  },
+  data() {
+    return {
+      pin: Array(this.pinLength).fill(""), // Initialize PIN array based on length
+    };
+  },
+  emits: ["pin-updated"],
+  methods: {
+    handleInput(index, event) {
+      const value = event.target.value;
+      if (!/^\d$/.test(value)) {
+        this.pin[index] = ""; // Clear invalid input
+        return;
+      }
+      this.pin[index] = value;
+      if (index < this.pinLength - 1) {
+        this.$refs[`pin-${index + 1}`][0].focus(); // Move focus to next box
+      }
+      this.$emit("pin-updated", this.pin.join("")); // Emit updated PIN
     },
+    handleBackspace(index, event) {
+      if (event.key === "Backspace") {
+        this.pin[index] = ""; // Clear current box
+        if (index > 0) {
+          this.$refs[`pin-${index - 1}`][0].focus(); // Focus previous box
+        }
+        this.$emit("pin-updated", this.pin.join("")); // Emit updated PIN
+      }
+    },
+    focusFirstInput() {
+      this.$nextTick(() => {
+        const firstInput = this.$refs["pin-0"]?.[0];
+        if (firstInput) firstInput.focus(); // Focus the first input box
+      });
+    },
+  },
+  mounted() {
+    this.focusFirstInput(); // Automatically focus the first input box when mounted
   },
 };
 </script>
 
 <style scoped>
-/* Container for the PIN input and buttons */
-.pin-container {
+/* Same styles as before */
+.pin-input-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
-/* Align all PIN input boxes in a row */
-.pin-box-container {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-/* Style each PIN input box */
-.pin-box {
-  width: 2.5rem;
-  height: 2.5rem;
+.pin-input {
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
   font-size: 1.5rem;
-  text-align: center;
-  border: 2px solid #343a40;
-  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
 }
 
-/* Button for submitting the PIN */
-.btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  border-radius: 0.5rem;
-  text-align: center;
-  cursor: pointer;
-}
-
-/* Button hover effect */
-.btn:hover {
-  background-color: #0056b3;
-}
-
-/* Error message styling */
-.error-message {
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+.pin-input:focus {
+  border-color: #007bff;
+  outline: none;
 }
 </style>
