@@ -1,5 +1,5 @@
 "use strict";
-import { readFileSync } from "fs"; // Import the readFileSync function for reading files, reading questions
+import { readFileSync } from "fs";
 
 // Define a Data class to encapsulate poll data and keep the global namespace clean.
 // In a real-world scenario, this would interface with a database.
@@ -45,9 +45,9 @@ Data.prototype.createPoll = function (
       currentView: "question_view", // Start with the question view
       currentQuestion: 0, // Start with the first question
 
-      questions: [], // Empty array for questions
-      answers: [], // Empty array for answers
-      participants: [], // Empty array for participants
+      questions: [],
+      answers: [],
+      participants: [],
 
       adminId: adminId,
       categoryWinners: {}, // To store the top participants for each category
@@ -56,7 +56,6 @@ Data.prototype.createPoll = function (
       globalTopAvatar: "test",
     };
     this.polls[pollId] = poll; // Add the poll to the polls object
-    console.log("Poll created", pollId, poll, "Admin is:", adminId);
   }
   return this.polls[pollId];
 };
@@ -76,9 +75,7 @@ Data.prototype.participateInPoll = function (
   userId,
   isAdmin
 ) {
- 
-  // console.log("participant will be added to", pollId, name);
-  
+   
   console.log("participant will be added to", pollId, name, userId, isAdmin);
   this.polls[pollId].participants.push({
     name: name,
@@ -96,14 +93,6 @@ Data.prototype.getParticipants = function (pollId) {
   }
   return [];
 };
-
-/* //används inte i nuläget
-// Add a question to a poll
-Data.prototype.addQuestion = function (pollId, q) {
-  if (this.pollExists(pollId)) {
-    this.polls[pollId].questions.push(q);
-  }
-};*/
 
 // Retrieve a specific question from a poll
 Data.prototype.getQuestion = function (pollId) {
@@ -143,34 +132,26 @@ Data.prototype.submitAnswer = function (pollId, answer, voter) {
       answers[answer.name] = { count: 0, voters: [], avatar: answer.avatar };
       console.log("");
     }
-    console.log("answers answer är", answer);
 
     // Increment the count for this answer
     answers[answer.name].count += 1;
 
     // Log the voter for the option
     answers[answer.name].voters.push(voter);
-
-    console.log(
-      `Sumbit answer: Updated answers for question ${currentQuestion} in poll ${pollId}:`,
-      answers
-    );
   }
 };
+
 Data.prototype.updateView = function (pollId, view) {
   const poll = this.polls[pollId];
   if (view === "question_view") {
     if (poll.questionCount - 1 === poll.currentQuestion) {
       poll.currentView = "final_view";
-      console.log("Changed to final results view.");
     } else {
       poll.currentView = "results_view";
-      console.log("Changed to results view.");
     }
   } else {
     // Switch view to show the result after answer submission
     poll.currentView = "question_view";
-    console.log("Changed to question view.");
   }
 };
 
@@ -178,7 +159,6 @@ Data.prototype.votingReset = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
     const currentQuestion = poll.currentQuestion; //ger ett index??
-    console.log("data votingreset har currentquestion:", currentQuestion);
     // Save the winner to the category using the complementary function
     this.updateCategoryWinner(
       pollId,
@@ -191,18 +171,14 @@ Data.prototype.votingReset = function (pollId) {
     poll.currentQuestion += 1; // Increment to the next question
 
     poll.answers[poll.currentQuestion] = {}; // Initialize answers for the new question
-    console.log(
-      "data votingreset har uppdaterat currentquestion till:",
-      poll.currentQuestion
-    );
+    
   }
 };
 
 Data.prototype.runQuestion = function (pollId) {
   if (this.pollExists(pollId)) {
     const poll = this.polls[pollId];
-    const currentQuestion = poll.currentQuestion; //ger ett index??
-    console.log("data runQuestion har currentquestion:", currentQuestion);
+    const currentQuestion = poll.currentQuestion;
 
     // Determine the top answer for the current question
     const answers = poll.answers[currentQuestion];
@@ -217,17 +193,11 @@ Data.prototype.runQuestion = function (pollId) {
         maxVotes = count;
         topAnswer = answer;
         topAvatar = avatar;
-        //topAnswer = {answer, avatar};
         this.globalTopAnswer = topAnswer;
         this.globalTopAvatar = topAvatar;
 
       }
     }
-
-    // Log the top answer for the current question
-    console.log(
-      `Top answer for poll ${pollId}, question ${poll.questions[currentQuestion].q}: ${topAnswer} with ${maxVotes} votes.`
-    );
 
     // Return the topAnswer and maxVotes (to sockets then to clients)
     return { topAnswer, maxVotes, topAvatar };
@@ -265,10 +235,6 @@ Data.prototype.updateCategoryWinner = function (
       avatar: topParticipantAvatar || "", // Include avatar
     };
 
-    console.log(
-      `Updated categoryWinners for category '${category}':`,
-      poll.categoryWinners[category]
-    );
   } else {
     console.error(`Poll ID ${pollId} does not exist.`);
   }
@@ -305,9 +271,8 @@ Data.prototype.generateQuestions = function (pollId, questionCount) {
     }
 
     poll.questions = questions; // Assign the questions to the poll
-    console.log(`Generated questions for poll ${pollId}:`, questions);
 
-    return questions; //behövs nog inte om inte för debug
+    return questions; // behövs nog inte om inte för debug
   }
   return []; //behövs nog inte om inte för debug
 };
