@@ -244,7 +244,6 @@ export default {
       console.log("adminLeftPoll event received");
       if (!this.isAdmin) {
         this.showModalGameEnds = true;
-        
       }
       this.leavePoll();
     });
@@ -264,7 +263,6 @@ export default {
       socket.emit("adminLeavePoll", {
         pollId: this.pollId,
       });
-     
     },
 
     leavePoll: function () {
@@ -300,7 +298,6 @@ export default {
       if (this.participants.length >= 3) {
         this.atLeastThree = true;
       }
-
       this.nextStep(); //hoppa till nästa steg
     },
 

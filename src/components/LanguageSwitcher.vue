@@ -55,7 +55,7 @@ export default {
   position: fixed;
   top: 1rem;
   right: 1rem; /* Right side for the language switcher */
-  z-index: 1000;
+  z-index: 9999;
   display: flex;
   gap: 0.8rem;
   align-items: center;

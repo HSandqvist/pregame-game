@@ -26,7 +26,7 @@
         this.$emit("confirm");
       },
       cancel() {
-        this.emit("cancel");
+        this.$emit("cancel");
       }
     },
   };
