@@ -20,7 +20,6 @@ export default {
     lang: { type: String, default: "en" },
     viewKey: { type: String, required: true },
     uiLabels: { type: Object, default: () => ({}) },
-    //showInstructions: { type: Boolean, default: true }, // Ny prop
   },
 
   data() {
@@ -77,7 +76,6 @@ export default {
     },
   },
   created() {
-    console.log("Labels loaded:", this.labels); // Kontrollera att labels innehåller INSTRUCTIONS
     // Listen for UI label updates from the server
     this.loadLabels();
   },

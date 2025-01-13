@@ -1,6 +1,6 @@
 {
-  "name": "polly24",
-  "version": "0.0.0",
+  "name": "pregame",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev:frontend": "vite",

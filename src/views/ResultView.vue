@@ -168,7 +168,6 @@ export default {
       this.resultsShown = true;
       socket.emit("getCategoriesWithAnswers", this.pollId);
       socket.on("categoriesWithAnswers", (categories) => {
-        console.log("är i socket on categorieswith answers");
         this.categoriesAnswers = categories;
         this.handleResults();
       });

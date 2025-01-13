@@ -16,7 +16,6 @@
           @touchstart="onTouch(participant)"
         >
             <div :class="draggedParticipant === participant ? 'participant-container-touched' : 'participant-container'">
-            <!-- p>{{ participant.name }}</p-->
             <div class="curved-text">
               <span
               v-for="(char, i) in participant.name.split('')"
@@ -59,7 +58,6 @@
       </span>
     </h2>
 
-    <!-- h2 v-if="voting" v-motion="jumpingCharacter"> {{ this.uiLabels.waitingForAnswers || "Waiting for answers.." }} </h2 -->
   </div>
 </template>
 

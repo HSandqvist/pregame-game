@@ -160,36 +160,23 @@ export default {
     socket.emit("pollInfoUpdatePersonal", { pollId: this.pollId });
 
     socket.on("pollInfoUpdate", (d) => {
-      console.log("pollInfoUpdate", d);
       this.view = d.currentView;
-      console.log("view", d.currentView);
       this.currentQuestionIndex = d.currentQuestion; //current question i data är ett index
-      console.log("currentQuestionIndex", d.currentQuestion);
       this.updateCurrentQuestion(this.currentQuestionIndex);
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
 
     socket.on("allParticpantsForGame", (participantData) => {
-      console.log("Participants uppdaterade:", participantData);
       this.participants = participantData; // Ensure the array is directly assigned here.
-      console.log("längden av participants", this.participants.length);
       this.totalNumberOfParticipants = participantData.length;
     });
 
     // Get this participant
     socket.on("currentParticipant", (participantData) => {
       this.currentParticipant = participantData;
-      console.log("Participant name received:", participantData.name);
     });
 
-    //används ej
-    // Listen for server events to update the question and submitted answers
-    /*socket.on("questionUpdate", (q) => {
-      this.currentQuestion = q;
-      //console.log("Updated question:", q); // Add this log
-    }); // Update the current question
-*/
     socket.on(
       "participantNextQuestion",
       () => this.particpantNext(),
@@ -205,7 +192,6 @@ export default {
     ); // Update the submitted answers
 
     socket.on("uiLabels", (labels) => {
-      console.log("Received labels:", labels); // Debugging
       this.uiLabels = labels;
     });
 
@@ -219,7 +205,6 @@ export default {
 
     socket.on("previousAnswers", (answers) => {
       this.submittedAnswers = answers;
-      //console.log("Tidigare svar hämtade från servern:", answers);
     });
 
     //ask server for chosen questions
@@ -230,7 +215,6 @@ export default {
       if (qs) {
         this.questions = qs;
         // Start with the first question
-        //console.log("Questions received from server:", this.questions);
         this.currentQuestion = this.questions[this.currentQuestionIndex];
       } else {
         console.error("Received empty questions array from server.");
@@ -241,14 +225,10 @@ export default {
     socket.off("topAnswerUpdate"); // Clear any existing listeners
 
     socket.on("topAnswerUpdate", (data) => {
-      //console.log("Received data:", data); // Log the received data
       const { topAnswer, maxVotes, topAvatar } = data;
-      console.log(`Most voted answer: ${topAnswer} with ${maxVotes} votes.`);
       this.topAnswer = topAnswer;
       this.maxVotes = maxVotes;
       this.topAvatar = topAvatar;
-
-      //console.log("avataren är", topAvatar);
 
       //Uppdaterar röstare. Kan vara problematisk
       socket.on("updateNumberOfVotes", () => {
@@ -271,7 +251,6 @@ export default {
     },
 
     submitAnswer: function (answer) {
-      const voter = this.currentParticipant; // Assume `currentParticipant` contains the voter's info
 
       // Emit the answer to the server
       socket.emit("submitAnswer", {
@@ -279,7 +258,6 @@ export default {
         answer: answer,
         voter: this.userId,
       });
-      console.log("Answer sent:", answer, "by voter", voter.name);
 
       //uppdatera topanswer och votecounten
 
@@ -296,14 +274,12 @@ export default {
       // Listen for the server's response
       socket.on("adminCheckResult", (data) => {
         if (data.isAdmin) {
-          console.log("You are the admin for this poll.");
           this.isAdmin = true; // Set admin flag
         } else if (data.error) {
           console.error(data.error); // Handle errors (e.g., poll does not exist)
           alert(data.error);
           return; // Stop further execution
         } else {
-          console.log("You are not the admin for this poll.");
           this.isAdmin = false; // Set participant flag
         }
         // Execute the callback after admin check
@@ -323,38 +299,29 @@ export default {
         pollId: this.pollId,
         currentView: this.view,
       });
-      console.log("In admin next");
     },
 
     particpantNext: function () {
       if (this.view === "question_view") {
-        console.log("participant next result");
         if (this.isAdmin) {
           socket.emit("votingReset", this.pollId);
         }
       } else if (this.view === "results_view" || this.view === "final_view") {
-        console.log("participant next question");
 
         this.nextQuestion();
       }
     },
     updateCurrentQuestion: function (index) {
-      console.log("Updating current question to index:", index);
       if (this.questions && this.questions[index]) {
         this.currentQuestion = this.questions[index];
-        console.log("Current question data:", this.currentQuestion);
-      } else {
-        //"console.error("Invalid question index:", index);"
       }
     },
 
     adminToResults: function () {
       socket.emit("toResults", this.pollId, this.userId);
-      console.log("In admin final");
     },
 
     toResults: function () {
-      console.log("game finished, going to result view");
       this.$router.push(`/result/${this.pollId}/${this.userId}`);
     },
   },
