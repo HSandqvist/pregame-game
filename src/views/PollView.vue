@@ -116,7 +116,6 @@ export default {
   data: function () {
     return {
       // Current question data (question text and answer options)
-      //question: {q: "", a: [],}, // Legacy object for compatibility
       currentParticipant: {}, //the participant using a certain poll client
       userId: "",
 
@@ -160,14 +159,13 @@ export default {
 
     socket.emit("pollInfoUpdatePersonal", { pollId: this.pollId });
 
-    socket.on("pollInfoUpdate", (data) => {
-      console.log("pollInfoUpdate", data);
-      this.view = data.currentView;
-      console.log("view", data.currentView);
-      this.currentQuestionIndex = data.currentQuestion; //current question i data är ett index
-      console.log("currentQuestionIndex", data.currentQuestion);
+    socket.on("pollInfoUpdate", (d) => {
+      console.log("pollInfoUpdate", d);
+      this.view = d.currentView;
+      console.log("view", d.currentView);
+      this.currentQuestionIndex = d.currentQuestion; //current question i data är ett index
+      console.log("currentQuestionIndex", d.currentQuestion);
       this.updateCurrentQuestion(this.currentQuestionIndex);
-      this.totalNumberOfParticipants = data.participants.length;
     });
 
     socket.emit("getAllParticipantsForGame", this.pollId);
@@ -176,6 +174,7 @@ export default {
       console.log("Participants uppdaterade:", participantData);
       this.participants = participantData; // Ensure the array is directly assigned here.
       console.log("längden av participants", this.participants.length);
+      this.totalNumberOfParticipants = participantData.length;
     });
 
     // Get this participant
