@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isAdmin">
     <MusicPlayer :viewKey="'RESULTVIEW'" />
   </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
@@ -104,8 +104,11 @@ export default {
       lang: localStorage.getItem("lang") || "en",
       uiLabels: {},
 
+      userId: "",
+
       pollId: "",
       question: "",
+      isAdmin: false,
       submittedAnswers: {},
       resultsShown: false,
       categoriesAnswers: {},
@@ -137,6 +140,22 @@ export default {
     socket.on("categoriesWithAnswers", (categories) => {
       this.categoriesAnswers = categories;
     });
+    
+    socket.on("adminCheckResult", (data) => {
+      if (data.isAdmin) {
+        this.isAdmin = true; // Set admin flag
+      } else if (data.error) {
+        console.error(data.error); // Handle errors (e.g., poll does not exist)
+        alert(data.error);
+        return; // Stop further execution
+      } else {
+        this.isAdmin = false; // Set participant flag
+      }
+      // Execute the callback after admin check
+      if (typeof callback === "function") callback();
+    });
+
+    socket.emit("checkAdmin", { pollId: this.pollId, userId: this.userId });
   },
 
   computed: {
@@ -327,7 +346,7 @@ header {
   margin: 2rem;
   padding: 1rem;
   text-align: center;
-  background: linear-gradient(135deg, rgb(210, 66, 133), rgb(102, 0, 153));
+  background: linear-gradient(135deg, rgb(175, 38, 193), rgb(102, 0, 153));
   border-radius: 2rem;
   border: 0.3rem solid white;
   font-size: 1rem;

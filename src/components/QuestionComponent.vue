@@ -15,14 +15,20 @@
           @dragstart="onDragStart(participant)"
           @touchstart="onTouch(participant)"
         >
-            <div :class="draggedParticipant === participant ? 'participant-container-touched' : 'participant-container'">
+          <div
+            :class="
+              draggedParticipant === participant
+                ? 'participant-container-touched'
+                : 'participant-container'
+            "
+          >
             <div class="curved-text">
               <span
-              v-for="(char, i) in participant.name.split('')"
-              :key="i"
-              :style="getCurvedStyle(i, participant.name.length)"
+                v-for="(char, i) in participant.name.split('')"
+                :key="i"
+                :style="getCurvedStyle(i, participant.name.length)"
               >
-              {{ char }}
+                {{ char }}
               </span>
             </div>
             <img
@@ -30,24 +36,27 @@
               alt="Participant Avatar"
               class="participant-avatar"
             />
-            </div>
+          </div>
         </div>
       </div>
 
       <!-- Drop zone -->
-      <div class="drop-zone" @dragover.prevent @drop="onDrop" @touchend="onDrop">
+      <div
+        class="drop-zone"
+        @dragover.prevent
+        @drop="onDrop"
+        @touchend="onDrop"
+      >
         <div v-if="!touched">
           {{ this.uiLabels.dropAnswerHere || "Drop answer here" }}
         </div>
         <div v-if="touched">
           {{ this.uiLabels.clickHere || "Click your answer here" }}
         </div>
-
-       
       </div>
     </div>
 
-    <h2 v-if="voting">
+    <h2 id="waiting-answers-text" v-if="voting">
       <span
         v-for="(char, index) in textArray"
         :key="index"
@@ -57,7 +66,6 @@
         {{ char }}
       </span>
     </h2>
-
   </div>
 </template>
 
@@ -75,7 +83,7 @@ export default {
   data() {
     return {
       draggedParticipant: null, // Temporarily holds the dragged participant
-      touched: false
+      touched: false,
     };
   },
   computed: {
@@ -99,10 +107,9 @@ export default {
       this.draggedParticipant = participant;
     },
 
-    onTouch: function(participant) {
+    onTouch: function (participant) {
       this.onDragStart(participant);
       this.touched = true;
-
     },
 
     // When an item is dropped in the drop zone
@@ -115,9 +122,9 @@ export default {
         this.draggedParticipant = null;
       }
     },
-   
-    getCurvedStyle: function(index, length) {
-      const angleStep = 12; // Adjust for curvature intensity
+
+    getCurvedStyle: function (index, length) {
+      const angleStep = 9; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
 
@@ -171,7 +178,7 @@ export default {
 
 .draggable:active {
   cursor: grabbing;
-  transform: scale(1.00);
+  transform: scale(1);
 }
 
 /* Container for draggable items */
@@ -214,7 +221,7 @@ export default {
   transform-origin: bottom center;
   font-size: 1.1rem;
   font-weight: bold;
-  color: rgb(252, 160, 198);
+  color: rgb(249, 191, 215);
   letter-spacing: 0.05rem; /* Adjusts spacing between letters */
 }
 
@@ -251,7 +258,12 @@ h2 span {
   }
 
   .participant-avatar:active {
-  transform: scale(1.01); /* Slightly enlarge the avatar when dragging */
-}
+    transform: scale(1.01); /* Slightly enlarge the avatar when dragging */
+  }
+
+  #waiting-answers-text {
+    font-size: 1rem;
+    min-width:21rem;
+  }
 }
 </style>
