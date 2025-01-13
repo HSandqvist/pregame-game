@@ -28,10 +28,15 @@ function sockets(io, socket, data) {
 
       }
       else{
+        data.removeAvatarFromStorage(pollId, userId);
+        
         poll.participants = poll.participants.filter(
           (participant) => participant.userId != userId)}
+
         }
-        catch(err){console.log("Rushing in socket for deleting poll caught", err)}
+        catch(err){console.log("Rushing in socket for deleting poll caught", err)
+          
+        }
      
       // Notify all clients in the poll room about the updated participant list
       io.to(pollId).emit("waitingParticipantsUpdate", poll.participants);

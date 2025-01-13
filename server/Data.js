@@ -344,7 +344,16 @@ Data.prototype.storeSelectedAvatar = function (pollId, userId, avatar) {
     poll.userAvatars[userId] = avatar;
   }
 };
-
+Data.prototype.removeAvatarFromStorage= function(pollId, userId){
+  console.log("removing avatar from storage in data")
+  if (this.pollExists(pollId)) {
+    const poll = this.polls[pollId];
+    const avatarIndex = poll.takenAvatars.indexOf(poll.userAvatars[userId]);
+    delete poll.takenAvatars[avatarIndex];
+    console.log("avatar removed from storage in data")
+    
+    }
+}
 // Retrieve selected avatars for a specific poll
 Data.prototype.getSelectedAvatars = function (pollId) {
   if (this.pollExists(pollId)) {
