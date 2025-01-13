@@ -61,10 +61,9 @@ import PinInput from "@/components/PinInput.vue"; // Import PinInput component
 
 import { motionGrowBiggerAndGlow } from "@/assets/motions.ts"; // Import motion settings
 
-// ---- FOR Normal TESTING ----
-const socket = io("localhost:3000"); // Initialize WebSocket connection
+sessionStorage.setItem("dataserver", "");
+const socket = io(sessionStorage.getItem("dataserver"));
 
-//const socket = io("172.20.10.2:3000"); // Initialize multiple joiners
 
 export default {
   name: "StartView",

@@ -9,6 +9,7 @@
     "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
     "host": "concurrently 'npm:dev:frontendhost' 'npm:dev:backend'",
     "build": "vite build",
+    "prod": "node server/index.js",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
@@ -18,14 +19,14 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "vite": "^5.4.10"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.4",
     "concurrently": "^9.0.1",
     "eslint": "^9.13.0",
     "eslint-plugin-vue": "^9.29.0",
-    "nodemon": "^3.1.7",
-    "vite": "^5.4.10"
+    "nodemon": "^3.1.7"
   }
 }
