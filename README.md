@@ -2,6 +2,8 @@
 
 This is the code for the project in [Interface Programming with a User Perspective](https://www.uu.se/en/study/course?query=1MD031) at Uppsala university. Our project is a game called *PreGame<sup>2*, which you can play together with your friends and family.
 
+You can play the game [here](https://pregame-game.onrender.com/).
+
 ## Customize configuration
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
