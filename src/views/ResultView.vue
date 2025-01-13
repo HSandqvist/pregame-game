@@ -226,7 +226,7 @@ export default {
         setTimeout(() => {
           this.showPopup = false;
           this.displayNextPopup();
-        }, 2000);
+        }, 3500);
       } else {
         this.showPopup = false;
       }

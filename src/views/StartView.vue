@@ -229,4 +229,10 @@ export default {
   color: red;
   margin-bottom: 1rem; 
 }
+
+@media (max-width: 400px) {
+  .game-title {
+    font-size: 2.3rem;
+  }
+}
 </style>
