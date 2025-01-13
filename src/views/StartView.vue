@@ -202,6 +202,7 @@ export default {
   color: rgb(255, 205, 226);
   margin-bottom: 2rem;
   font-family: "Limelight", cursive; /* Match font family from CreateView */
+  min-width:20rem;
 }
 
 /* Container for Join Game input and button */

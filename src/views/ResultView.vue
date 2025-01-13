@@ -4,9 +4,13 @@
   </div>
   <InstructionButton :uiLabels="uiLabels" :lang="lang" viewKey="RESULTVIEW" />
   <LanguageSwitcher @language-changed="updateLanguage" />
-  <header id = "header-text">
-    <h1 v-if ="showPopup" v-motion="popEffect"> {{ this.uiLabels.theMost || "THE MOST"}} </h1>
-    <h1 v-if = "resultsShown && !showPopup"> {{this.uiLabels.allResults || "ALL RESULTS"}} </h1>
+  <header id="header-text">
+    <h1 v-if="showPopup" v-motion="popEffect">
+      {{ this.uiLabels.theMost || "THE MOST" }}
+    </h1>
+    <h1 v-if="resultsShown && !showPopup">
+      {{ this.uiLabels.allResults || "ALL RESULTS" }}
+    </h1>
   </header>
 
   <div class="result-view">
@@ -20,29 +24,37 @@
       <p>{{ this.uiLabels.showEndResults || "Show Results" }}</p>
     </button>
 
-      <div v-if="showPopup" class="popup">
-        <h2>{{ currentPopupCategory }}</h2>
-        <div class="winner-details">
-        <img :src="currentPopupWinnerAvatar" alt="Winner Avatar" class="winner-avatar" v-if="currentPopupWinnerAvatar" />
-        <h1>{{ currentPopupWinner}}</h1>
-        </div>
+    <div v-if="showPopup" class="popup">
+      <h2>{{ currentPopupCategory }}</h2>
+      <div class="winner-details">
+        <img
+          :src="currentPopupWinnerAvatar"
+          alt="Winner Avatar"
+          class="winner-avatar"
+          v-if="currentPopupWinnerAvatar"
+        />
+        <h1>{{ currentPopupWinner }}</h1>
+      </div>
     </div>
-      
-      <div v-if="showPopup">
+
+    <div v-if="showPopup">
       <button @click="skipToResults" class="skip-button">
-      {{this.uiLabels.skip|| "Skip"}}
+        {{ this.uiLabels.skip || "Skip" }}
       </button>
     </div>
 
     <!-- Render the full results after popups -->
     <div v-if="resultsShown && !showPopup" class="results">
-      <div
-        v-for="(topVoted, category) in topVotedCategories"
-        :key="category">
-        <div class="one-result-each"> 
-        <h2> <span id="the-most"> {{ this.uiLabels.theMost || "THE MOST"}} </span> {{ category }}</h2>
-        <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted.name }}!</h1>
-      </div>
+      <div v-for="(topVoted, category) in topVotedCategories" :key="category">
+        <div class="one-result-each">
+          <h2>
+            <span id="the-most">
+              {{ this.uiLabels.theMost || "THE MOST" }}
+            </span>
+            {{ category }}
+          </h2>
+          <h1 v-motion="motionGrowBiggerAndGlow">{{ topVoted.name }}!</h1>
+        </div>
       </div>
     </div>
 
@@ -56,7 +68,7 @@
     :show="showReturnStartModal"
     v-model:uiLabels="uiLabels"
     @confirm="returnToStart"
-    @cancel="showReturnStartModal=false"
+    @cancel="showReturnStartModal = false"
   />
 </template>
 
@@ -97,11 +109,11 @@ export default {
       submittedAnswers: {},
       resultsShown: false,
       categoriesAnswers: {},
-      showPopup: false, 
-      popupQueue: [], 
-      currentPopupCategory: "", 
-      currentPopupWinner: "", 
-      motionGrowBiggerAndGlow, 
+      showPopup: false,
+      popupQueue: [],
+      currentPopupCategory: "",
+      currentPopupWinner: "",
+      motionGrowBiggerAndGlow,
       motionGlowNeon,
       popEffect,
       showReturnStartModal: false,
@@ -118,7 +130,7 @@ export default {
     socket.on(
       "submittedAnswersUpdate",
       (update) => (this.submittedAnswers = update)
-    ); 
+    );
     // Emit events to get UI labels and join the poll
     socket.emit("getUILabels", this.lang);
     socket.emit("joinPoll", this.pollId);
@@ -129,19 +141,20 @@ export default {
 
   computed: {
     topVotedCategories() {
-    const result = {};
-    for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
-      const topVoted = Object.entries(votes).reduce(
-        (max, [person, data]) => {
-          if (data.count > max.count) return { name: person, avatar: data.avatar, count: data.count };
-          return max;
-        },
-        { name: null, avatar: null, count: -1 }
-      );
-      result[category] = topVoted; // Include avatar and name
-    }
-    return result;
-  },
+      const result = {};
+      for (const [category, votes] of Object.entries(this.categoriesAnswers)) {
+        const topVoted = Object.entries(votes).reduce(
+          (max, [person, data]) => {
+            if (data.count > max.count)
+              return { name: person, avatar: data.avatar, count: data.count };
+            return max;
+          },
+          { name: null, avatar: null, count: -1 }
+        );
+        result[category] = topVoted; // Include avatar and name
+      }
+      return result;
+    },
   },
   methods: {
     // Update language when changed in LanguageSwitcher
@@ -152,7 +165,7 @@ export default {
 
     // Method to fetch categories with answers
     fetchCategoriesWithAnswers() {
-      this.resultsShown = true; 
+      this.resultsShown = true;
       socket.emit("getCategoriesWithAnswers", this.pollId);
       socket.on("categoriesWithAnswers", (categories) => {
         console.log("är i socket on categorieswith answers");
@@ -163,57 +176,54 @@ export default {
 
     handleResults() {
       const categories = Object.keys(this.categoriesAnswers);
-      if (categories.length <= 5) {
-      // Add both winner name and avatar to the popupQueue
-      this.popupQueue = categories.map((category) => {
-        const winner = this.topVotedCategories[category];
+
+      const limitedCategories = categories.length > 5 ? categories.slice(0, 5) : categories;
+
+        // Add both winner name and avatar to the popupQueue
+        this.popupQueue = limitedCategories.map((category) => {
+          const winner = this.topVotedCategories[category];
           return {
-        category,
-        winnerName: winner.name,
-        winnerAvatar: winner.avatar,
+            category,
+            winnerName: winner.name,
+            winnerAvatar: winner.avatar,
           };
         });
-      this.displayNextPopup();
-  }
+        this.displayNextPopup();
     },
 
     skipToResults() {
-        this.showPopup = false; 
-        this.popupQueue = [];
-        this.resultsShown = true; 
+      this.showPopup = false;
+      this.popupQueue = [];
+      this.resultsShown = true;
     },
 
     displayNextPopup() {
-    if (this.popupQueue.length > 0) {
-    const nextPopup = this.popupQueue.shift();
-    this.currentPopupCategory = nextPopup.category;
-    this.currentPopupWinner = nextPopup.winnerName;
-    this.currentPopupWinnerAvatar = nextPopup.winnerAvatar; 
-    this.showPopup = true;
+      if (this.popupQueue.length > 0) {
+        const nextPopup = this.popupQueue.shift();
+        this.currentPopupCategory = nextPopup.category;
+        this.currentPopupWinner = nextPopup.winnerName;
+        this.currentPopupWinnerAvatar = nextPopup.winnerAvatar;
+        this.showPopup = true;
 
-    setTimeout(() => {
-      this.showPopup = false;
-      this.displayNextPopup();
-    }, 2000);
-  } else {
-    this.showPopup = false;
-  }
-  },
+        setTimeout(() => {
+          this.showPopup = false;
+          this.displayNextPopup();
+        }, 2000);
+      } else {
+        this.showPopup = false;
+      }
+    },
 
     returnToStart() {
-      //här borde läggas till så pollen tas bort/användare tas bort som i waitingroom
-
       this.showReturnStartModal = false;
       socket.emit("leavePoll", {
         pollId: this.pollId,
         userId: this.userId,
       });
-      
       this.$router.push("/");
     },
   },
 };
-
 </script>
 
 <style>
@@ -222,11 +232,11 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  position: absolute; 
-  top: 0; 
-  left: 50%; 
-  transform: translate(-50%,0); 
-  margin-top: 4rem; 
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin-top: 4rem;
   width: 100%;
   height: calc(100vh - 4rem); /* Subtract header height */
   box-sizing: border-box; /* Include padding and borders in the height calculation */
@@ -234,19 +244,23 @@ export default {
 
 header {
   display: flex;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 100px; 
-  position: fixed; 
+  height: 100px;
+  position: fixed;
   top: 3rem;
-  z-index: 2000; 
+  z-index: 2000;
 }
 
 .result-button {
   padding: 0.7rem;
   font-size: 2rem;
-  background-color: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
+  background-color: linear-gradient(
+    135deg,
+    rgb(210, 66, 133),
+    rgb(102, 0, 153)
+  );
   border: 0.3rem solid white;
   border-radius: 1rem;
   cursor: pointer;
@@ -272,7 +286,7 @@ header {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  z-index: 10; 
+  z-index: 10;
   margin-top: 2rem;
 }
 
@@ -290,7 +304,7 @@ header {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 2rem;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
+  background: linear-gradient(135deg, rgb(210, 66, 133), rgb(102, 0, 153));
   border: 0.3rem solid white;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px #ff99c8, 0 0 40px #ff80b5;
@@ -314,22 +328,22 @@ header {
   margin: 2rem;
   padding: 1rem;
   text-align: center;
-  background: linear-gradient(135deg, rgb(210, 66, 133),rgb(102, 0, 153));
+  background: linear-gradient(135deg, rgb(210, 66, 133), rgb(102, 0, 153));
   border-radius: 2rem;
   border: 0.3rem solid white;
   font-size: 1rem;
-  animation: bounce 1.5s infinite; 
-  max-width: 80%; 
-  max-height: 60vh; 
-  overflow-y: auto; 
-  overflow-x: hidden; 
-  box-sizing: border-box; 
+  animation: bounce 1.5s infinite;
+  max-width: 80%;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 #the-most {
-  color: rgb(255, 157, 230 );
-  text-shadow: -0.05rem -0.05rem 0 white, 0.05rem -0.05rem 0 white, 0.05rem 0.05rem 0 white,
-  0.05rem 0.05rem 0 white;
+  color: rgb(255, 157, 230);
+  text-shadow: -0.05rem -0.05rem 0 white, 0.05rem -0.05rem 0 white,
+    0.05rem 0.05rem 0 white, 0.05rem 0.05rem 0 white;
 }
 
 @keyframes pulse {
@@ -353,23 +367,25 @@ header {
 }
 
 .skip-button {
-  position: fixed; 
+  position: fixed;
   bottom: 5%;
-  left: 50%; 
-  transform: translateX(-50%); 
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 999;
 }
 
-#header-text{
-  text-shadow: -0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem 0.1rem 0 rgb(102, 0, 153),
-  0.1rem 0.1rem 0 rgb(102, 0, 153);
+#header-text {
+  text-shadow: -0.1rem -0.1rem 0 rgb(102, 0, 153),
+    0.1rem -0.1rem 0 rgb(102, 0, 153), 0.1rem 0.1rem 0 rgb(102, 0, 153),
+    0.1rem 0.1rem 0 rgb(102, 0, 153);
 }
 
 .one-result-each {
   margin-bottom: 2rem;
 }
 
-h1,h2 {
+h1,
+h2 {
   margin: 2%;
 }
 
@@ -399,14 +415,13 @@ h1,h2 {
 }
 
 @media (max-height: 667px) {
-  .winner-avatar{
-    width:10rem;
+  .winner-avatar {
+    width: 10rem;
     height: 10rem;
   }
 
- header {
-  top: 2rem;
- }
+  header {
+    top: 2rem;
+  }
 }
-
 </style>

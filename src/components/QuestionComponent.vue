@@ -100,7 +100,8 @@ export default {
     onDragStart: function (participant) {
       this.draggedParticipant = participant;
     },
-    onTouch(participant) {
+
+    onTouch: function(participant) {
       this.onDragStart(participant);
       this.touched = true;
 
@@ -117,8 +118,7 @@ export default {
       }
     },
    
-
-    getCurvedStyle(index, length) {
+    getCurvedStyle: function(index, length) {
       const angleStep = 12; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
@@ -147,7 +147,7 @@ export default {
 }
 
 .participant-avatar:active {
-  transform: scale(1.1); /* Slightly enlarge the avatar when dragging */
+  transform: scale(1.05); /* Slightly enlarge the avatar when dragging */
 }
 
 /* Draggable answer options */
@@ -173,7 +173,7 @@ export default {
 
 .draggable:active {
   cursor: grabbing;
-  transform: scale(1.05);
+  transform: scale(1.00);
 }
 
 /* Container for draggable items */
@@ -196,11 +196,12 @@ export default {
   flex-direction: column; /* Stack items vertically */
   align-items: center; /* Center name and avatar horizontally */
 }
+
 .participant-container-touched {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   align-items: center; /* Center name and avatar horizontally */
-  transform: scale(1.5); /* Make the container a bit bigger */
+  transform: scale(1.2); /* Make the container a bit bigger */
 }
 
 .curved-text {
@@ -250,5 +251,9 @@ h2 span {
     max-width: 6rem;
     max-height: 6rem;
   }
+
+  .participant-avatar:active {
+  transform: scale(1.01); /* Slightly enlarge the avatar when dragging */
+}
 }
 </style>
