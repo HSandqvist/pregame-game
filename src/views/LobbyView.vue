@@ -322,7 +322,7 @@ export default {
     },
 
     getCurvedStyle(index, length) {
-      const angleStep = 12; // Adjust for curvature intensity
+      const angleStep = 9; // Adjust for curvature intensity
       const midpoint = length / 2;
       const rotationAngle = (index - midpoint) * angleStep;
 
@@ -451,9 +451,9 @@ input[type="text"] {
 .curved-text span {
   display: inline-block;
   transform-origin: bottom center;
-  font-size: 18px;
+  font-size: 1.2rem;
   font-weight: bold;
-  color: rgb(252, 160, 198);
+  color: rgb(249, 191, 215);
   letter-spacing: 0.05rem; /* Adjusts spacing between letters */
 }
 

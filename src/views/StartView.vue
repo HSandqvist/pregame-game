@@ -25,10 +25,13 @@
         viewKey="PINVIEW"
       />
       <PinInput :pin-length="6" @pin-updated="updatePin" />
-      <ErrorMessage :message="errorMessage" />
+    
       <button class="btn" @click="attemptJoin" :disabled="isLobbyFull">
         {{ uiLabels.participateGame || "Join Game" }}
       </button>
+      <div class="error-message-container">
+      <ErrorMessage :message="errorMessage" />
+      </div>
 
       <div class="back-to-start">
         <button @click="goToStartPage">
@@ -217,5 +220,14 @@ export default {
   position: fixed;
   bottom: 3rem;
   left: 3rem;
+}
+
+.error-message-container {
+  height: 1.5rem; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: red;
+  margin-bottom: 1rem; 
 }
 </style>
